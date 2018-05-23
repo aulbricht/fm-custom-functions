@@ -1,0 +1,36 @@
+/**
+ * Function Name: 	Text.ExtractFromString()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Search a string by a two sub-strings, and extract all characters in between
+ *
+ * @param {string}	string = full string to search within
+ * @param {string}	search_1 = search sub-string 1
+ * @param {string}	search_2 = search sub-string 2
+ *
+ * @note_1 			if search_1 is null, default is first beginning of the content string
+ * @note_2 			if search_2 is null, default is the end of the content string
+ * @note_3 			otherwise, the order of search sub-strings is irrelevant
+ *
+ * @returnSuccess {string} string of characters between found sub-strings
+ * @returnError {boolean} "" no errors returned
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+	~content = string;
+	~s1 = search_1;
+	~s2 = search_2;
+	~pos1 = If( IsEmpty ( ~s1 ); 1; Position ( ~content; ~s1; 1; 1 ));
+	~pos2 = If( IsEmpty ( ~s2 ); Length ( ~content ) + 1; Position ( ~content; ~s2; 1; 1 ));
+	~startSearch = If ( Min ( ~pos1; ~pos2 ) = ~pos1; 1; 2 );
+	~start = Min ( ~pos1; ~pos2 ) + Case ( ~startSearch = 1; Length ( ~s1 ); Length ( ~s2 ) );
+	~end = Max ( ~pos1; ~pos2 )
+];
+
+Middle( ~content; ~start; ~end - ~start )
+
+)
