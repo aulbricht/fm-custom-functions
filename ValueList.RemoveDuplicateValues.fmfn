@@ -1,0 +1,47 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.RemoveDuplicateValues()
+ * Name Dependency: yes (i.e. recursion, must update the code if renaming the function)
+ * Purpose: 		Remove any duplicate values in a value list
+ *
+ * @param {string}	valueList = value list (¶ delimited)
+ *
+ * @returnSuccess {string} value list with duplicate values removed
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+	~list = ValueList;
+	~val = LeftValues ( ~list; 1 );
+	~count = ValueCount ( ~list );
+	~new =	Replace ( 
+				Substitute ( "¶" & ~list & "¶" ; 
+					[ "¶" ; "¶|" ]; 
+					[ "|" & ~val ; "" ];
+					[ "|" ; "" ] 
+				); 
+				1; 
+				1; 
+				"" 
+			)
+];
+
+Case ( ~count > 0 ;
+	~val & 
+
+	// RECURSION
+	ValueList.RemoveDuplicateValues ( 
+  		Replace ( ~new ; 
+  			Length ( ~new ) ; 
+  			1 ; 
+  			"" 
+		) 
+ 	)
+)
+
+)

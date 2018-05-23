@@ -1,0 +1,32 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.FindStringPosition()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Find the value position of a search sub-string in a value list
+ *
+ * @param {string}	valueList = value list (¶ delimited) to search
+ * @param {string}	searchString = search sub-string
+ * @param {string}	occurrence = if multiple occurrences are found, which position to return
+ *
+ * @returnSuccess {string} full string of the value entry containing the search sub-string
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~list = valueList;
+	~search = searchString;
+	~occurence = occurence;
+	~numOccurrences = PatternCount ( ~list; ~search );
+	~occurrence = If ( ~occurence > ~numOccurrences; ~numOccurrences; ~occurrence );
+	~position = Position ( ~list; ~search; 1; ~occurrence );
+	~listPosition = PatternCount ( Left ( ~list; ~position ); "¶") + 1
+];
+
+If( ~numOccurrences = 0; 0; ~listPosition )
+
+)

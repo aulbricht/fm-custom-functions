@@ -1,0 +1,29 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.ValueAdd()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Add a value to an existing value list
+ *
+ * @param {string}	valueList = value list (¶ delimited)
+ * @param {string}	valueToAdd = value to add to the end of the value list
+ *
+ * @returnSuccess {string} updated value list, containing the new value
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~list = valueList;
+	~value = valueToAdd
+];
+
+List (
+	~list;
+	~value
+)
+
+)

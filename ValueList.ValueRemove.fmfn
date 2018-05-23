@@ -1,0 +1,39 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.ValueRemove()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Remove a value to an existing value list
+ *
+ * @param {string}	valueList = value list (¶ delimited)
+ * @param {string}	valueToRemove = value to remove from the value list (all matching entries)
+ *
+ * @returnSuccess {string} updated value list, containing the new value
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~originalList= valueList ;
+	~originalSearch = valueToRemove ;
+	~numValues = ValueCount ( ~originalList );
+
+	// add a carriage returns to the beginning and end so the first and last values are included in our search
+	~search = "¶" & ~originalSearch & "¶";
+	~list = "¶" & ~originalList & "¶"
+];
+
+Case (
+	~numValues > 1 and PatternCount (  ~list; ~search ) > 0; Middle ( 
+																Substitute ( ~list; ~search ; "¶") ; 
+																2 ; 
+																Length ( ~originalList ) - Length ( ~originalSearch ) - 1 
+																); 
+	~numValues = 1 and PatternCount (  ~list; ~search ) > 0; "";
+	~originalList   // if there's no match, return the original list
+)
+
+)
