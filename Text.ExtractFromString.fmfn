@@ -1,4 +1,5 @@
 /**
+ * VERSION:			1.0.0
  * Function Name: 	Text.ExtractFromString()
  * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
  * Purpose: 		Search a string by a two sub-strings, and extract all characters in between
@@ -12,7 +13,7 @@
  * @note_3 			otherwise, the order of search sub-strings is irrelevant
  *
  * @returnSuccess {string} string of characters between found sub-strings
- * @returnError {boolean} "" no errors returned
+ * @returnError {boolean} "" this function does not return errors
  * 
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
