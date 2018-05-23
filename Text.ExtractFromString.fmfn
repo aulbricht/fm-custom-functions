@@ -20,17 +20,17 @@
  */
 
 
-Let([
+Let ([
 	~content = string;
 	~s1 = search_1;
 	~s2 = search_2;
-	~pos1 = If( IsEmpty ( ~s1 ); 1; Position ( ~content; ~s1; 1; 1 ));
-	~pos2 = If( IsEmpty ( ~s2 ); Length ( ~content ) + 1; Position ( ~content; ~s2; 1; 1 ));
+	~pos1 = If ( IsEmpty ( ~s1 ); 1; Position ( ~content; ~s1; 1; 1 ));
+	~pos2 = If ( IsEmpty ( ~s2 ); Length ( ~content ) + 1; Position ( ~content; ~s2; 1; 1 ));
 	~startSearch = If ( Min ( ~pos1; ~pos2 ) = ~pos1; 1; 2 );
-	~start = Min ( ~pos1; ~pos2 ) + Case ( ~startSearch = 1; Length ( ~s1 ); Length ( ~s2 ) );
+	~start = Min ( ~pos1; ~pos2 ) + Case ( ~startSearch = 1; Length ( ~s1 ); Length ( ~s2 ));
 	~end = Max ( ~pos1; ~pos2 )
 ];
 
-Middle( ~content; ~start; ~end - ~start )
+Middle ( ~content; ~start; ~end - ~start )
 
 )
