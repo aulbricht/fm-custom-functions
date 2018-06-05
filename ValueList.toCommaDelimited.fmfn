@@ -1,0 +1,25 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.ToCommaDelimited()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Convert value list to comma-delimited string
+ *
+ * @param {string}	valueList = value list (¶ delimited)
+ *
+ * @returnSuccess {string} comma delimited string
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+  ~list = valueList;
+  ~list = If( Right( ~list ; 1 ) = "¶"; Left ( ~list ; Length ( ~list ) - 1 ); ~list )
+];
+
+Substitute( ~list ; "¶"; ", ")
+
+)
