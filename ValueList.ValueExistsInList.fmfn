@@ -1,0 +1,26 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	ValueList.ValueExistsInList()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Determine is a given value is present in the list
+ *
+ * @param {string}	valueList = value list (¶ delimited) to search
+ * @param {string}	searchString = search sub-string
+ *
+ * @returnSuccess {boolean} return True if the search value is present in the list
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~list = valueList;
+	~search = searchString
+];
+
+PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0
+
+)
