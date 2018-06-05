@@ -1,0 +1,34 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	JSON.Format()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Formats a JSON object
+ *
+ * @param {string}	json = JSON object
+ *
+ * @returnSuccess {JSON} returns formatted JSON object
+ * @returnError {JSON Array} error[n].code = error code
+ * @returnError {JSON Array} error[n].description = description of error
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~json = json;
+	~jsonVal = JSONFormatElements ( ~json );
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("{}"; 
+					[ "error[0].code"; -2; JSONNumber ]; 
+					[ "error[0].description"; "JSON invalid"; JSONString ]
+					);
+				~jsonVal
+				);
+
+~=""];
+
+JSONFormatElements ( ~result )
+
+)

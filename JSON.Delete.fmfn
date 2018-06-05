@@ -1,0 +1,41 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	JSON.Delete()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Unformats a JSON object
+ *
+ * @param {string}	json = JSON object
+ * @param {string}	key = key of the element to delete
+ *
+ * @returnSuccess {JSON} returns altered JSON object
+ * @returnError {JSON Array} error[n].code = error code
+ * @returnError {JSON Array} error[n].description = description of error
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~json = json;
+	~key = key;
+	~jsonVal = JSONFormatElements ( ~json );
+	~jsonAltered = JSONDeleteElement ( ~json; ~key );
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("{}"; 
+					[ "error[0].code"; -2; JSONNumber ]; 
+					[ "error[0].description"; "JSON invalid"; JSONString ]
+					);
+				~key = ""; JSONSetElement( ~json; 
+					[ "error[0].code"; -3; JSONNumber ]; 
+					[ "error[0].description"; "JSON invalid key"; JSONString ]
+					);
+				~jsonAltered
+				);
+	~left = Left ( ~result; 1 );
+~=""];
+
+If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
+
+)

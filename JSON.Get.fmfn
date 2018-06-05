@@ -1,0 +1,40 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	JSON.Get()
+ * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
+ * Purpose: 		Get the value from a JSON object key/value pair
+ *
+ * @param {string}	json = initial JSON object
+ * @param {string}	key = key for the element
+ *
+ * @returnSuccess {JSON} returns a value
+ * @returnError {JSON Array} error[n].code = error code
+ * @returnError {JSON Array} error[n].description = description of error
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+Let ([
+	~json = json;
+	~key = key;
+	~jsonVal = JSONFormatElements ( ~json );
+	~jsonAltered = JSONGetElement ( ~json; ~key );
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("{}"; 
+					[ "error[0].code"; -2; JSONNumber ]; 
+					[ "error[0].description"; "JSON invalid"; JSONString ]
+					);
+				~key = ""; JSONSetElement( ~json; 
+					[ "error[0].code"; -3; JSONNumber ]; 
+					[ "error[0].description"; "JSON invalid key"; JSONString ]
+					);
+				~jsonAltered
+				);
+	~left = Left ( ~result; 1 );
+~=""];
+
+If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
+
+)
