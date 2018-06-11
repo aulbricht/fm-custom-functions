@@ -1,0 +1,26 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	Text.toCamelCase()
+ * Name Dependency:	yes (i.e. recursion, must update the code if renaming the function)
+ * Purpose: 		Convert a text value to camel case
+ *
+ * @param {string}	text = string to convert to camel case
+ *
+ * @returnSuccess {string} updated value list
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([ 
+	~value = Proper( text );
+	~value = Substitute ( ~value ; " "; "" );
+	~value = Replace ( ~value ; 1; 1; Lower ( Left ( ~value ; 1 )) )
+];
+
+~value
+
+)
