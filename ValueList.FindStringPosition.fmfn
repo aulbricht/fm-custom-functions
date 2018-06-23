@@ -20,9 +20,9 @@
 Let ([
 	~list = valueList;
 	~search = searchString;
-	~occurence = occurence;
+	~occurrence = occurrence;
 	~numOccurrences = PatternCount ( ~list; ~search );
-	~occurrence = If ( ~occurence > ~numOccurrences; ~numOccurrences; ~occurrence );
+	~occurrence = If ( ~occurrence > ~numOccurrences; ~numOccurrences; ~occurrence );
 	~position = Position ( ~list; ~search; 1; ~occurrence );
 	~listPosition = PatternCount ( Left ( ~list; ~position ); "¶") + 1
 ];
