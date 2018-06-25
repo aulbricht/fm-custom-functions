@@ -24,16 +24,26 @@
 Let ([
 
 	~high = high ;
-	~step = stepSize ;
-	~low = low ;
+	~low= low ;
+	~step = Abs( stepSize );
 
+	// if one or more of the range values are below zero, we have to adjust so both numbers are positive
+	~adjustment = If ( ~low < ~step or ~high < ~step ; 
+				Abs( Min ( ~low ; ~high )) + ~step ; 
+				0 
+				);
+	~low = ~low + ~adjustment ;
+	~high = ~high + ~adjustment ;
+
+	// calculate random number on step within the given range
 	~low = Max ( ~low ; ~step );
 	~high = ~high + ~step - 1 ;
 	~numItems = ~high - ~low + 1 ;
-	~randomNum = Floor( Random * ~numItems ) + ~low 
+	~randomNum = Floor( Random * ~numItems ) + ~low ;
+	~result = ~randomNum - Mod( ~randomNum ; ~step ) - ~adjustment;
 
-];
+~=""];
 
-~randomNum - Mod( ~randomNum ; ~step )
+~result
 
 )
