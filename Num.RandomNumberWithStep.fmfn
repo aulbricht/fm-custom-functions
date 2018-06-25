@@ -1,0 +1,39 @@
+/**
+ * VERSION:			1.0.0
+ * Function Name: 	Num.RandomNumberWithStep()
+ * Name Dependency:	no (i.e. no recursion)
+ * Purpose: 		Return a random number in the given range, within a given step size
+ *
+ * @param (integer)	low = bottom of the random number range
+ * @param (integer)	high = top of the random number range
+ * @param (integer)	step = step size for result number
+ *
+ * @returnSuccess {string} updated value list
+ * @returnError {boolean} "" this function does not return errors
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+/*
+* 
+*/
+
+Let ([
+
+	~high = high ;
+	~step = stepSize ;
+	~low = low ;
+
+	~low = Max ( ~low ; ~step );
+	~high = ~high + ~step - 1 ;
+	~numItems = ~high - ~low + 1 ;
+	~randomNum = Floor( Random * ~numItems ) + ~low 
+
+];
+
+~randomNum - Mod( ~randomNum ; ~step )
+
+)
