@@ -1,5 +1,5 @@
 /**
- * VERSION:			1.0.0
+ * VERSION:			1.1.0
  * Function Name: 	JSON.Values()
  * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
  * Purpose: 		List the values in a JSON object or nested object
@@ -8,9 +8,11 @@
  * @param {string}	key = key for the element
  *
  * @returnSuccess {JSON} returns a value list of values from the JSON object
- * @returnError {JSON Array} error[n].code = error code
- * @returnError {JSON Array} error[n].description = description of error
- * @returnError {JSON Array} error[n].notes = additional notes about the error
+ *
+ * @returnError {JSON Array} returns empty, but sets designated global $$dev variable as JSON:
+ * @returnError {JSON Array} last.ARRAY_error[n].code = error code
+ * @returnError {JSON Array} last.ARRAY_error[n].description = description of error
+ * @returnError {JSON Array} last.ARRAY_error[n].notes = additional notes about the error
  * 
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
@@ -22,21 +24,26 @@ Let ([
 	~key = key;
 	~jsonVal = JSONFormatElements ( ~json );
 	~list_values = JSONListValues ( ~json; if( IsEmpty( ~key ); "."; ~key ));
-	~result = Case (
-				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("{}"; 
-					[ "error[0].code"; -2; JSONNumber ]; 
-					[ "error[0].description"; "JSON invalid"; JSONString ]
+	~error = Case (
+				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("[]"; 
+					[ "[0].code"; -2; JSONNumber ]; 
+					[ "[0].description"; "JSON invalid"; JSONString ]
 					);
 				~key = ""; JSONSetElement( ~json; 
-					[ "error[0].code"; -3; JSONNumber ]; 
-					[ "error[0].description"; "JSON invalid key"; JSONString ];
-					[ "error[0].notes"; "If you meant to set the root key, use a \".\" to do so"; JSONString ]
+					[ "[0].code"; -3; JSONNumber ]; 
+					[ "[0].description"; "JSON invalid key"; JSONString ];
+					[ "[0].notes"; "If you meant to set the root key, use a \".\" to do so"; JSONString ]
 					);
-				~list_values
 				);
-	~left = Left ( ~result; 1 );
+	~result = Case ( IsEmpty ( ~error ); JSONFormatElements ( ~list_values ) );
+
+	// If there is an error, set this developer variable with error details, otherwise clear the variable
+	$$dev = If ( not IsEmpty ( ~error ); 
+					JSONSetElement ( ""; "last.ARRAY_error" ; ~error ; JSONArray )
+					);
+
 ~=""];
 
-If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
+~result
 
 )
