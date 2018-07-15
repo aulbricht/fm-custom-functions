@@ -10,6 +10,8 @@
  * @returnSuccess {boolean} return True if the search value is present in the list
  * @returnError {boolean} "" this function does not return errors
  * 
+ * @note			If both parameters are empty, return false
+ * 
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -17,10 +19,21 @@
 
 
 Let ([
-	~list = valueList;
-	~search = searchString
+	~list = valueList ;
+	~search = searchString ;
+
+	 // remove any trailing carriage returns
+	~search = If( Right ( ~search ; 1 ) = "¶"; 
+			Left( ~search ; Length ( ~search ) - 1  ) ;
+			~search
+			)  
 ];
 
-PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0
+Case (
+
+	IsEmpty ( ~list ) and IsEmpty ( ~search ) ; False ;
+	PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0
+
+)
 
 )
