@@ -5,13 +5,11 @@
  * Purpose: 		Convert value list to a JSON array
  *
  * @param {string}	valueList = return delimited value list
- * @param {string}	jsonKey = key string under which to store the values, e.g. "names.first" (or "." for root)
  * @param {string}	format = "object" or "array"
+ * @param {string}	preKey = key string under which to store the values, e.g. "names.first" (or "." for root)
+ * @param {string}	postKey = if you want an additional key string after the array cell, e.g. "[3].names.last"; note: only for an array
  *
  * @returnSuccess {integer} length of the array
- * @returnError {JSON Array} error[n].code = error code
- * @returnError {JSON Array} error[n].description = description of error
- * @returnError {JSON Array} error[n].notes = additional notes about the error
  * 
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
@@ -21,8 +19,9 @@
 Let([
 
 	~list = valueList ;
-	~key = jsonKey ;
 	~format = format ;
+	~preKey = preKey ;
+	~postKey = postKey ;
 
 	~value = RightValues ( ~list; 1 );
 	~value = If ( Right ( ~value ; 1 ) = "¶" ; Left ( ~value ; Length ( ~value ) - 1 ); ~value );
@@ -34,14 +33,16 @@ Let([
 
 Case ( 
 
-	~count = 0 ; If ( ~key = "." or IsEmpty ( ~key ) ; ~jsonInitString ; "" ) ;
+	~count = 0 ; If ( ~preKey = "." or IsEmpty ( ~preKey ) ; ~jsonInitString ; "" ) ;
 	~count > 0 ;
 		JSONSetElement (  
 			// RECURSION
-			ValueList.toJSON ( ~listUpdated ; ~key ; ~format ) ;
+			ValueList.toJSON ( ~listUpdated ; ~format ; ~preKey ; ~postKey ) ;
 
 			// array cell
-			~key & If ( Right ( ~key ; 1 ) ≠ "." ; "." ) & If ( ~format = "object" ; ~count ; "[" & ~count - 1 & "]" ) ;
+			~preKey & If ( Right ( ~preKey ; 1 ) ≠ "." ; "." ) & 
+			If ( ~format = "object" ; ~count ; "[" & ~count - 1 & "]" ) &
+			If ( Left ( ~postKey ; 1 ) ≠ "." ; "." ) & ~postKey ;
 
 			// value to store
 			~value ;
