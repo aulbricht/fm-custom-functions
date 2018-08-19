@@ -4,10 +4,10 @@
  * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
  * Purpose: 		Remove a value to an existing value list
  *
- * @param {string}	valueList = value list (¶ delimited)
+ * @param {string}	listOfValues = value list (¶ delimited)
  * @param {string}	valueToRemove = value to remove from the value list (all matching entries)
  *
- * @returnSuccess {string} updated value list, containing the new value
+ * @returnSuccess {string}	updated value list, with the specified value removed
  * @returnError {boolean} "" this function does not return errors
  * 
  * @author Allen Ulbricht, https://github.com/aulbricht
@@ -17,23 +17,44 @@
 
 
 Let ([
-	~originalList= valueList ;
+
+	~originalList = listOfValues ;
 	~originalSearch = valueToRemove ;
 	~numValues = ValueCount ( ~originalList );
 
-	// add a carriage returns to the beginning and end so the first and last values are included in our search
-	~search = "¶" & ~originalSearch & "¶";
-	~list = "¶" & ~originalList & "¶"
+	// Add a carriage returns to the beginning and end so the first and last values are included in our search
+	~search = "¶" & ~originalSearch & "¶" ;
+	~list = "¶" & ~originalList & "¶" ;
+
+	// Process several cases for the value list
+	~processedList = Case (
+
+		// If the value list contains more than one value, and the valueToRemove exists in the list at least once, remove the found instances of the value...
+		~numValues > 1 and PatternCount (  ~list; ~search ) > 0; Middle ( 
+									Substitute ( ~list; ~search ; "¶") ; 
+									2 ; 
+									Length ( ~originalList ) - Length ( ~originalSearch ) - 1 
+									); 
+
+		// If the value list contains only one value and it is the valueToRemove, return an empty value (i.e. no list)...
+		~numValues = 1 and PatternCount (  ~list; ~search ) > 0; "";
+
+		// If there's no match, return the original list
+		~originalList   
+	)
+
 ];
 
-Case (
-	~numValues > 1 and PatternCount (  ~list; ~search ) > 0; Middle ( 
-																Substitute ( ~list; ~search ; "¶") ; 
-																2 ; 
-																Length ( ~originalList ) - Length ( ~originalSearch ) - 1 
-																); 
-	~numValues = 1 and PatternCount (  ~list; ~search ) > 0; "";
-	~originalList   // if there's no match, return the original list
+// If the last value of the list is the carriage return we added for processing, remove it
+If ( 
+
+	Right ( ~processedList ; 1 ) = "¶" ; 
+	Left ( 
+		~processedList ; 
+		Length ( ~processedList ) - 1  
+		);
+	~processedList
+
 )
 
 )
