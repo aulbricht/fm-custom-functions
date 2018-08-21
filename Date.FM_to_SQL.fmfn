@@ -4,7 +4,7 @@
  * Name Dependency:	no (i.e. no recursion)
  * Purpose: 		Convert FileMaker native date (e.g. 01/02/2018) to SQL required date format (e.g. 2018-01-02)
  *
- * @param (date)	fmDate = FileMake formatted date
+ * @param (date)	fmDate = FileMaker formatted date
  *
  * @returnSuccess {string} converted date
  * @returnError {boolean} "" this function does not return errors
