@@ -60,7 +60,7 @@
 			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; JSONObject ;
 			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; JSONArray ;
 			GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; JSONString;
-			GetAsNumber ( ~value ) = ~value ; JSONNumber;
+			GetAsTime ( ~value ) = ~value ; JSONNumber; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
 			GetAsText ( ~value ) = ~value ; JSONString;
 			);
 
