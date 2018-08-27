@@ -12,6 +12,8 @@
  * @returnError {JSON Array} error[n].description = description of error
  * @returnError {JSON Array} error[n].notes = additional notes about the error
  * 
+ * @dependency		JSON.DataType()
+ * 
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -56,13 +58,7 @@
 	~value = JSONGetElement ( ~array2 ; "[0]" );
 
 	// Determine the data type which to set the data to the combined JSON object
-	~type = Case ( 
-			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; JSONObject ;
-			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; JSONArray ;
-			GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; JSONString;
-			GetAsTime ( ~value ) = ~value ; JSONNumber; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
-			GetAsText ( ~value ) = ~value ; JSONString;
-			);
+	~type = JSON.DataType ( ~value );
 
 	// Merge the next data bit from array2 into array1
 	~jsonMerged = JSONSetElement ( ~array1 ; "[" & ~nextArrayCell & "]" ; ~value ; ~type );
