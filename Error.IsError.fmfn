@@ -1,0 +1,49 @@
+/********
+ * 
+ * Tests the object for an errorCode
+ * 
+ * @param {object} errorObject - JSON error object or array
+ * 
+ * @return {boolean} TRUE if the errorCode is NOT "" or 0
+ * 
+ * @module Error
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @credit Forked from code by original author Todd Geist
+ * 
+ ********/
+
+
+Let ([
+
+	~json = errorObject ;
+
+	~isEmpty = IsEmpty ( ~json );
+	~isArray = Left ( JSONFormatElements ( ~json )  ; 1 ) = "[" ;
+	~numErrors = Case ( 
+			~isArray ; ValueCount ( JSONListKeys ( ~json ; "." ) ); 
+			~isEmpty ; 0 ;
+			1
+			);
+
+	~errorCode = JSONGetElement ( ~json ; If ( ~isArray ; "[0]." ) & "errorCode" );
+	~errorCodeExists =  not IsEmpty ( ~errorCode );
+
+	~errorExists =  GetAsBoolean ( JSONGetElement ( ~json ; "error" ) )
+
+];
+
+Case (
+
+	~isEmpty ; False ;
+	~errorCode = 0 ; False ;
+	~errorExists ; True ;
+	~errorCodeExists ; True ;
+
+	// default return false
+	False
+
+)
+
+)
