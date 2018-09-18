@@ -1,0 +1,94 @@
+/********
+ * 
+ * Convert clipboard format between Mac and Windows
+ * 
+ * @param {object} format - the stored format
+ * 
+ * @return {text} format appropriate to the current platform
+ * 
+ * @requires {plugin} BaseElements
+ * 
+ * @module Clipboard
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ *******/
+
+
+Let ([
+
+	~format = format ;
+
+	~isMac = Get ( SystemPlatform ) = 1 ;
+	~isWindows = Get ( SystemPlatform ) = -2 ;
+
+	~LIST_macFormats = List (
+					"dyn.ah62d4rv4gk8zuxngku" ;
+					"dyn.ah62d4rv4gk8zuxnxkq" ;
+					"dyn.ah62d4rv4gk8zuxnxnq" ;
+					"dyn.ah62d4rv4gk8zuxnqgk" ;
+					"dyn.ah62d4rv4gk8zuxngm2" ;
+					"dyn.ah62d4rv4gk8zuxnykk" ;
+					"public.utf8-plain-text";
+					"com.apple.traditional-mac-plain-text" 
+					) ;
+
+	~LIST_windowsFormats = List (
+					"Mac-XMFD" ;
+					"Mac-XMSC" ;
+					"Mac-XMSS" ;
+					"Mac-XML2" ;
+					"Mac-XMFN" ;
+					"Mac-XMTB" ;
+					"CF_UNICODETEXT" ;
+					"public.utf8-plain-text"
+					) ;
+
+~=""];
+
+Case ( 
+
+
+	~isWindows ; Case (
+
+		// If the format is already a Windows format, no conversion is necessary
+		PatternCount ( ~LIST_windowsFormats ; ~format ) > 0 ; ~format ;
+
+		//Mac Formats to Windows
+		~format = "dyn.ah62d4rv4gk8zuxngku"  ; "Mac-XMFD" ;  // Field(s)
+		~format = "dyn.ah62d4rv4gk8zuxnxkq"  ; "Mac-XMSC" ;  // Script(s)
+		~format = "dyn.ah62d4rv4gk8zuxnxnq"  ; "Mac-XMSS" ;  // Script Step(s)
+		~format = "dyn.ah62d4rv4gk8zuxnqgk"  ; "Mac-XML2" ; // Layout Object(s)
+		~format = "dyn.ah62d4rv4gk8zuxngm2"  ; "Mac-XMFN" ; //Custom Function(s)"
+		~format = "dyn.ah62d4rv4gk8zuxnykk"  ; "Mac-XMTB" ; // Table(s)
+		~format = "public.utf8-plain-text" ; "CF_UNICODETEXT" ; // Plain Text ;
+		~format = "com.apple.traditional-mac-plain-text"  ; "CF_UNICODETEXT" ; // Plain Text
+		"CF_UNICODETEXT"  // DEFAULT: Plain Text
+
+		);
+
+
+
+	~isMac ; Case (
+
+		// If the format is already a Mac format, no conversion is necessary
+		PatternCount ( ~LIST_macFormats ; ~format ) > 0 ; ~format ;
+
+		//Windows Formats to Mac
+		~format = "Mac-XMFD"  ; "dyn.ah62d4rv4gk8zuxngku" ; // Field(s)
+		~format = "Mac-XMSC"  ; "dyn.ah62d4rv4gk8zuxnxkq" ; // Script(s)
+		~format = "Mac-XMSS"  ; "dyn.ah62d4rv4gk8zuxnxnq" ; // Script Step(s)
+		~format = "Mac-XML2"  ; "dyn.ah62d4rv4gk8zuxnqgk" ; // Layout Object(s)
+		~format = "Mac-XMFN"  ; "dyn.ah62d4rv4gk8zuxngm2" ; // Custom Function(s)
+		~format = "Mac-XMTB"  ; "dyn.ah62d4rv4gk8zuxnykk" ; // Table(s) 
+		~format = "CF_UNICODETEXT"  ; "public.utf8-plain-text" ; // Plain Text
+		"public.utf8-plain-text" // DEFAULT: Plain Text
+
+		);
+
+	"Unknown"
+
+)
+
+)
