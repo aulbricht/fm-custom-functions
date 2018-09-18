@@ -1,56 +1,64 @@
 /**
- * VERSION:			1.1.0
- * Function Name: 	JSON.ArrayLength()
- * Name Dependency: yes (i.e. recursion, must update the code if renaming the function)
- * Purpose: 		Determine the length of a JSON array
  *
- * @param {string}	JSON_Array = JSON array object
+ * Determine the length of a JSON array
  *
- * @returnSuccess {integer} length of the array
+ * @param {text} JSON_Array - JSON array object
+ *
+ * @returnSuccess {number} length of the array
  * 
- * @returnError {JSON Array} returns empty, but sets designated global $$dev variable as JSON:
- * @returnError {JSON Array} last.ARRAY_error[n].code = error code
- * @returnError {JSON Array} last.ARRAY_error[n].description = description of error
- * @returnError {JSON Array} last.ARRAY_error[n].notes = additional notes about the error
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
  * 
+ * @module JSON
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
  */
 
+
  Let ([
 	~json = JSON_Array;
 	~jsonVal = JSONFormatElements ( ~json );
 	~error = Case (
-				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("[]"; 
-					[ "[0].code"; -2; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid"; JSONString ]
-					);
-				Left ( ~jsonVal; 1 ) ≠ "["; JSONSetElement ("[]"; 
-					[ "[0].code"; -2; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid: expecting a JSON array"; JSONString ];
-					[ "[0].notes"; "Each JSON to be concatentated must be an array"; JSONString ]
-					);
-				);
-	~result = Case ( IsEmpty ( ~error ); JSONFormatElements ( 
-					JSONDeleteElement ( ~json; "[0]" ) // remove the current array value
-					);
-	~next = If ( not IsEmpty ( JSONGetElement ( ~result; "[0]" )); // check to see if any values remain in the array
-				JSON.ArrayLength ( ~result ); // if any values remain, recurse
-				0 // if no values remain, return starting count of 0
-				);
-
-	// If there is an error, set this developer variable with error details, otherwise clear the variable
-	$$dev = If ( not IsEmpty ( ~error ); 
-					JSONSetElement ( ""; "last.ARRAY_error" ; ~error ; JSONArray )
+				Left ( ~jsonVal; 1 ) = "?"; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid"; JSONString ]
+						);
+				Left ( ~jsonVal; 1 ) ≠ "["; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid: Must be an array"; JSONString ]
+						)
 					);
 
+	// remove the current array value
+	~result = JSONDeleteElement ( ~json; "[0]" ); 
+
+	// check to see if any values remain in the array
+	~next = If ( not IsEmpty ( JSONGetElement ( ~result; "[0]" )); 
+
+				// if any values remain, recurse
+				JSON.ArrayLength ( ~result ); 
+
+				// if no values remain, return starting count of 0
+				0 
+
+				);
 ~=""];
 
 Case ( 
-	not IsEmpty ( ~error ); ""; // if this iteration had an error, return empty instead of a number
-	Length ( Filter ( ~next; "0123456789" )) = Length ( ~next ); ~next + 1; // if only a positive integer was returned from the next recursion, add the value; otherwise just return the non-numeric value
+
+	// if this iteration had an error, return it instead of a number
+	not IsEmpty ( ~error ); ~error; 
+
+	// if only a positive integer was returned from the next recursion, add the value; otherwise just return the non-numeric value
+	Length ( Filter ( ~next; "0123456789" )) = Length ( ~next ); ~next + 1; 
+
 	~next
+	
 )
 
 )

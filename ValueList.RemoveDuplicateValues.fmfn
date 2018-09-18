@@ -1,0 +1,47 @@
+/**
+ *
+ * Remove any duplicate values in a value list
+ *
+ * @param {text} valueList - value list (¶ delimited)
+ *
+ * @returnSuccess {text} value list with duplicate values removed
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+	~list = ValueList;
+	~val = LeftValues ( ~list; 1 );
+	~count = ValueCount ( ~list );
+	~new =	Replace ( 
+				Substitute ( "¶" & ~list & "¶" ; 
+					[ "¶" ; "¶|" ]; 
+					[ "|" & ~val ; "" ];
+					[ "|" ; "" ] 
+				); 
+				1; 
+				1; 
+				"" 
+			)
+];
+
+Case ( ~count > 0 ;
+	~val & 
+
+	// RECURSION
+	ValueList.RemoveDuplicateValues ( 
+  		Replace ( ~new ; 
+  			Length ( ~new ) ; 
+  			1 ; 
+  			"" 
+		) 
+ 	)
+)
+
+)

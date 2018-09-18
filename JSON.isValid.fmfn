@@ -1,14 +1,14 @@
 /**
- * VERSION:			1.0.0
- * Function Name: 	JSON.isValid()
- * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
- * Purpose: 		Determines whether the JSON object is valid
  *
- * @param {string}	json = JSON object
+ * Determines whether the JSON object is valid
+ *
+ * @param {text} json - JSON object
  *
  * @returnSuccess {boolean} returns True if the JSON is valid
- * @returnError {boolean} "" this function does not return errors
+ *
+ * @module JSON
  * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -16,8 +16,10 @@
 
 
 Let ([
+
 	~json = json;
 	~validate = JSONFormatElements ( ~json );
+
 ~=""];
 
 Left( ~validate; 1 ) ≠ "?"

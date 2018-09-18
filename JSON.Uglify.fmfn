@@ -1,17 +1,21 @@
 /**
- * VERSION:			1.0.1
- * Function Name: 	JSON.Uglify()
- * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
- * Purpose: 		Unformats a JSON object
  *
- * @param {string}	json = JSON object
+ * Unformats a JSON object
  *
- * @returnSuccess {JSON} returns unformatted JSON object
+ * @param {text} json - JSON object
+ *
+ * @returnSuccess {object} returns unformatted JSON object
  * 
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
+ * 
+ * @module JSON
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
  */
 
 
-JSONDeleteElement ( json ; Get( UUID) )
+JSONDeleteElement ( json; Get( UUID) )

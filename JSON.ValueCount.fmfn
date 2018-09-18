@@ -1,16 +1,18 @@
 /**
- * VERSION:			1.1.0
- * Function Name: 	JSON.ValueCount()
- * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
- * Purpose: 		Count the number of values in a JSON object or nested object
  *
- * @param {string}	json = initial JSON object
- * @param {string}	key = key for the element
+ * Count the number of values in a JSON object or nested object
  *
- * @returnError {JSON Array} returns empty, but sets designated global $$dev variable as JSON:
- * @returnError {JSON Array} last.ARRAY_error[n].code = error code
- * @returnError {JSON Array} last.ARRAY_error[n].description = description of error
+ * @param {text} json - initial JSON object
+ * @param {text} key - key for the element
+ *
+ * @returnSuccess {object} returns a value
+ *
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
  * 
+ * @module JSON
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -21,21 +23,17 @@ Let ([
 	~key = key;
 	~jsonVal = JSONFormatElements ( ~json );
 	~list_values = JSONListValues ( ~json; if( IsEmpty( ~key ); "."; ~key ));
-	~error = Case (
-				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("[]"; 
-					[ "[0].code"; -2; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid"; JSONString ]
-					);
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid"; JSONString ]
+						);
+				ValueCount( ~list_values )
 				);
-	~result = Case ( IsEmpty ( ~error ); ValueCount( ~list_values ) );
-
-	// If there is an error, set this developer variable with error details, otherwise clear the variable
-	$$dev = If ( not IsEmpty ( ~error ); 
-					JSONSetElement ( ""; "last.ARRAY_error" ; ~error ; JSONArray )
-					);
-
+	~left = Left ( ~result; 1 );
 ~=""];
 
-~result
+If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
 
 )

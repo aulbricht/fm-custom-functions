@@ -1,0 +1,25 @@
+/**
+ * 
+ * Convert value list to comma-delimited string
+ *
+ * @param {text} valueList - value list (¶ delimited)
+ *
+ * @returnSuccess {text} comma delimited string
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+  ~list = valueList;
+  ~list = If( Right( ~list ; 1 ) = "¶"; Left ( ~list ; Length ( ~list ) - 1 ); ~list )
+];
+
+Substitute( ~list ; "¶"; ", ")
+
+)

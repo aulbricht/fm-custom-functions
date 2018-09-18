@@ -1,14 +1,14 @@
 /**
- * VERSION:			1.0.0
- * Function Name: 	Date.PreviousWeekday()
- * Name Dependency:	no (i.e. no recursion)
- * Purpose: 		Determine yesterday's date, excluding weekend days. e.g. If the date provideed is a Monday, the result will be the previous Friday.
- *
- * @param (date)	originDate = FileMaker formatted date
- *
- * @returnSuccess {string} yesterday's date, Monday-Friday
- * @returnError {boolean} "" this function does not return errors
  * 
+ * Determine yesterday's date, excluding weekend days. e.g. If the date provideed is a Monday, the result will be the previous Friday.
+ *
+ * @param {date} originDate - FileMaker formatted date
+ *
+ * @returnSuccess {date} yesterday's date, Monday-Friday
+ * 
+ * @module Date
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *

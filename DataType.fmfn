@@ -1,0 +1,34 @@
+/**
+ *
+ * Determine the JSON data type (e.g. numeric, string, etc) and return the corresponding numeral for the JSONSetElements data type argument
+ *
+ * @param {data} data - input data to analyze and detext the type
+ *
+ * @returnSuccess {text} JSON data type: text, number, time, timestamp, object, array
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+ 
+
+ Let ([
+
+	// Abstract the input variable
+	~value = value 
+
+];
+
+Case ( 
+
+	Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
+	Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
+	GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
+	GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
+	GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
+	GetAsText ( ~value ) = ~value ; "text" ;
+
+)
+
+)

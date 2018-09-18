@@ -1,47 +1,46 @@
 /**
- * VERSION:			1.1.0
- * Function Name: 	JSON.Get()
- * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
- * Purpose: 		Get the value from a JSON object key/value pair
  *
- * @param {string}	json = initial JSON object
- * @param {string}	key = key for the element
+ * Get the value from a JSON object key/value pair
  *
- * @returnSuccess {JSON} returns a value
+ * @param {text} json - initial JSON object
+ * @param {text} key - key for the element
  *
- * @returnError {JSON Array} returns empty, but sets designated global $$dev variable as JSON:
- * @returnError {JSON Array} last.ARRAY_error[n].code = error code
- * @returnError {JSON Array} last.ARRAY_error[n].description = description of error
+ * @returnSuccess {object} returns a value
+ *
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
  * 
+ * @module JSON
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
  */
+
 
 Let ([
 	~json = json;
 	~key = key;
 	~jsonVal = JSONFormatElements ( ~json );
 	~jsonAltered = JSONGetElement ( ~json; ~key );
-	~error = Case (
-				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("[]"; 
-					[ "[0].code"; -2; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid"; JSONString ]
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid"; JSONString ]
+						);
+				~key = "" ; 
+					JSONSetElement ( ~json; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid key"; JSONString ]
+						)
 					);
-				~key = ""; JSONSetElement( ~json; 
-					[ "[0].code"; -3; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid key"; JSONString ]
-					);
+				~jsonAltered
 				);
-	~result = Case ( IsEmpty ( ~error ); JSONFormatElements ( ~jsonAltered ) );
-
-	// If there is an error, set this developer variable with error details, otherwise clear the variable
-	$$dev = If ( not IsEmpty ( ~error ); 
-					JSONSetElement ( ""; "last.ARRAY_error" ; ~error ; JSONArray )
-					);
-
+	~left = Left ( ~result; 1 );
 ~=""];
 
-~result
+If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
 
 )

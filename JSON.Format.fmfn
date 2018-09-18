@@ -1,17 +1,17 @@
 /**
- * VERSION:			1.1.0
- * Function Name: 	JSON.Format()
- * Name Dependency: none (i.e. no recursion, so feel free to rename the function)
- * Purpose: 		Formats a JSON object
  *
- * @param {string}	json = JSON object
+ * Formats a JSON object
  *
- * @returnSuccess {JSON} returns formatted JSON object
+ * @param {text} json - JSON object
  *
- * @returnError {JSON Array} returns empty, but sets designated global $$dev variable as JSON:
- * @returnError {JSON Array} last.ARRAY_error[n].code = error code
- * @returnError {JSON Array} last.ARRAY_error[n].description = description of error
+ * @returnSuccess {object} returns formatted JSON object
+ *
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
  * 
+ * @module JSON
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -21,21 +21,17 @@
 Let ([
 	~json = json;
 	~jsonVal = JSONFormatElements ( ~json );
-	~error = Case (
-				Left ( ~jsonVal; 1 ) = "?"; JSONSetElement("[]"; 
-					[ "[0].code"; -2; JSONNumber ]; 
-					[ "[0].description"; "JSON invalid"; JSONString ]
-					)
+	~result = Case (
+				Left ( ~jsonVal; 1 ) = "?"; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid"; JSONString ]
+						);
+				~jsonVal
 				);
-	~result = If ( IsEmpty ( ~error ); JSONFormatElements ( ~jsonVal ) );
-
-	// If there is an error, set this developer variable with error details, otherwise clear the variable
-	$$dev = If ( not IsEmpty ( ~error ); 
-					JSONSetElement ( ""; "last.ARRAY_error" ; ~error ; JSONArray )
-					);
 
 ~=""];
 
-~result
+JSONFormatElements ( ~result )
 
 )
