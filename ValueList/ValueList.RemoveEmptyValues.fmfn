@@ -1,0 +1,54 @@
+/**
+ *
+ * Remove any empty values in a value list
+ *
+ * @param {text} valueList - value list (¶ delimited)
+ *
+ * @returnSuccess {text} value list with empty values removed
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+
+	~list = ValueList ;
+
+	// check first value, and remove if it's empty
+	~list = If ( Left ( ~list ; 1 ) = "¶"; 
+				Right ( ~list ; Length ( ~list ) - 1 );
+				~list 
+				);
+
+	// check last value, and remove if it's empty
+	~list = If ( Right ( ~list ; 1 ) = "¶"; 
+				Left ( ~list ; Length ( ~list ) - 1 );
+				~list 
+				);
+
+	// check to see if there are any empty values in the value list. 
+	// note: added ¶ to beginning and end to check for empties in case there were multiple empties at the beginning or end of the list
+	~isEmptyValueInList = PatternCount ( "¶" & ~list & "¶" ; "¶¶" ) > 0 
+
+];
+
+Case ( ~isEmptyValueInList ;
+
+	// RECURSION
+	ValueList.RemoveEmptyValues ( 
+
+		// remove any empties in the middle of the list with substitute
+  		Substitute ( ~list ; "¶¶" ; "¶" )
+
+  		);
+
+ 	~list
+
+)
+
+)
