@@ -1,0 +1,46 @@
+/**
+ *
+ * creates a JSON validation error
+ *
+ * @param {string} key = json key for the item that failed validation
+ * @param {string} message = customized message to accompany the error (something more specific than the general error code descriptor)
+ * 
+ * @returns {object} error JSON object
+ *
+ * @private
+ * @requires {function} Error.Descriptor
+ *
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @credit forked from code by original author Todd Geist
+ *
+ */
+
+
+Let ([
+
+	// Abstract parameters
+	~key = key ;
+	~message = message ;
+
+	// Get error code descriptor
+	~errorCode = -3 ;
+	~descriptor = Error.GetDescriptor ( ~errorCode );
+
+~=""];
+
+
+JSONSetElement( "{}" ;
+
+	// General info
+	[ "errorCode"; ~errorCode ; JSONNumber ]; 
+	[ "type"; "JSON.Validate" ; JSONString ]; 
+	[ "scriptName" ; Get ( ScriptName ); JSONString ];
+
+	// Info specific to the validation error
+	[ "key" ; ~key ; JSONString ];
+	[ "descriptor" ; ~descriptor ; JSONString ];
+	[ "message" ; ~message ; JSONString ]
+
+)
+
+)
