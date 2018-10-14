@@ -4,6 +4,7 @@
  *
  * @param {object} json
  * 
+ * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 

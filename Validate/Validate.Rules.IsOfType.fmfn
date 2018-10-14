@@ -12,6 +12,7 @@
  * @requires {function} DataType()
  * @requires {function} ValueList.ValueExistsInList()
  * 
+ * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */

@@ -12,6 +12,7 @@
   * 
  * @requires {function} JSON.Validate.Rule.IsOfType ()
  * 
+ * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
