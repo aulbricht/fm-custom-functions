@@ -1,0 +1,41 @@
+/**
+ *
+ * A rule that tests whether a parameter value exists is in a list of valid values
+ *
+ * @param {string} key = the JSON key path to the value to test
+ * @param {string} LIST_values = value list to validate against
+ *
+ * @returnSuccess {NULL}
+ * @returnError {object} JSON.Validate.Error: an error object
+ * 
+ * @requires {function} ValueList.ValueExistsInList()
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @credit forked from code by original author Todd Geist
+ *
+ */
+
+
+Let ([
+
+	~key = key ;
+	~list = LIST_values ;
+
+	~value = JSONGetElement(  $JSON.Validate.This ; ~key  )
+
+];
+
+Case (
+
+	// if value is NULL, return NULL 
+	IsEmpty ( ~value ) ; "" ; 
+
+	// if value exists in the list, return NULL 
+	ValueList.ValueExistsInList  ( ~list ; ~value ) ; "" ; 
+
+	// if value does not exist in the list, return error
+	JSON.Validate._errorCreate ( ~key ; "\"" & ~key & "\" should be one of: " & Substitute( ~list ; "¶"; ", " ) & ". Instead it was: " & If ( IsEmpty( ~value ) ; "EMPTY STRING" ; ~value ) )
+
+)
+
+)

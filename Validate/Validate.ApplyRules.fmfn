@@ -1,0 +1,50 @@
+/**
+ *
+ * Apply a list of rules to the JSON set by JSON.Validate.This()
+ *
+ * @param {string} LIST_rules = value list of rules, e.g. List ( JSON.Validate.Rule.<x> ; … )
+ *
+ * @returnSuccess {NULL}
+ * @returnError {object} JSON.Validate.Error: an error object
+ * 
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @credit forked from code by original author Todd Geist
+ *
+ */
+
+
+Let ([
+
+	~data = $JSON.Validate.This ;
+	~LIST_errors = LIST_rules ;
+
+	~formattedData = JSONFormatElements ( ~data );
+
+	// clear the known validation variable
+	$JSON.Validate.This = ""
+
+];
+
+Case (
+
+	// check for invalid JSON
+	Left ( ~formattedData ; 1 ) = "?" ; JSON.Validate._errorCreate( "" ; List ( "JSON To Validate is Invalid." ; ~formattedData ) );
+
+	// if there are no errors, return false errorCode
+	IsEmpty( ~LIST_errors ) ; JSONSetElement( "{}"; "errorCode" ; 0 ; JSONNumber );
+
+  	// if there are errors, return error object
+	Let ([
+		~numErrors = ValueCount ( ~LIST_errors );
+		~ARRAY_errors = "[" & Substitute( ~LIST_errors ; "¶" ; "," ) & "]" 
+	];
+
+	Case ( 
+		~numErrors > 1 ; ~ARRAY_errors ;
+		JSONFormatElements ( ~LIST_Errors )
+		)
+
+	)
+)
+
+)
