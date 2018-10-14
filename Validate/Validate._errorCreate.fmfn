@@ -8,6 +8,7 @@
  * @returns {object} error JSON object
  *
  * @private
+ * @module Validate
  * @requires {function} Error.Descriptor
  *
  * @version 1.0.0

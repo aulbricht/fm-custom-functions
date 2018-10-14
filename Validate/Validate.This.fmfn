@@ -4,12 +4,14 @@
  *
  * @param {object} json
  * 
+ * @module Validate
+ * 
  * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
  */
 
-Let ( $JSON.Validate.This = json ; "" )
+Let ( $Validate.This = json ; "" )
 
 // Note: must return a NULL or else it will interfere with any subsequent function calls in the same calc

@@ -9,8 +9,9 @@
  * @returnSuccess {NULL}
  * 
  * @returnError {object} JSON.Validate.Error: an error object
-  * 
- * @requires {function} JSON.Validate.Rule.IsOfType ()
+ * 
+ * @module Validate
+ * @requires {function} Validate.Rule.IsOfType ()
  * 
  * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
@@ -24,7 +25,7 @@ Let ([
 	~key = key ;
 	~list = LIST_validTypes ;
 
-	~value = JSONGetElement( $JSON.Validate.This ; ~key  )
+	~value = JSONGetElement( $Validate.This ; ~key  )
 
 ];
 

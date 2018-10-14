@@ -5,7 +5,9 @@
  * @param {string} LIST_rules = value list of rules, e.g. List ( JSON.Validate.Rule.<x> ; … )
  *
  * @returnSuccess {NULL}
- * @returnError {object} JSON.Validate.Error: an error object
+ * @returnError {object} Validate.Error: an error object
+ * 
+ * @module Validate
  * 
  * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
@@ -16,7 +18,7 @@
 
 Let ([
 
-	~data = $JSON.Validate.This ;
+	~data = $Validate.This ;
 	~LIST_errors = LIST_rules ;
 
 	~formattedData = JSONFormatElements ( ~data );

@@ -9,6 +9,7 @@
  * @returnSuccess {NULL}
  * @returnError {object} JSON.Validate.Error: an error object
  * 
+ * @module Validate
  * @requires {function} DataType()
  * @requires {function} ValueList.ValueExistsInList()
  * 
@@ -26,7 +27,7 @@ Let ([
 	// Get the first type in the list to test
 	~type = GetValue ( ~list ; 1 );
 
-	~value = JSONGetElement( $JSON.Validate.This ; ~key  )
+	~value = JSONGetElement( $Validate.This ; ~key  )
 
 ];
 

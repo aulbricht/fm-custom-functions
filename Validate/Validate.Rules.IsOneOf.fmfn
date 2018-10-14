@@ -8,6 +8,7 @@
  * @returnSuccess {NULL}
  * @returnError {object} JSON.Validate.Error: an error object
  * 
+ * @module Validate
  * @requires {function} ValueList.ValueExistsInList()
  * 
  * @version 1.0.0
@@ -22,7 +23,7 @@ Let ([
 	~key = key ;
 	~list = LIST_values ;
 
-	~value = JSONGetElement(  $JSON.Validate.This ; ~key  )
+	~value = JSONGetElement(  $Validate.This ; ~key  )
 
 ];
 
