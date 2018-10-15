@@ -1,0 +1,15 @@
+/**
+ *
+ * Determine if the solution is being hosted by FM Server (i.e. not a local file)
+ *
+ * @returnSuccess {boolean} True if it is hosted, False if not.
+ * 
+ * @module System (Sys)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+Get ( MultiUserState ) = 2
