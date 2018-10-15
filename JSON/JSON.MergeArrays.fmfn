@@ -10,7 +10,7 @@
  * @returnError {array} error[n].code - error code
  * @returnError {array} error[n].descriptor - description of error
  * 
- * @requires {function} JSON.DataType
+ * @requires {function} DataType
  * 
  * @module JSON
  * 
@@ -61,7 +61,7 @@
 	~value = JSONGetElement ( ~array2 ; "[0]" );
 
 	// Determine the data type which to set the data to the combined JSON object
-	~type = JSON.DataType ( ~value );
+	~type = DataType ( ~value );
 
 	// Merge the next data bit from array2 into array1
 	~jsonMerged = JSONSetElement ( ~array1 ; "[" & ~nextArrayCell & "]" ; ~value ; ~type );
