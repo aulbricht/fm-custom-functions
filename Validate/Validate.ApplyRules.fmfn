@@ -2,7 +2,7 @@
  *
  * Apply a list of rules to the JSON set by JSON.Validate.This()
  *
- * @param {string} LIST_rules = value list of rules, e.g. List ( JSON.Validate.Rule.<x> ; … )
+ * @param {string} LIST_rules = value list of rules, e.g. List ( Validate.Rule.<x> ; … )
  *
  * @returnSuccess {NULL}
  * @returnError {object} Validate.Error: an error object
