@@ -7,10 +7,10 @@
  *				Valid types: text, number, time, timestamp, object, array
  *
  * @returnSuccess {NULL}
- * @returnError {object} JSON.Validate.Error: an error object
+ * @returnError {object} Validate.Error: an error object
  * 
  * @module Validate
- * @requires {function} DataType()
+ * @requires {function} Validate._dataType()
  * @requires {function} ValueList.ValueExistsInList()
  * 
  * @version 1.0.0
@@ -57,12 +57,12 @@ Case (
 				ValueCount ( ~list ) > 1 ; 
 
 					// RECURSE ///////////////////////////
-					JSON.Validate.Rule.IsOfType ( ~key ; Substitute ( ~list & "¶" ; ~type & "¶" ; "" ) );
+					Validate.Rule.IsOfType ( ~key ; Substitute ( ~list & "¶" ; ~type & "¶" ; "" ) );
 					////////////////////////////////////////
 
 
 				// else return an error object
-				JSON.Validate._errorCreate ( ~key ; "Value type is invalid"  ) 
+				Validate._errorCreate ( ~key ; "Value type is invalid"  ) 
 
 				)
 
