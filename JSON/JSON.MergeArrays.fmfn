@@ -80,7 +80,12 @@ Case (
 	not IsEmpty ( ~error ); ~error; 
 
 	// If there are more keys in array2 to merge, recurse to process the next cell
-	~valuesRemaining > 0 ; JSON.MergeArrays ( ~jsonMerged ; ~jsonRemaining ) ; 
+	~valuesRemaining > 0 ; 
+
+		// RECURSE ///////////////////////////
+		JSON.MergeArrays ( ~jsonMerged ; ~jsonRemaining ) ; 
+		////////////////////////////////////////
+
 
 	// If there are no additional keys left to merge, return the final merged object
 	~jsonMerged 
