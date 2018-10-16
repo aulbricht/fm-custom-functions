@@ -24,7 +24,7 @@ Let ([
 	~formattedData = JSONFormatElements ( ~data );
 
 	// clear the known validation variable
-	$JSON.Validate.This = ""
+	$Validate.This = ""
 
 ];
 

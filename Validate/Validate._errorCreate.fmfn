@@ -35,7 +35,7 @@ JSONSetElement( "{}" ;
 
 	// General info
 	[ "errorCode"; ~errorCode ; JSONNumber ]; 
-	[ "type"; "JSON.Validate" ; JSONString ]; 
+	[ "type"; "Validate" ; JSONString ]; 
 	[ "scriptName" ; Get ( ScriptName ); JSONString ];
 
 	// Info specific to the validation error
