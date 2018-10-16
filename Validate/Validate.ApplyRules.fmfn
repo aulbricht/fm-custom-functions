@@ -31,7 +31,7 @@ Let ([
 Case (
 
 	// check for invalid JSON
-	Left ( ~formattedData ; 1 ) = "?" ; JSON.Validate._errorCreate( "" ; List ( "JSON To Validate is Invalid." ; ~formattedData ) );
+	Left ( ~formattedData ; 1 ) = "?" ; Validate._errorCreate( "" ; List ( "JSON To Validate is Invalid." ; ~formattedData ) );
 
 	// if there are no errors, return false errorCode
 	IsEmpty( ~LIST_errors ) ; JSONSetElement( "{}"; "errorCode" ; 0 ; JSONNumber );

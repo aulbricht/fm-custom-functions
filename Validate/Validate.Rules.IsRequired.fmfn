@@ -32,10 +32,10 @@ Let ([
 Case (
 
 	// if value is NULL, return an error
-	IsEmpty ( ~value ) ; JSON.Validate._errorCreate ( ~key ; "Required value is missing"  ) ; 
+	IsEmpty ( ~value ) ; Validate._errorCreate ( ~key ; "Required value is missing"  ) ; 
 
 	// if a data type parameter was included, validate that it matches the given value's data type
-	not IsEmpty ( ~list ) ; JSON.Validate.Rule.IsOfType ( ~key ; ~list ); 
+	not IsEmpty ( ~list ) ; Validate.Rule.IsOfType ( ~key ; ~list ); 
 
 	// default return NULL
 	""

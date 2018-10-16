@@ -40,7 +40,7 @@ Case (
 	Let ([ 
 
 		// determine base data type (e.g. text, number, etc)
-		~LIST_validDataTypes = JSON.Validate._dataType ( ~value );
+		~LIST_validDataTypes = Validate._dataType ( ~value );
 
 		// validate data type against first higher order data types, then base data types (e.g. "boolean" could also be true if validating as such or as "number")
 		~typeMatch = ValueList.ValueExistsInList( ~LIST_validDataTypes ; ~type );
