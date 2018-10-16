@@ -1,4 +1,4 @@
-/*/********
+/********
  * 
  * Extract the custom error message(s) from the json object
  * 
@@ -62,10 +62,15 @@ Let ([
 Case (
 
 	// invalid JSON
-	Left ( ~formattedData ; 1 ) = "?" ; JSON.Validate._errorCreate( "" ; List ( "Error object to validate is invalid JSON" ; ~json ) );
+	Left ( ~formattedData ; 1 ) = "?" ; JSONSetElement( "{}" ;
+								[ "errorCode"; "-2" ; JSONNumber ]; 
+								[ "type"; "Error.Message" ; JSONString ]; 
+								[ "scriptName" ; Get ( ScriptName ); JSONString ];
+								[ "message" ; List ( "Error object to validate is invalid JSON" ; ~json ) ; JSONString ]
+								);
 
 	~LIST_messages 
 
 )
 
-)*/
+)
