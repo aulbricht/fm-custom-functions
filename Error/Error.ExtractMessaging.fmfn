@@ -1,4 +1,4 @@
-/********
+/*/********
  * 
  * Extract the custom error message(s) from the json object
  * 
@@ -8,7 +8,7 @@
  * 
  * @module Error
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -30,6 +30,7 @@ Let ([
 	~errorMessage  =  Let ([ 
 				~errorCode = JSONGetElement ( ~json ; If ( ~isArray ; ~cell & "." ) & "errorCode" );
 				~descriptor = JSONGetElement ( ~json ; If ( ~isArray ; ~cell & "." ) & "descriptor" );
+				~key = JSONGetElement ( ~json ; If ( ~isArray ; ~cell & "." ) & "key" );
 				~message = JSONGetElement ( ~json ; If ( ~isArray ; ~cell & "." ) & "message" )
 				];
 					If ( not IsEmpty ( ~descriptor ) ; 
@@ -37,6 +38,7 @@ Let ([
 						Error.GetDescriptor ( ~errorCode ) 
 						)
 					& If ( not IsEmpty ( ~message ) ; ": " & ~message )
+					& If ( not IsEmpty ( ~key ) ; " [" & ~key & "]" )
 				);
 
 	// If there are multiple array cells, remove the last one to prepare for recursive call
@@ -47,7 +49,7 @@ Let ([
 				If ( ~numErrors > 1 ; 
 
 					// RECURSIVE CALL //////////////////////
-					Error.GetMessage ( ~json_updated ) ;
+					Error.ExtractMessaging ( ~json_updated ) ;
 					///////////////////////////////////////////
 
 					""
@@ -66,4 +68,4 @@ Case (
 
 )
 
-)
+)*/
