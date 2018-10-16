@@ -8,7 +8,7 @@
  * 
  * @returnSuccess {NULL}
  * 
- * @returnError {object} JSON.Validate.Error: an error object
+ * @returnError {object} Validate.Error: an error object
  * 
  * @module Validate
  * @requires {function} Validate.Rule.IsOfType ()
