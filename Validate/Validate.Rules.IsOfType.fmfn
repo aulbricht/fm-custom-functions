@@ -34,7 +34,7 @@ Let ([
 Case (
 
 	// if no value was provided or if no type was provided, return NULL (abort validation)
-	IsEmpty ( ~value ) or IsEmpty ( ~list ) ; "" ; 
+	IsEmpty ( ~key ) or IsEmpty ( ~value ) or IsEmpty ( ~list ) ; "" ; 
 
 	// validate that the given value matches a valid data type
 	Let ([ 
