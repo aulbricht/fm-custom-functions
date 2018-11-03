@@ -21,7 +21,7 @@ Let ([
 	~data = $Validate.This ;
 	~LIST_errors = LIST_rules ;
 
-	~formattedData = JSONFormatElements ( ~data );
+	~formattedData = If ( not IsEmpty ( ~data ) ; JSONFormatElements ( ~data ) );
 
 	// clear the known validation variable
 	$Validate.This = ""
