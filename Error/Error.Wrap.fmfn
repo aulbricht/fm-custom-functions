@@ -5,12 +5,13 @@
  * @param {number} errorCode - the FileMaker Error Code.
  * @param {string} descriptor - describe where the error is happening
  * @param {object} [data] - optional extra data to include in the error object
+ * @param {object} [errorArray] - optional include an existing array or object to create or add to an error array
  * 
- * @return {object} an error object
+ * @return {array} an array of errors. Note: if there is only one error, it will be an object
  * 
  * @module Error
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit Forked from code by original author Todd Geist
  * 
@@ -21,25 +22,49 @@ Let ([
 
 	~descriptor = descriptor ;
 	~data = data ;
+	~array = errorArray ; 
+	~nextArrayCell = If ( not IsEmpty ( ~array ) ; 
+						ValueCount ( JSONListKeys ( ~array ; "." ) );
+						0 
+						);
+
 	~error = errorCode ;
 	~error = If( IsEmpty ( ~error ) ; 0 ; GetAsNumber ( ~error ) );
 
 	~base = JSONSetElement ( "{}" ; "errorCode" ; ~error ; JSONNumber );
 	~basePlusMessage = If ( ~error ≥ -1 ; 
-				JSONSetElement ( ~base ; "errorMessage"; Error.GetDescriptor ( ~error ) ; JSONString) ; 
+				JSONSetElement ( ~base ; "errorMessage"; Error.GetDescriptor ( ~error ) ; JSONString ) ; 
 				~base 
-				)
+				);
 
-];
+	~currentError = Case (
+		not ~error ; ~base ;
+	
+		JSONSetElement( ~basePlusMessage ; 
+			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
+			[ "type" ; "FM" ; JSONString ] ;
+			[ "descriptor" ; ~descriptor ; JSONString] ;
+			[ "data" ; ~data ; JSONObject ] 
+		 )
+
+	);
+
+~=""];
 
 Case (
-	not ~error ; ~base ;
-	 JSONSetElement( ~basePlusMessage ; 
-		[ "scriptName" ; Get ( ScriptName ) ; JSONString];
-		[ "type" ; "FM" ; JSONString] ;
-		[ "descriptor" ; ~descriptor ; JSONString] ;
-		[ "data" ; ~data ; JSONObject] 
-	 )
+	
+	// If no additional errors were provided, just return the new error object
+	IsEmpty ( ~array ) ; ~currentError ;
+	
+	// If the provided error object is an array already, append the current error object
+	Left ( ~array ; 1 ) = "[" ; JSONSetElement( ~array ; ~nextArrayCell ; ~currentError ; JSONObject );
+
+	// If the provided error object is a single error object, create an array out of the two objects
+	Left ( ~array ; 1 ) = "{" ; 
+			JSONSetElement( "[]" ; 
+				[ "[0]" ; ~array ; JSONObject ];
+				[ "[1]" ; ~currentError ; JSONObject ]
+				)
 
 )
 
