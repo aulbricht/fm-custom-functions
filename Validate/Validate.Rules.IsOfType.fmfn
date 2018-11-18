@@ -3,8 +3,8 @@
  * A rule that tests that the value at the given JSON key path (if not NULL) is of the required type
  *
  * @param {string} key = the JSON key path to the value to test; if NULL, validation is aborted
- * @param {string} LIST_validTypes = list of valid data types for the value; if NULL, any data type is accepted
- *				Valid types: text, number, time, timestamp, object, array
+ * @param {string} LIST_dataTypes = list of valid data types for the value; if NULL, any data type is accepted
+ *				Valid types: text, number, date, time, timestamp, object, array
  *
  * @returnSuccess {NULL}
  * @returnError {object} Validate.Error: an error object
@@ -13,7 +13,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} ValueList.ValueExistsInList()
  * 
- * @version 1.0.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -22,10 +22,19 @@ Let ([
 
 	// Abstract parameters
 	~key = key ;
-	~list = UniqueValues ( LIST_validTypes );
+	~LIST_dataTypes = UniqueValues ( LIST_dataTypes );
+
+	// remove any trailing carriage returns
+	~LIST_dataTypes = If ( Right ( ~LIST_dataTypes ; 1 ) = "¶" ; 
+			Left ( ~LIST_dataTypes ; Length ( ~LIST_dataTypes ) - 1  );
+			~LIST_dataTypes
+			);
+
+	// All valid data types (which this function is able to validate)
+	~LIST_validDataTypes = List ( "text"; "number"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
 
 	// Get the first type in the list to test
-	~type = GetValue ( ~list ; 1 );
+	~type = GetValue ( ~LIST_dataTypes ; 1 );
 
 	~value = JSONGetElement( $Validate.This ; ~key  )
 
@@ -34,16 +43,23 @@ Let ([
 Case (
 
 	// if no value was provided or if no type was provided, return NULL (abort validation)
-	IsEmpty ( ~key ) or IsEmpty ( ~value ) or IsEmpty ( ~list ) ; "" ; 
+	IsEmpty ( ~key ) or IsEmpty ( ~value ) or IsEmpty ( ~LIST_dataTypes ) ; "" ; 
+
+	// if the list of valid types contains an invalid value, return an error (abort validation)
+	not ValueList.ValueExistsInList ( ~LIST_validDataTypes ; ~LIST_dataTypes ); 
+
+				// else return an error object
+				Validate._errorCreate ( ~key ; "One or more values in the list of valid data types (" & Substitute ( ~LIST_dataTypes ; "¶"; ", " ) & ") is invalid"  );
+
 
 	// validate that the given value matches a valid data type
 	Let ([ 
 
 		// determine base data type (e.g. text, number, etc)
-		~LIST_validDataTypes = Validate._dataType ( ~value );
+		~LIST_baseDataTypes = Validate._dataType ( ~value );
 
 		// validate data type against first higher order data types, then base data types (e.g. "boolean" could also be true if validating as such or as "number")
-		~typeMatch = ValueList.ValueExistsInList( ~LIST_validDataTypes ; ~type );
+		~typeMatch = ValueList.ValueExistsInList( ~LIST_baseDataTypes ; ~type );
 
 		~=""]; 
 
@@ -54,15 +70,21 @@ Case (
 				~typeMatch ; "" ;  
 
 				// if there are other valid types, recurse to check the next one
-				ValueCount ( ~list ) > 1 ; 
+				ValueCount ( ~LIST_dataTypes ) > 1 ; 
 
 					// RECURSE ///////////////////////////
-					Validate.Rule.IsOfType ( ~key ; Substitute ( ~list & "¶" ; ~type & "¶" ; "" ) );
+					Validate.Rule.IsOfType ( ~key ; Substitute ( ~LIST_dataTypes & "¶" ; ~type & "¶" ; "" ) );
 					////////////////////////////////////////
 
 
 				// else return an error object
-				Validate._errorCreate ( ~key ; "Value type is invalid"  ) 
+				Validate._errorCreate ( ~key ; "Value data type" & 
+					If ( ValueCount ( ~LIST_baseDataTypes ) > 1 ; 
+						"s (" & Substitute ( ~LIST_baseDataTypes ; "¶"; ", " ) & ") are"; 
+						" (" & ~LIST_baseDataTypes & ") is"
+						) 
+						& " not on the given list of allowed data types"  
+					) 
 
 				)
 
