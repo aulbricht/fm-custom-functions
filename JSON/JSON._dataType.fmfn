@@ -37,10 +37,10 @@ Let ([
 // return the corresponding numeral for the JSONSetElements data type argument
 Case (
 
-	~dataType = "number" ; 2 ;
-	~dataType = "object" ; 3 ;
-	~dataType = "array" ; 4 ;
-	1
+	~dataType = "number" ; 2 ; // JSONNumber
+	~dataType = "object" ; 3 ; // JSONObject
+	~dataType = "array" ; 4 ; // JSONArray
+	1 // default to JSONString
 
 )
 
