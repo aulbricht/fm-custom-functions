@@ -1,34 +1,45 @@
 /**
  *
- * Determine the JSON data type (e.g. numeric, string, etc) and return the corresponding numeral for the JSONSetElements data type argument
+ * Return the primary valid data type, (e.g. 0 or 1 would be valid for both "number" and "boolean", but this function will return only "number")
  *
- * @param {data} data - input data to analyze and detext the type
- *
- * @returnSuccess {text} JSON data type: text, number, time, timestamp, object, array
+ * @param {string} data = data to evaluate for type
  * 
- * @version 1.0.1
+ * @returns {string} primary valid data type
+ *
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
- 
 
- Let ([
 
-	// Abstract the input variable
-	~value = value 
+Let ([
 
-];
+	// Abstract the parameter
+	~value = value ;
 
-Case ( 
+	~baseDataType = Case ( 
 
-	Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
-	Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
-	GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
-	GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
-	GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
-	GetAsText ( ~value ) = ~value ; "text" ;
+				// JSON object types
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
 
-)
+				// timestamp
+				GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
+
+				// date
+				GetAsText ( GetAsDate ( ~value ) ) = ~value ; "date" ;
+
+				// time
+				GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
+				GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
+
+				// text
+				GetAsText ( ~value ) = ~value ; "text" ;
+
+				);
+
+~=""];
+
+~basedataType
 
 )
