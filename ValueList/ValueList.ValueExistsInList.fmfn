@@ -1,6 +1,6 @@
 /**
  *
- * Determine is a given value is present in the list
+ * Determine is a given search string value (or list of search string values) is/are present in the given value list
  *
  * @param {text} valueList - value list (¶ delimited) to search
  * @param {text} searchString - search sub-string
@@ -9,7 +9,7 @@
  * 
  * @module ValueList
  * 
- * @version 1.0.1
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -20,18 +20,40 @@ Let ([
 	~list = valueList ;
 	~search = searchString ;
 
-	 // remove any trailing carriage returns
+	// remove any trailing carriage returns
 	~search = If( Right ( ~search ; 1 ) = "¶"; 
 			Left( ~search ; Length ( ~search ) - 1  ) ;
 			~search
-			)  
-];
+			);
 
-Case (
+	// determine if the search is a single value or a value list
+	~isMultipleSearch = ValueCount ( ~search ) > 1 ;
 
-	IsEmpty ( ~list ) and IsEmpty ( ~search ) ; False ;
-	PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0
+	// get the first (or only) value of the search list
+	~currentSearch = GetValue ( ~search ; 1 );
 
-)
+	// get the remaining values (if any) in the search list
+	~remainingSearchString = RightValues ( ~search ; ValueCount ( ~search ) - 1 );
+
+	// validate the current search value
+	~isValid = Case (
+
+		// if the list is empty, return NULL
+		IsEmpty ( ~list ) and IsEmpty ( ~currentSearch ) ; False ;
+
+		// validate current: check to see if the curent search pattern exists in the list
+		PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0 ; True ;
+
+		// if there are multiple values in the search (list), recurse with the remaining values
+		ValueCount ( ~remainingSearchString ) > 0 ; ValueList.ValueExistsInList ( ~list ; ~remainingSearchString ) ;
+
+		// default
+		False
+
+	);
+
+~=""];
+
+~isValid
 
 )
