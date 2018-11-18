@@ -9,7 +9,7 @@
  * 
  * @module ValueList
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -45,7 +45,11 @@ Let ([
 		PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0 ; True ;
 
 		// if there are multiple values in the search (list), recurse with the remaining values
-		ValueCount ( ~remainingSearchString ) > 0 ; ValueList.ValueExistsInList ( ~list ; ~remainingSearchString ) ;
+		ValueCount ( ~remainingSearchString ) > 0 ; 
+
+					// RECURSE ///////////////////////////
+					ValueList.ValueExistsInList ( ~list ; ~remainingSearchString ) ;
+					////////////////////////////////////////
 
 		// default
 		False
