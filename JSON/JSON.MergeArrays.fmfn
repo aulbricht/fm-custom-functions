@@ -10,11 +10,9 @@
  * @returnError {array} error[n].code - error code
  * @returnError {array} error[n].descriptor - description of error
  * 
- * @requires {function} DataType
- * 
  * @module JSON
  * 
- * @version 1.0.1
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -61,7 +59,7 @@
 	~value = JSONGetElement ( ~array2 ; "[0]" );
 
 	// Determine the data type which to set the data to the combined JSON object
-	~type = DataType ( ~value );
+	~type = JSON._dataType ( ~value );
 
 	// Merge the next data bit from array2 into array1
 	~jsonMerged = JSONSetElement ( ~array1 ; "[" & ~nextArrayCell & "]" ; ~value ; ~type );
