@@ -1,0 +1,19 @@
+/**
+ *
+ * Determine if the current context is iOS
+ *
+ * @returnSuccess {boolean} True if the user is on a mobile device
+ * 
+ * @module System
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+Get ( SystemPlatform ) = 3 // iOS (FMGo)
+
+or
+
+PatternCount ( Get ( FileMakerPath ) ; "/Containers/Bundle/Application/" ) = 1 // iOS SDK
