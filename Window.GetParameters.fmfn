@@ -1,0 +1,26 @@
+/**
+ *
+ * Get the parameters of the current window
+ *
+ * @returnSuccess {object} - JSON object containing keys such as "height", "width", "top", and "left"
+ * 
+ * @version 1.2.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+JSONSetElement ( "{}" ;
+
+	[ "name" ; Get ( WindowName ) ; JSONString ];
+	[ "type" ; Get ( WindowStyle ) ; JSONString ];
+
+	[ "height" ; Get ( WindowHeight ) ; JSONNumber ];
+	[ "width" ; Get ( WindowWidth ) ; JSONNumber ];
+	[ "top" ; Get ( WindowTop ) ; JSONNumber ];
+	[ "left" ; Get ( WindowLeft ) ; JSONNumber ];
+
+	[ "contentHeight" ; Get ( WindowContentHeight ) ; JSONNumber ];
+	[ "contentWidth" ; Get ( WindowContentWidth ) ; JSONNumber ]
+
+)
