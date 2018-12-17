@@ -1,0 +1,64 @@
+/**
+ *
+ * Return a LIST of valid data types, (e.g. 0 or 1 would be valid for both "number" and "boolean")
+ *
+ * @param {string} data = data to evaluate for type
+ * 
+ * @returns {string} LIST of valid data types
+ *
+ * @private
+ * @module Validate
+ *
+ * @version 1.1.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// Abstract parameter
+	~value = value ;
+
+	~baseDataType = Case ( 
+
+				// JSON object types
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
+
+				// timestamp
+				GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
+
+				// date
+				GetAsText ( GetAsDate ( ~value ) ) = ~value ; "date" ;
+
+				// time
+				GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
+
+				// number
+				GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
+
+				// text
+				GetAsText ( ~value ) = ~value ; "text" ;
+
+				);
+
+	// add check for higher order data types (e.g. "boolean" which could also be true if validating as "number") an special cases
+	~higherOrderDataType = Case ( 
+
+				// boolean / number
+				~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); "boolean" ;
+
+				// date / text
+				~baseDataType = "date" ; "text" ;
+
+				); 
+
+~=""];
+
+List (
+	~basedataType ;
+	~higherOrderDataType 
+)
+
+)
