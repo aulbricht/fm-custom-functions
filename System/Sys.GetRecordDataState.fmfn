@@ -30,19 +30,21 @@ Let([
 			omitFieldsByTypeSearch
 			);
 
-	// use UUIDs for replacement text to minimize the chance that the actual data is the same (and would get replaced by accident)
+	// use UUIDs for replacement text instead of named local variables to minimize the chance that the actual script variable or field data is the same (and would get replaced by accident and possibly cause this function to fail)
 	~beforeResultData = Get ( UUIDNumber );
 	~afterResultData = Get ( UUIDNumber );
 	~rowSeparator = Get ( UUIDNumber );
 	~recordDataVar = "$" & Get ( UUIDNumber );
 
-	// set current layout table name (note: actually the Table Occurence name)
+	// set current layout table name
+	// note: actually the Table Occurence name
 	~tableName = Get ( LayoutTableName );
 
-	// reset the result variable
+	// initialize the result variable
+	// note: since it's a variable variable name (#varinception), we have to use a Let() statement to dynamically set its value
 	~result_initJSON = Evaluate ( "Let ( " & ~recordDataVar & " = \"{}\" ; False )" );
 
-	// process SQL
+	// base SQL statement
 	~sql = "
 	SELECT FieldName, FieldType, FieldID
 	FROM FileMaker_Fields
@@ -51,13 +53,15 @@ Let([
 		AND LOWER ( FieldClass ) LIKE 'normal'
 	";
 
-	~s1 = ExecuteSQL( ~sql ; ~rowSeparator ; ~afterResultData & " &¶" & ~beforeResultData ;
+	// process the SQL call and substitutions to turn the result into a valid JSON object
+	// note: since this process is fairly complicated, the code is easier to read if we do it in linear steps instead of inline-embedding everything
+	~step_1 = ExecuteSQL( ~sql ; ~rowSeparator ; ~afterResultData & " &¶" & ~beforeResultData ;
 		~tableName
 		 );
 
-	~s2 = ~beforeResultData & ~s1 & ~afterResultData ;
+	~step_2 = ~beforeResultData & ~step_1 & ~afterResultData ;
 
-	~s3 = Substitute( ~s2;
+	~step_3 = Substitute( ~step_2;
 			[ ~beforeResultData ; "Let( [ ~f = \"" ];
 			[ ~afterResultData ; "\" ; 
 					~list = Substitute ( ~f ; {{rowSeparator}} ; \"\¶\" ) ; 
@@ -88,7 +92,7 @@ Let([
 								Case ( not omitFieldValues ; "
 									[ ~key & \".value\" ; 
 										Case ( 
-											~fieldType = \"binary\" ; \"" &
+											~fieldType = \"binary\" ;
 												GetContainerAttribute ( Evaluate ( ~key ) ; \"filename\" )
 												& \" (MD5 Hash: \" & ~dataHash & \")\" ; 
 											~fieldData 
@@ -116,12 +120,12 @@ Let([
 		);
 
 
-	~result = If ( ValueCount ( ~s1 ) > 1 ;
-			Evaluate( ~s3 )
+	~result = If ( ValueCount ( ~step_1 ) > 1 ;
+			Evaluate( ~step_3 )
 			); 
 
 ~=""];
 
-If ( IsEmpty ( ~s1 ) ; "{}" ; Evaluate ( ~recordDataVar ) )
+If ( IsEmpty ( ~step_1 ) ; "{}" ; Evaluate ( ~recordDataVar ) )
 
 )
