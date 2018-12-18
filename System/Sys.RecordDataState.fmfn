@@ -1,0 +1,127 @@
+/**
+ *
+ * Capture the state of data in all fields for the current record
+ *
+ * @returnSuccess {object} JSON object containing the current record's field data
+ * 
+ * @parameter {text} [omitFieldsByNameSearch] - OPTIONAL: omit fields by field name search criterion. Partial field name is accepted. e.g. "modif" to omit fields named "modification" or "modified"
+ * @parameter {text} [omitFieldsByTypeSearch] - OPTIONAL: specify the SQL field type of the modification fields to omit. Partial field type is accepted. e.g. timestamp, varchar, decimal
+ * @parameter {boolean} [omitFieldValues] - OPTIONAL: if True, omit field values from result (e.g. if you only need the hashes for comparison); if False, store the full values as text (slower for large data sets)
+ * 
+ * @note If both search parameters are specified, it's an "and" search (e.g. fieldnames containing "modif" AND field of type "timestamp"
+ * 
+ * @module System (Sys)
+ * 
+ * @version 1.1.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([ 
+
+	// allow FileMaker field types; convert to SQL types for those types that are different
+	omitFieldsByTypeSearch = 
+		Case ( 
+			omitFieldsByTypeSearch = "text" ; "varchar" ;
+			omitFieldsByTypeSearch = "number" ; "decimal" ;
+			omitFieldsByTypeSearch = "container" ; "binary" ;
+			omitFieldsByTypeSearch
+			);
+
+	// use UUIDs for replacement text to minimize the chance that the actual data is the same (and would get replaced by accident)
+	~beforeResultData = Get ( UUIDNumber );
+	~afterResultData = Get ( UUIDNumber );
+	~rowSeparator = Get ( UUIDNumber );
+	~recordDataVar = "$" & Get ( UUIDNumber );
+
+	// set current layout table name (note: actually the Table Occurence name)
+	~tableName = Get ( LayoutTableName );
+
+	// reset the result variable
+	~result_initJSON = Evaluate ( "Let ( " & ~recordDataVar & " = \"{}\" ; False )" );
+
+	// process SQL
+	~sql = "
+	SELECT FieldName, FieldType, FieldID
+	FROM FileMaker_Fields
+	WHERE TableName = ?
+		AND FieldType NOT LIKE 'global%'
+		AND LOWER ( FieldClass ) LIKE 'normal'
+	";
+
+	~s1 = ExecuteSQL( ~sql ; ~rowSeparator ; ~afterResultData & " &¶" & ~beforeResultData ;
+		~tableName
+		 );
+
+	~s2 = ~beforeResultData & ~s1 & ~afterResultData ;
+
+	~s3 = Substitute( ~s2;
+			[ ~beforeResultData ; "Let( [ ~f = \"" ];
+			[ ~afterResultData ; "\" ; 
+					~list = Substitute ( ~f ; {{rowSeparator}} ; \"\¶\" ) ; 
+					~key = GetValue ( ~list ; 1 ); 
+					~fieldType = GetValue ( ~list ; 2 );
+					~recordID = GetValue ( ~list ; 3 );
+					~fieldData = Let ( ~value = Evaluate ( ~key ); 
+									If ( ~fieldType = GetAsNumber ( ~fieldType ) ; ~value ; List ( ~value ) )
+									); 
+					~dataHash = GetContainerAttribute ( ~fieldData ; \"MD5\" );
+					{{recordData}} = 
+						Case (
+							IsEmpty ( ~fieldData ) ; {{recordData}} ; 
+							PatternCount ( ~key ; \"" & omitFieldsByNameSearch & "\") > 0 " &
+
+								// if both search criteria are specified, perform an "and" search, otherwise "or" since it's just one or the other
+								Case (
+									not IsEmpty ( omitFieldsByNameSearch ) and not IsEmpty ( omitFieldsByTypeSearch ); "and" ; "or"
+
+								)
+
+							& " PatternCount ( ~fieldType ; \"" & omitFieldsByTypeSearch & "\") > 0 ; {{recordData}} ; 
+							JSONSetElement ( {{recordData}} ; " & 
+
+								/////////////////////////////////////////////////
+								// Only include the .value element if it's not flagged to be omitted
+								/////////////////////////////////////////////////
+								Case ( not omitFieldValues ; "
+									[ ~key & \".value\" ; 
+										Case ( 
+											~fieldType = \"binary\" ; \"" &
+												GetContainerAttribute ( Evaluate ( ~key ) ; \"filename\" )
+												& \" (MD5 Hash: \" & ~dataHash & \")\" ; 
+											~fieldData 
+											);
+										Case (
+											~fieldType = \"decimal\" or ~fieldType = \"numeric\"; JSONNumber;
+											JSONString
+											)
+
+										]; 
+								" )
+								/////////////////////////////////////////////////
+
+							& "
+								[ ~key & \".hash\" ; ~dataHash ; JSONString  ];
+								[ ~key & \".type\" ; ~fieldType ; JSONString  ];
+								[ ~key & \".recordID\" ; ~recordID ; JSONNumber  ]
+								) 
+							)
+					]; False )" ];
+
+			[ "{{rowSeparator}}" ; Quote ( ~rowSeparator ) ];
+			[ "{{recordData}}" ; ~recordDataVar ]
+
+		);
+
+
+	~result = If ( ValueCount ( ~s1 ) > 1 ;
+			Evaluate( ~s3 )
+			); 
+
+~=""];
+
+If ( IsEmpty ( ~s1 ) ; "{}" ; Evaluate ( ~recordDataVar ) )
+
+)
