@@ -1,0 +1,76 @@
+/**
+ *
+ * Given any date, Determine the start date and end date of a calendar quarter in which that date falls.
+ *
+ * @parameter {date} dateToEvaluate - The origin date to evaluate in which quarter it falls
+ * @parameter {number} [numQuartersOffset] - OPTIONAL: evaluate the quarter relative to the one the dateToEvaluate falls within. For example, if the dateToEvaluate is "4/15/2020" (Q2) and the numQuartersOffset is "-1", the result will include the Q1 bounding dates "1/1/2020" and "3/31/2020"
+ * 
+ * @returnSuccess {object} quarter - JSON object containing the resultant calendar quarter data
+ * @returnSuccess {date} quarter.start - bounding start date
+ * @returnSuccess {date} quarter.end - bounding end date
+ * @returnSuccess {date} quarter.number - quarter number in the year
+ * @returnSuccess {date} quarter.year - quarter year
+ * 
+ * @module System (Sys)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+
+	/////////////////////////////////////
+	~date = dateToEvaluate;
+	~offset = numQuartersOffset;
+	/////////////////////////////////////
+
+	~currentQuarter = Ceiling( Month( ~date ) / 3 );
+
+
+	~adjustedQuarter = Let([ ~q = ~currentQuarter + ~offset; ~mod = Mod( ~q; 4 ) ];
+		If( ~mod = 0; 4; ~mod	)
+	);
+
+
+	~month = Let( ~q = ~adjustedQuarter;
+		Ceiling( ~q * 3 ) - 2
+	);
+
+
+	~yearOffset = Let( ~offset = ~currentQuarter + ~offset;
+		Case( 
+			~offset > 0; Ceiling( ~offset / 4 ) - 1 ; 
+			~offset ≤ 0; Div( ~offset - 1 ; 4 )
+		) 
+	);
+
+
+	~year = Let( ~y = Year( ~date );
+		~y + ~yearOffset
+	);
+
+
+	~startDate = Let([ ~m = ~month; ~y = ~year ];
+		Date( ~m; 1; ~y )
+	);
+
+
+	~endDate = Let([ ~m = ~month + 3; ~y = ~year ];
+		Date( ~m; 1; ~y ) - 1 
+	);
+
+~=""];
+
+JSONSetElement ( "{}" ;
+
+	[ "quarter.start" ; ~startDate ; JSONString ];
+	[ "quarter.end" ; ~endDate ; JSONString ];
+	[ "quarter.number" ; ~adjustedQuarter ; JSONNumber ];
+	[ "quarter.year" ; ~year ; JSONNumber ]
+
+)
+
+)
