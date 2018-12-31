@@ -1,13 +1,12 @@
 /**
  *
- * Formats a JSON object
+ * Formats a JSON object, or returns any non-JSON text as-is (no error)
  *
  * @param {text} json - JSON object
  *
  * @returnSuccess {object} returns formatted JSON object
  *
- * @returnError {array} error[n].code - error code
- * @returnError {array} error[n].descriptor - description of error
+ * @returnError {test} if the passed in string is not a JSON object, simply return the same string
  * 
  * @module JSON
  * 
@@ -19,19 +18,16 @@
 
 
 Let ([
+
 	~json = json;
 	~jsonVal = JSONFormatElements ( ~json );
 	~result = Case (
-				Left ( ~jsonVal; 1 ) = "?"; 
-					JSONSetElement ("{}"; 
-						[ "errorCode"; -3; JSONNumber ]; 
-						[ "descriptor"; "JSON invalid"; JSONString ]
-						);
+				Left ( ~jsonVal; 1 ) = "?"; ~json ;
 				~jsonVal
 				);
 
 ~=""];
 
-JSONFormatElements ( ~result )
+~result
 
 )
