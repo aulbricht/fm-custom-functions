@@ -7,8 +7,7 @@
  *
  * @returnSuccess {object} returns a value
  *
- * @returnError {array} error[n].code - error code
- * @returnError {array} error[n].descriptor - description of error
+ * @returnError {test} if the passed in string is not a JSON object, simply return NULL
  * 
  * @module JSON
  * 
@@ -23,14 +22,14 @@ Let ([
 	~json = json ;
 	~key = key ;
 	~left = Left ( ~json ; 1 );
-	~isValid = Left ( JSONFormatElements ( ~result ); 1 ) ≠ "?" ;
+	~isValid = Left ( JSONFormatElements ( ~json ); 1 ) ≠ "?" ;
 	~value = JSONGetElement ( ~json; ~key );
 ~=""];
 
 Case ( 
 
 	// if valid JSON, return result
-	~left = "{" or ~left = "[" and ~isValid ; ~result ;
+	~left = "{" or ~left = "[" and ~isValid ; ~value ;
 
 	// return NULL if invalid JSON
 	""
