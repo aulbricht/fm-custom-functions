@@ -6,11 +6,13 @@
  * @param {string} value - value to assign to the variable
  * @param {string} [scope] - global ($$) or local ($) or private (~). Default is local ($).
  * 
- * @return {boolean} success - True if the variable was successfully assigned
+ * @note If the varName contains scope symbols (e.g. $ or ~) and the scope parameter is specified, the scope parameter will override the contained scope.
  * 
- * @module Var
+ * @return {boolean} False if the variable was successfully assigned
  * 
- * @version 1.0.0
+ * @module Variables (Var)
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  **/
@@ -22,11 +24,12 @@ Let ([
 	~value = value ;
 	~scope = scope ;
 
-	~scopeSym = Let ( ~s = Filter ( ~variable ; "$" ); 
+	~scopeSym = Let ( ~containedScope = Filter ( ~variable ; "$" ); 
 			Case ( 
-				Length ( ~s ) > 0 ; ~s ;
 				~scope = "global" ; "$$" ;
+				~scope = "local" ; "$" ;
 				~scope = "private" ; "~" ;
+				Length ( ~containedScope ) > 0 ; ~containedScope ;
 				"$"
 				)
 			);
