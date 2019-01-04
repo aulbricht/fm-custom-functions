@@ -1,0 +1,48 @@
+/**
+ * 
+ * Assign a value to a dynamic variable name
+ * 
+ * @param {string} varName - name of the variable
+ * @param {string} value - value to assign to the variable
+ * @param {string} [scope] - global ($$) or local ($) or private (~). Default is local ($).
+ * 
+ * @return {boolean} success - True if the variable was successfully assigned
+ * 
+ * @module Var
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([ 
+
+	~variable = varName ;
+	~value = value ;
+	~scope = scope ;
+
+	~scopeSym = Let ( ~s = Filter ( ~variable ; "$" ); 
+			Case ( 
+				Length ( ~s ) > 0 ; ~s ;
+				~scope = "global" ; "$$" ;
+				~scope = "private" ; "~" ;
+				"$"
+				)
+			);
+
+	~subStr = "Let( {{scope}}{{variable}} = \"{{value}}\" ; False)";
+
+	~evalStr = Substitute ( ~subStr ;
+			[ "{{scope}}" ; ~scopeSym ];
+			[ "{{variable}}" ; ~variable ];
+			[ "{{value}}" ; ~value ]
+			);
+
+	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) )
+
+];
+
+~evalResult
+
+)
