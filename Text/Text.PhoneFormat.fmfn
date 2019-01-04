@@ -1,0 +1,118 @@
+/**
+ * 
+ * Assign a value to a dynamic variable name
+ * 
+ * @param {string} phoneNumber
+ * 
+ * @note If the number contains both a country code and an extension, the extension must follow text that includes the letter "x" (e.g. "ext." or "x")
+ * 
+ * @return {string} formatted phone number
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+	~phone = phoneNumber ;
+
+	// filter invalid characters 
+	~phoneFiltered = Filter ( ~phone ;"0123456789+x"); 
+
+	~phoneAsNumber = Abs ( GetAsNumber ( ~phone ) );
+	~digitCount = Length ( ~phoneAsNumber );
+
+	// determine what features the phone number contains
+	~hasExt = Max ( PatternCount ( ~phone ; "ext" ); PatternCount ( ~phone ; "x" ) ) > 0 ;
+	~hasCountryCode = Let ( ~left = Left ( ~phoneFiltered ; 1 ); ~left = "+" or ~left = "0" or ~left = "1" );
+
+	~format = Case (
+
+			// no country code (but could have an extension)
+			not ~hasCountryCode ; List ( 0 ; 3 ; 3 ; 4 ; Max ( 0 ; ~digitCount - 10 ) );
+
+			// has a country code and no extension
+			~hasCountryCode and not ~hasExt; List ( Max ( 0 ; ~digitCount - 10 ) ; 3 ; 3 ; 4 ; 0 );
+
+			// has a country code and an extension
+			Let ([
+
+				~phoneSansNums = Substitute ( ~phone ; [0;""];[1;""];[2;""];[3;""];[4;""];[5;""];[6;""];[7;""];[8;""];[9;""] );
+				~lastChar = Right ( ~phoneSansNums ; 1 );
+				~pos = Position ( ~phone ; ~lastChar ; 1 ; PatternCount ( ~phone ; ~lastChar )) ;
+				~ext = 	GetAsNumber ( Right ( ~phone ; Length ( ~phone ) - ~pos ) );
+				~lengthExt = Length ( ~ext );
+				~lengthCountryCode = Max ( 0 ; ~digitCount - 10 - ~lengthExt )
+
+				];
+
+				List ( ~lengthCountryCode ; 3 ; 3 ; 4 ; ~lengthExt )
+
+				)
+
+			);
+
+~=""];
+
+
+// country code
+Let ([
+	~section = 1 ; 
+	~digits = GetValue ( ~format ; ~section )
+	]; 
+
+	If ( ~digits > 0 ; "+" & Middle ( ~phoneAsNumber ; 1 ; ~digits ) & " " ) 
+
+	) &
+
+
+// area code
+Let ([ 
+	~section = 2 ; 
+	~digits = GetValue ( ~format ; ~section ); 
+	~start = Evaluate ( Substitute ( MiddleValues ( ~format ; 1 ; ~section - 1 ); "¶" ; "+" ) & 0 ) + 1
+	];
+
+	If ( ~digits > 0 ; Middle ( ~phoneAsNumber ; ~start ; ~digits ) & "-" )
+
+	) &
+
+// prefix
+Let ([ 
+	~section = 3 ; 
+	~digits = GetValue ( ~format ; ~section ); 
+	~start = Evaluate ( Substitute ( MiddleValues ( ~format ; 1 ; ~section - 1 ); "¶" ; "+" ) & 0 ) + 1
+	];
+
+	If ( ~digits > 0 ; Middle ( ~phoneAsNumber ; ~start ; ~digits ) & "-" )
+
+	) &
+
+// line number
+Let ([ 
+	~section = 4 ; 
+	~digits = GetValue ( ~format ; ~section ); 
+	~start = Evaluate ( Substitute ( MiddleValues ( ~format ; 1 ; ~section - 1 ); "¶" ; "+" ) & 0 ) + 1
+	];
+
+	If ( ~digits > 0 ; Middle ( ~phoneAsNumber ; ~start ; ~digits ))
+
+	) &
+
+// extension
+Let ([ 
+	~section = 5 ; 
+	~digits = GetValue ( ~format ; ~section ); 
+	~start = Evaluate ( Substitute ( MiddleValues ( ~format ; 1 ; ~section - 1 ); "¶" ; "+" ) & 0 ) + 1
+	];
+
+	If ( ~digits > 0 ; " ext. " & Middle ( ~phoneAsNumber ; ~start ; ~digits ))
+
+	) 
+
+
+)
