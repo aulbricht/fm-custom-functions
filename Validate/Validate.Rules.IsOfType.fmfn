@@ -4,7 +4,7 @@
  *
  * @param {string} key = the JSON key path to the value to test; if NULL, validation is aborted
  * @param {string} LIST_dataTypes = list of valid data types for the value; if NULL, any data type is accepted
- *				Valid types: text, number, date, time, timestamp, object, array
+ *				Valid types: text, number, boolean, date, time, timestamp, object, array
  *
  * @returnSuccess {NULL}
  * @returnError {object} Validate.Error: an error object
@@ -13,7 +13,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} ValueList.ValueExistsInList()
  * 
- * @version 1.1.1
+ * @version 1.2.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -31,14 +31,17 @@ Let ([
 			);
 
 	// All valid data types (which this function is able to validate)
-	~LIST_validDataTypes = List ( "text"; "number"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
+	~LIST_validDataTypes = List ( "text"; "number"; "boolean"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
 
 	// Get the first type in the list to test
 	~type = GetValue ( ~LIST_dataTypes ; 1 );
 
-	~value = JSONGetElement( $Validate.This ; ~key  )
+	~value = Case ( 
+			Left ( JSONFormatElements ( $Validate.This ) ; 1 ) = "?" ; "" ; 
+			JSONGetElement( $Validate.This ; ~key  )
+			);
 
-];
+~=""];
 
 Case (
 
@@ -62,7 +65,6 @@ Case (
 		~typeMatch = ValueList.ValueExistsInList( ~LIST_baseDataTypes ; ~type );
 
 		~=""]; 
-
 
 			Case ( 
 
