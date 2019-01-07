@@ -1,0 +1,38 @@
+/**
+ *
+ * Get the value from a JSON object key/value pair
+ *
+ * @param {text} json - initial JSON object
+ * @param {text} key - key for the element
+ *
+ * @returnSuccess {object} returns a value
+ *
+ * @returnError {test} if the passed in string is not a JSON object, simply return NULL
+ * 
+ * @module JSON
+ * 
+ * @version 1.1.2
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+	~json = json ;
+	~key = key ;
+	~value = JSONGetElement ( ~json ; ~key );
+	~isInvalid = Left ( JSONFormatElements ( ~json ) ; 1 ) = "?" ;
+~=""];
+
+Case ( 
+
+	// instead of an error, simply return NULL if invalid JSON
+	~isInvalid ; "" ;
+
+	// if valid JSON, return result
+	~value
+
+	)
+
+)
