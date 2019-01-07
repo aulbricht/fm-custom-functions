@@ -11,7 +11,7 @@
  * 
  * @module JSON
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -21,15 +21,14 @@
 Let ([
 	~json = json ;
 	~key = key ;
-	~left = Left ( ~json ; 1 );
-	~isValid = Left ( JSONFormatElements ( ~json ); 1 ) ≠ "?" ;
 	~value = JSONGetElement ( ~json; ~key );
+	~isValid = Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" ;
 ~=""];
 
 Case ( 
 
 	// if valid JSON, return result
-	~left = "{" or ~left = "[" and ~isValid ; ~value ;
+	~isValid ; ~value ;
 
 	// return NULL if invalid JSON
 	""
