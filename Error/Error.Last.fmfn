@@ -1,0 +1,22 @@
+/********
+ * 
+ * Wrap the last error in a JSON Object
+ * 
+ * @param {object} [data] - optional extra data to include in the error object
+ * @param {object} [errorArray] - optional include an existing array or object to create or add to an error array
+ * 
+ * @return {array} an array of errors. Note: if there is only one error, it will be an object
+ * 
+ * @module Error
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @credit Forked from code by original author Todd Geist
+ * 
+ *******/
+
+Let ( ~error = Get ( LastError ) ;
+
+	Error.Wrap ( ~error ; Error.GetDescriptor ( ~error ) ; data ; errorArray )
+
+)
