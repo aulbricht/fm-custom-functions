@@ -4,14 +4,14 @@
  * 
  * @param {number} errorCode - the FileMaker Error Code.
  * @param {string} descriptor - describe where the error is happening
- * @param {object} [data] - optional extra data to include in the error object
+ * @param {text or object} [data] - optional extra data to include in the error object
  * @param {object} [errorArray] - optional include an existing array or object to create or add to an error array
  * 
  * @return {array} an array of errors. Note: if there is only one error, it will be an object
  * 
  * @module Error
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit Forked from code by original author Todd Geist
  * 
@@ -36,7 +36,12 @@ Let ([
 				JSONSetElement ( ~base ; "errorMessage"; Error.GetDescriptor ( ~error ) ; JSONString ) ; 
 				~base 
 				);
-
+	~dataType = Let ( ~leftChar = Left ( JSONFormatElements ( ~data )  ; 1 ); 
+							Case ( 
+								~leftChar = "{" or ~leftChar = "[" ; JSONObject ; 
+								JSONString 
+								) 
+							);
 	~currentError = Case (
 		not ~error ; ~base ;
 	
@@ -44,7 +49,7 @@ Let ([
 			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
 			[ "type" ; "FM" ; JSONString ] ;
 			[ "descriptor" ; ~descriptor ; JSONString] ;
-			[ "data" ; ~data ; JSONObject ] 
+			[ "data" ; ~data ; ~dataType ] 
 		 )
 
 	);
