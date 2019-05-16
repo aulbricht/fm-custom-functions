@@ -3,6 +3,11 @@
  * Tests the object for an errorCode
  * 
  * @param {object} errorObject - JSON error object or array
+ * @param {text or number} cell - OPTIONAL: specify which array cell to test
+ * 									Valid parameter values:
+ * 										"any" [default]
+ * 										"last" / "n" - last (most recent) array cell
+ * 										1, 2..[n] - numeric cell value (1 = array cell 0, etc)
  * 
  * @return {boolean} TRUE if any errorCode is not 0 or NULL
  * 
@@ -10,7 +15,7 @@
  * 
  * @module Error
  * 
- * @version 1.1.3
+ * @version 2.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  ********/
@@ -19,10 +24,22 @@
 Let ([
 
 	~eo = errorObject ;
+	~cell = cell ;
 
+	// process cell specification
+	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
+	~eo = Case (
+			not ~isArray ; ~eo ; // if the object is anything except an array, skip this step
+			~cell = "last" ; JSONGetElement ( ~eo ; "[" & ValueCount ( JSONListKeys ( ~eo ; "." )) - 1 & "]" );
+			~cell > 0 and ~cell = GetAsNumber ( ~cell ) ; JSONGetElement ( ~eo ; Int ( ~cell ) - 1 );
+			~eo
+			);
+
+	// determine error object input type
 	~isObject = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "{" ;
 	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
 	~isJSON = ~isObject or ~isArray ;
+
 
 	~errorNonJSON = If ( not ( ~isJSON ) ; ~eo );
 	~LIST_keys = JSONListKeys ( ~eo ; "." );
@@ -49,7 +66,8 @@ Let ([
 							JSONDeleteElement ( 
 								~eo ; 
 								If ( ~isJSON ; GetValue ( ~LIST_keys ; 1 ) ; "[0]" ) 
-								) 
+								);
+							""
 							);
 
 						/////////////////////////////////////////////////////////

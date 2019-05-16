@@ -1,0 +1,111 @@
+/********
+ * 
+ * Extract the custom error message(s) from the json object
+ * 
+ * @param {object} errorObject - the error JSON object or array
+ * @param {text or number} cell - OPTIONAL: specify which array cell to test
+ * 						Valid parameter values:
+ * 							"any" / "all" [default]
+ * 							"last" / "n" - last (most recent) array cell
+ * 							1, 2..[n] - numeric cell value (1 = array cell 0, etc)
+ * 
+ * @param {text} element - OPTIONAL: the error element to extract
+ *	 					Valid elements:
+ *	 						errorMessage / message [default]
+ *	 						errorCode / error / code
+ *	 						descriptor
+ *	 						json / array / .
+ *
+ * 
+ * @return {text} description of the error, or value list of descriptions if multiple
+ * 
+ * @note If error object is an array, will return result as a value list
+ * 
+ * @module Error
+ * 
+ * @version 2.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ *******/
+
+
+Let ([
+
+	~eo = errorObject ;
+	~cell = cell ;
+	~element = element ;
+	
+	// process cell specification
+	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
+	~eo = Case (
+			not ~isArray ; ~eo ; // if the object is anything except an array, skip this step
+			~cell = "last" ; JSONGetElement ( ~eo ; "[" & ValueCount ( JSONListKeys ( ~eo ; "." )) - 1 & "]" );
+			~cell > 0 and ~cell = GetAsNumber ( ~cell ) ; JSONGetElement ( ~eo ; Int ( ~cell ) - 1 );
+			~eo
+			);
+
+	// account for alternative element names
+	~element = 
+		Case ( 
+			IsEmpty ( ~element ) ; "errorMessage";
+			~element = "message" ; "errorMessage";
+			~element = "error" ; "errorCode";
+			~element = "code" ; "errorCode";
+			~element = "json" or ~element = "array" ; ".";
+			~element
+			);
+
+	// If errorObject is an ARRAY of errors
+	~isArray = Left ( ~eo ; 1 ) = "[" ;
+	~numCells = If ( ~isArray ; ValueCount ( JSONListKeys ( ~eo ; "." ) ) );
+
+	// Get error message (if array: extract from the first element in the array)
+	~key = If ( ~isArray ; "[0]." ) & ~element ;
+	~result = JSONGetElement ( ~eo ; ~key );
+
+	~nextResult = 
+		If ( ~isArray and ~numCells > 1 ; 
+
+			///////////////////////////////////////////
+			// RECURSIVE CALL /////////////////////////
+
+			Error.Extract ( 
+				JSONDeleteElement ( ~eo ; "[0]" ); 
+				~cell ;
+				~element 
+				)
+
+			///////////////////////////////////////////
+			///////////////////////////////////////////
+
+			);
+
+~=""];
+
+Case (
+
+	// invalid JSON
+	Left ( ~eo ; 1 ) = "?" ; 
+		JSONSetElement( "{}" ;
+			[ "errorCode"; "-2" ; JSONNumber ]; 
+			[ "type"; "Error.Message" ; JSONString ]; 
+			[ "scriptName" ; Get ( ScriptName ); JSONString ];
+			[ "message" ; List ( "Error object to validate is invalid JSON" ; ~eo ) ; JSONString ]
+			);
+
+	// invalid result, return NULL
+	Left ( ~result ; 1 ) = "?" ; "" ;
+
+	// Return result or list of results; omitting empty results (instead of having a blank line)
+	Case ( 
+		~isArray ; 
+			List ( 
+				If ( not IsEmpty ( ~result ) ; ~result );
+				If ( not IsEmpty ( ~nextResult ) ; ~nextResult )
+				);
+		~result
+		)
+
+	)
+
+)
