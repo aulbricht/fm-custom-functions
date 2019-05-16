@@ -11,7 +11,7 @@
  * 
  * @module Error
  * 
- * @version 1.1.2
+ * @version 1.1.3
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit Forked from code by original author Todd Geist
  * 
@@ -61,15 +61,15 @@ Let ([
 								) 
 							);
 	
-	~currentError = Case (
-		not ~error ; ~base ;
-	
-		JSONSetElement( ~basePlusMessage ; 
-			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
-			[ "type" ; "FM" ; JSONString ] ;
-			[ "descriptor" ; ~descriptor ; JSONString] ;
-			[ "data" ; ~data ; ~dataType ] 
-		 )
+	~currentError = 
+		Case (
+			not ~error ; ~base ;
+			JSONSetElement( ~basePlusMessage ; 
+				[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
+				[ "type" ; "FM" ; JSONString ] ;
+				[ "descriptor" ; ~descriptor ; JSONString] ;
+				[ "data" ; ~data ; ~dataType ] 
+			 )
 
 	);
 
@@ -81,7 +81,10 @@ Case (
 	IsEmpty ( ~array ) ; ~currentError ;
 	
 	// If the provided error object is an array already, append the current error object
-	Left ( ~array ; 1 ) = "[" ; JSONSetElement( ~array ; ~nextArrayCell ; ~currentError ; JSONObject );
+	Left ( ~array ; 1 ) = "[" ; 
+		JSONFormatElements (
+			JSONSetElement( ~array ; ~nextArrayCell ; ~currentError ; JSONObject )
+			);
 
 	// If the provided error object is a single error object, create an array out of the two objects
 	Left ( ~array ; 1 ) = "{" ; 
