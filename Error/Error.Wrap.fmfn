@@ -11,7 +11,7 @@
  * 
  * @module Error
  * 
- * @version 1.1.1
+ * @version 1.1.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit Forked from code by original author Todd Geist
  * 
@@ -32,9 +32,27 @@ Let ([
 	~error = If( IsEmpty ( ~error ) ; 0 ; GetAsNumber ( ~error ) );
 
 	~base = JSONSetElement ( "{}" ; "errorCode" ; ~error ; JSONNumber );
-	~basePlusMessage = If ( ~error ≥ -1 ; 
+	~basePlusMessage = If ( ~error ≠ 0 ; 
 				JSONSetElement ( ~base ; "errorMessage"; Error.GetDescriptor ( ~error ) ; JSONString ) ; 
 				~base 
+				);
+	
+	~data = If ( IsEmpty ( ~data );
+				JSONSetElement ( "{}" ;
+					[ "accountName" ; Get ( AccountName ) ; JSONString ];
+					[ "accountPrivilegeSetName" ; Get ( AccountPrivilegeSetName ) ; JSONString ];
+					[ "filename" ; Get ( FileName ) ; JSONString ];
+					[ "scriptParameter" ; Get ( ScriptParameter ) ; JSONString ];
+					[ "scriptResult" ; Get ( ScriptResult ) ; JSONString ];
+					[ "lastODBCError" ; Get ( LastExternalErrorDetail ) ; JSONString ];
+					[ "layoutName" ; Get ( LayoutName ) ; JSONString ];
+					[ "layoutTableName" ; Get ( LayoutTableName ) ; JSONString ];
+					[ "recordOpenCount" ; Get ( RecordOpenCount ) ; JSONNumber ];
+					[ "recordModificationCount" ; Get ( RecordModificationCount ) ; JSONNumber ];
+					[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
+					[ "activeFieldTableName" ; Get ( ActiveFieldTableName ) ; JSONString ];
+					[ "activeLayoutObjectName" ; Get ( ActiveLayoutObjectName ) ; JSONString ]
+					)
 				);
 	~dataType = Let ( ~leftChar = Left ( JSONFormatElements ( ~data )  ; 1 ); 
 							Case ( 
@@ -42,6 +60,7 @@ Let ([
 								JSONString 
 								) 
 							);
+	
 	~currentError = Case (
 		not ~error ; ~base ;
 	
@@ -66,10 +85,12 @@ Case (
 
 	// If the provided error object is a single error object, create an array out of the two objects
 	Left ( ~array ; 1 ) = "{" ; 
-			JSONSetElement( "[]" ; 
+		JSONFormatElements (
+			JSONSetElement ( "[]" ; 
 				[ "[0]" ; ~array ; JSONObject ];
 				[ "[1]" ; ~currentError ; JSONObject ]
 				)
+			)
 
 )
 
