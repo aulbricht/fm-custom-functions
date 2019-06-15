@@ -11,7 +11,7 @@
  * 
  * @module Error
  * 
- * @version 1.1.3
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit Forked from code by original author Todd Geist
  * 
@@ -33,7 +33,7 @@ Let ([
 
 	~base = JSONSetElement ( "{}" ; "errorCode" ; ~error ; JSONNumber );
 	~basePlusMessage = If ( ~error ≠ 0 ; 
-				JSONSetElement ( ~base ; "errorMessage"; Error.GetDescriptor ( ~error ) ; JSONString ) ; 
+				JSONSetElement ( ~base ; "errorMessage"; Error._getDescriptor ( ~error ) ; JSONString ) ; 
 				~base 
 				);
 	
@@ -77,6 +77,9 @@ Let ([
 
 Case (
 	
+	// If the error code is 0, do not add it to the errors array; rather, return the original error object
+	~error = 0 or IsEmpty ( ~error ) ; ~array ;
+
 	// If no additional errors were provided, just return the new error object
 	IsEmpty ( ~array ) ; ~currentError ;
 	
