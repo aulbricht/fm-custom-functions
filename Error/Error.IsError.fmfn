@@ -5,9 +5,9 @@
  * @param {object} errorObject - JSON error object or array
  * @param {text or number} cell - OPTIONAL: specify which array cell to test
  * 									Valid parameter values:
- * 										"any" [default]
  * 										"last" / "n" - last (most recent) array cell
  * 										1, 2..[n] - numeric cell value (1 = array cell 0, etc)
+ * 										[default] - no value or any other value will simply default to any/all cells
  * 
  * @return {boolean} TRUE if any errorCode is not 0 or NULL
  * 
@@ -15,7 +15,7 @@
  * 
  * @module Error
  * 
- * @version 2.0.1
+ * @version 2.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  ********/
