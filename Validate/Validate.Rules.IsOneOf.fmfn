@@ -9,9 +9,9 @@
  * @returnError {object} Validate.Error: an error object
  * 
  * @module Validate
- * @requires {function} ValueList.ValueExistsInList()
+ * @requires {function} Validate._errorCreate()
  * 
- * @version 1.0.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -23,7 +23,7 @@ Let ([
 	~key = key ;
 	~list = LIST_values ;
 
-	~value = JSONGetElement(  $Validate.This ; ~key  )
+	~value = JSONGetElement(  $validate.this ; ~key  )
 
 ];
 
@@ -33,7 +33,7 @@ Case (
 	IsEmpty ( ~value ) ; "" ; 
 
 	// if value exists in the list, return NULL 
-	ValueList.ValueExistsInList  ( ~list ; ~value ) ; "" ; 
+	PatternCount ( "¶" & ~list & "¶"; "¶" & ~value & "¶" ) > 0 ; "" ; 
 
 	// if value does not exist in the list, return error
 	Validate._errorCreate ( ~key ; "\"" & ~key & "\" should be one of: " & Substitute( ~list ; "¶"; ", " ) & ". Instead it was: " & If ( IsEmpty( ~value ) ; "EMPTY STRING" ; ~value ) )
