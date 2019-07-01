@@ -11,18 +11,20 @@
  * 
  * @module Validate
  * @requires {function} Validate._dataType()
- * @requires {function} ValueList.ValueExistsInList()
+ * @requires {function} Validate._errorCreate()
  * 
- * @version 1.2.1
+ * @version 1.3.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
+
 
 Let ([
 
 	// Abstract parameters
 	~key = key ;
 	~LIST_dataTypes = UniqueValues ( LIST_dataTypes );
+	~dataToValidate = $validate.this ;
 
 	// remove any trailing carriage returns
 	~LIST_dataTypes = If ( Right ( ~LIST_dataTypes ; 1 ) = "¶" ; 
@@ -37,8 +39,8 @@ Let ([
 	~type = GetValue ( ~LIST_dataTypes ; 1 );
 
 	~value = Case ( 
-			Left ( JSONFormatElements ( $Validate.This ) ; 1 ) = "?" ; "" ; 
-			JSONGetElement( $Validate.This ; ~key  )
+			Left ( JSONFormatElements ( ~dataToValidate ) ; 1 ) = "?" ; "" ; 
+			JSONGetElement( ~dataToValidate ; ~key  )
 			);
 
 ~=""];
@@ -48,21 +50,22 @@ Case (
 	// if no value was provided or if no type was provided, return NULL (abort validation)
 	IsEmpty ( ~key ) or IsEmpty ( ~value ) or IsEmpty ( ~LIST_dataTypes ) ; "" ; 
 
-	// if the list of valid types contains an invalid value, return an error (abort validation)
-	not ValueList.ValueExistsInList ( ~LIST_validDataTypes ; ~LIST_dataTypes ); 
+	// if the current data type is invalid, return an error (abort validation)
+	not PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) > 0 ; 
 
-				// else return an error object
-				Validate._errorCreate ( ~key ; "One or more values in the list of valid data types (" & Substitute ( ~LIST_dataTypes ; "¶"; ", " ) & ") is invalid"  );
+		// else return an error object
+		Validate._errorCreate ( ~key ; "\"" & ~type & "\" is not a valid data type.";
 
 
+	// DEFAULT CASE CONDITION
 	// validate that the given value matches a valid data type
 	Let ([ 
 
-		// determine base data type (e.g. text, number, etc)
+		// determine the possible valid data types for the given value (e.g. text, number, etc)
 		~LIST_baseDataTypes = Validate._dataType ( ~value );
 
-		// validate data type against first higher order data types, then base data types (e.g. "boolean" could also be true if validating as such or as "number")
-		~typeMatch = ValueList.ValueExistsInList( ~LIST_baseDataTypes ; ~type );
+		// validate data type against first higher order data type, then base data type (e.g. "boolean" as a base data type could also be true if validating as such or as "number", which would be a higher order data type for a boolean value)
+		~typeMatch = PatternCount ( "¶" & ~LIST_baseDataTypes & "¶"; "¶" & ~type & "¶" ) > 0 ;
 
 		~=""]; 
 
@@ -71,10 +74,10 @@ Case (
 				// return NULL if valid
 				~typeMatch ; "" ;  
 
-				// if there are other valid types, recurse to check the next one
+				// if there are other valid types given, recurse to check the next one against the list of actual valid types for the given value
 				ValueCount ( ~LIST_dataTypes ) > 1 ; 
 
-					// RECURSE ///////////////////////////
+					// RECURSE /////////////////////////////
 					Validate.Rule.IsOfType ( ~key ; Substitute ( ~LIST_dataTypes & "¶" ; ~type & "¶" ; "" ) );
 					////////////////////////////////////////
 
