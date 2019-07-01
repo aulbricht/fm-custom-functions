@@ -1,8 +1,8 @@
 /**
  *
- * Return a LIST of valid data types, (e.g. 0 or 1 would be valid for both "number" and "boolean")
+ * Return a LIST of valid data types for the given value (e.g. 0 or 1 would be valid for both "number" and "boolean")
  *
- * @param {string} data = data to evaluate for type
+ * @param {string} value = data to evaluate for type
  * 
  * @returns {string} LIST of valid data types
  *
@@ -57,8 +57,10 @@ Let ([
 ~=""];
 
 List (
+
 	~basedataType ;
 	~higherOrderDataType 
-)
+
+	)
 
 )

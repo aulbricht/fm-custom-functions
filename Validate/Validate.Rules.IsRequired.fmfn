@@ -3,7 +3,7 @@
  * A rule that tests for a value at the given JSON key path
  * 
  * @param {string} key = the JSON key path to the value to test
- * @param {string} [LIST_validTypes] = OPTIONAL: the required data type of the value; if NULL, any data type is accepted
+ * @param {string} [LIST_dataTypes] = OPTIONAL: the required data type of the value; if NULL, any data type is accepted
  * 				Valid types: text, number, boolean, time, timestamp, object, array
  * 
  * @returnSuccess {NULL}
@@ -11,9 +11,10 @@
  * @returnError {object} Validate.Error: an error object
  * 
  * @module Validate
+ * @requires {function} Validate._errorCreate()
  * @requires {function} Validate.Rule.IsOfType ()
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
@@ -23,16 +24,17 @@
 Let ([
 
 	~key = key ;
-	~list = LIST_validTypes ;
+	~list = LIST_dataTypes ;
+	~dataToValidate = $validate.this ;
 
-	~value = JSONGetElement( $Validate.This ; ~key  )
+	~value = JSONGetElement( ~dataToValidate ; ~key  )
 
 ];
 
 Case (
 
-	// if value is NULL, return an error
-	IsEmpty ( ~value ) ; Validate._errorCreate ( ~key ; "Required value is missing"  ) ; 
+	// if either A) the parameter data is NULL or the extracted value is NULL, return an error
+	IsEmpty ( ~dataToValidate ) or IsEmpty ( ~value ) ; Validate._errorCreate ( ~key ; "Required value is missing"  ) ; 
 
 	// if a data type parameter was included, validate that it matches the given value's data type
 	not IsEmpty ( ~list ) ; Validate.Rule.IsOfType ( ~key ; ~list ); 

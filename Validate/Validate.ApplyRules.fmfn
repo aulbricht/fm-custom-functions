@@ -8,8 +8,9 @@
  * @returnError {object} Validate.Error: an error object
  * 
  * @module Validate
+ * @requires {function} Validate._errorCreate()
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -18,13 +19,13 @@
 
 Let ([
 
-	~data = $Validate.This ;
+	~data = $validate.this ;
 	~LIST_errors = LIST_rules ;
 
 	~formattedData = If ( not IsEmpty ( ~data ) ; JSONFormatElements ( ~data ) );
 
 	// clear the known validation variable
-	$Validate.This = ""
+	$validate.this = ""
 
 ];
 
@@ -33,8 +34,8 @@ Case (
 	// check for invalid JSON
 	Left ( ~formattedData ; 1 ) = "?" ; Validate._errorCreate( "" ; List ( "JSON To Validate is Invalid." ; ~formattedData ) );
 
-	// if there are no errors, return false errorCode
-	IsEmpty( ~LIST_errors ) ; JSONSetElement( "{}"; "errorCode" ; 0 ; JSONNumber );
+	// if there are no errors
+	IsEmpty( ~LIST_errors ) ; "";
 
   	// if there are errors, return error object
 	Let ([
