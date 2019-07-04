@@ -11,7 +11,7 @@
  * 
  * @module Error
  * 
- * @version 2.0.0
+ * @version 2.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -42,8 +42,6 @@ Let ([
 			[ "accountPrivilegeSetName" ; Get ( AccountPrivilegeSetName ) ; JSONString ];
 			[ "filename" ; Get ( FileName ) ; JSONString ];
 			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
-			[ "scriptParameter" ; Get ( ScriptParameter ) ; JSONString ];
-			[ "scriptResult" ; Get ( ScriptResult ) ; JSONString ];
 			[ "lastODBCError" ; Get ( LastExternalErrorDetail ) ; JSONString ];
 			[ "layoutName" ; Get ( LayoutName ) ; JSONString ];
 			[ "layoutTableName" ; Get ( LayoutTableName ) ; JSONString ];
