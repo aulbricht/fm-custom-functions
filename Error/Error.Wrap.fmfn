@@ -3,87 +3,92 @@
  * Wrap the error in a JSON Object
  * 
  * @param {number} errorCode - the FileMaker Error Code.
- * @param {string} descriptor - describe where the error is happening
- * @param {text or object} [data] - optional extra data to include in the error object
- * @param {object} [errorArray] - optional include an existing array or object to create or add to an error array
+ * @param {string} [customMessage] - OPTIONAL: custom description of the error
+ * @param {text or object} [data] - OPTIONAL: extra data to include in the error object
+ * @param {object} [errorArray] - OPTIONAL: include an existing array or object to create or add to an error array
  * 
- * @return {array} an array of errors. Note: if there is only one error, it will be an object
+ * @return {array} array of errors, or if the error code is 0 or empty, return only what was passed in for the errorArray
  * 
  * @module Error
  * 
- * @version 1.2.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @credit Forked from code by original author Todd Geist
  * 
  *******/
 
 
 Let ([
 
-	~descriptor = descriptor ;
+	~message = customMessage ;
 	~data = data ;
 	~array = errorArray ; 
-	~nextArrayCell = If ( not IsEmpty ( ~array ) ; 
-						ValueCount ( JSONListKeys ( ~array ; "." ) );
-						0 
-						);
+	~nextArrayCell = 
+		If ( not IsEmpty ( ~array ) ; 
+			ValueCount ( JSONListKeys ( ~array ; "." ) );
+			0 
+			);
 
 	~error = errorCode ;
-	~error = If( IsEmpty ( ~error ) ; 0 ; GetAsNumber ( ~error ) );
+	~error = If ( IsEmpty ( ~error ) ; 0 ; GetAsNumber ( ~error ) );
 
+	// Set up the new error object (note: not yet combining with any existing, passed in error array)
 	~base = JSONSetElement ( "{}" ; "errorCode" ; ~error ; JSONNumber );
-	~basePlusMessage = If ( ~error ≠ 0 ; 
-				JSONSetElement ( ~base ; "errorMessage"; Error._getDescriptor ( ~error ) ; JSONString ) ; 
-				~base 
-				);
+	~descriptor = If ( not ~error ; "" ; Error._getDescriptor ( ~error ) );
+	~basePlusDescriptor = JSONSetElement ( ~base ; "descriptor"; ~descriptor ; JSONString );
 	
-	~data = If ( IsEmpty ( ~data );
-				JSONSetElement ( "{}" ;
-					[ "accountName" ; Get ( AccountName ) ; JSONString ];
-					[ "accountPrivilegeSetName" ; Get ( AccountPrivilegeSetName ) ; JSONString ];
-					[ "filename" ; Get ( FileName ) ; JSONString ];
-					[ "scriptParameter" ; Get ( ScriptParameter ) ; JSONString ];
-					[ "scriptResult" ; Get ( ScriptResult ) ; JSONString ];
-					[ "lastODBCError" ; Get ( LastExternalErrorDetail ) ; JSONString ];
-					[ "layoutName" ; Get ( LayoutName ) ; JSONString ];
-					[ "layoutTableName" ; Get ( LayoutTableName ) ; JSONString ];
-					[ "recordOpenCount" ; Get ( RecordOpenCount ) ; JSONNumber ];
-					[ "recordModificationCount" ; Get ( RecordModificationCount ) ; JSONNumber ];
-					[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
-					[ "activeFieldTableName" ; Get ( ActiveFieldTableName ) ; JSONString ];
-					[ "activeLayoutObjectName" ; Get ( ActiveLayoutObjectName ) ; JSONString ]
-					)
-				);
-	~dataType = Let ( ~leftChar = Left ( JSONFormatElements ( ~data )  ; 1 ); 
-							Case ( 
-								~leftChar = "{" or ~leftChar = "[" ; JSONObject ; 
-								JSONString 
-								) 
-							);
+	~meta = 
+		JSONSetElement ( "{}" ;
+			[ "accountName" ; Get ( AccountName ) ; JSONString ];
+			[ "accountPrivilegeSetName" ; Get ( AccountPrivilegeSetName ) ; JSONString ];
+			[ "filename" ; Get ( FileName ) ; JSONString ];
+			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
+			[ "scriptParameter" ; Get ( ScriptParameter ) ; JSONString ];
+			[ "scriptResult" ; Get ( ScriptResult ) ; JSONString ];
+			[ "lastODBCError" ; Get ( LastExternalErrorDetail ) ; JSONString ];
+			[ "layoutName" ; Get ( LayoutName ) ; JSONString ];
+			[ "layoutTableName" ; Get ( LayoutTableName ) ; JSONString ];
+			[ "recordOpenCount" ; Get ( RecordOpenCount ) ; JSONNumber ];
+			[ "recordModificationCount" ; Get ( RecordModificationCount ) ; JSONNumber ];
+			[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
+			[ "activeFieldTableName" ; Get ( ActiveFieldTableName ) ; JSONString ];
+			[ "activeLayoutObjectName" ; Get ( ActiveLayoutObjectName ) ; JSONString ]
+			);
 	
+	// Determine the datatype for anything included in the "data" parameter
+	~dataType = 
+		Let ( ~leftChar = Left ( JSONFormatElements ( ~data )  ; 1 ); 
+			Case ( 
+				~leftChar = "{" ; JSONObject ;  
+				~leftChar = "[" ; JSONArray ; 
+				JSONString 
+				) 
+			);
+	
+	// Add additional data to the new error object
 	~currentError = 
-		Case (
-			not ~error ; ~base ;
-			JSONSetElement( ~basePlusMessage ; 
-				[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
-				[ "type" ; "FM" ; JSONString ] ;
-				[ "descriptor" ; ~descriptor ; JSONString] ;
-				[ "data" ; ~data ; ~dataType ] 
-			 )
-
-	);
+		JSONSetElement( ~basePlusDescriptor ; 
+			[ "data" ; ~data ; ~dataType ];
+			[ "message" ; If ( not IsEmpty ( ~message ) ; ~message ; ~descriptor ) ; JSONString ];
+			[ "meta" ; ~meta ; JSONObject ]
+			);
 
 ~=""];
+
 
 Case (
 	
 	// If the error code is 0, do not add it to the errors array; rather, return the original error object
-	~error = 0 or IsEmpty ( ~error ) ; ~array ;
+	not ~error ; ~array ;
 
-	// If no additional errors were provided, just return the new error object
-	IsEmpty ( ~array ) ; ~currentError ;
-	
-	// If the provided error object is an array already, append the current error object
+	// If the provided error object is empty, create an array out of the new error object
+	IsEmpty ( ~array ) ; 
+		JSONFormatElements (
+			JSONSetElement ( "[]" ; 
+				[ "[0]" ; ~currentError ; JSONObject ]
+				)
+			);
+
+	// If the provided error object is an array already, append the new error object
 	Left ( ~array ; 1 ) = "[" ; 
 		JSONFormatElements (
 			JSONSetElement( ~array ; ~nextArrayCell ; ~currentError ; JSONObject )
@@ -96,8 +101,11 @@ Case (
 				[ "[0]" ; ~array ; JSONObject ];
 				[ "[1]" ; ~currentError ; JSONObject ]
 				)
-			)
+			);
 
-)
+	// If something is wrong with the error array, just return the new error object
+	~currentError
+
+	)
 
 )
