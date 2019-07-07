@@ -1,0 +1,44 @@
+/**
+ * 
+ * Generate a random character string
+ * 
+ * @param {number} numChars - character length of the result string
+ * @param {boolean} [includeSymbols] - OPTIONAL: if true, include symbols in the character string
+ * 
+ * @return {object} array of script context information
+ * 
+ * @module Text
+ * 
+ * @version 1.1.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+While ( 
+
+	[ 
+		$numChars = numChars ;
+		$includeSymbols = includeSymbols ;
+
+		$data = "" ;
+		$chars = "01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" & If ( $includeSymbols ; "$-_.+!*'()," );
+		$i = 1
+	]; 
+
+	$i ≤ $numChars ;
+
+	[
+		$data = $data &
+			Middle ( 
+				$chars ;
+				Round ( Random * Length ( $chars ) ; 0 );
+				1
+				);
+
+		$i = $i + 1
+	] ; 
+
+	$data
+
+	)
