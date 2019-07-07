@@ -47,14 +47,18 @@ Let ([
 
 Case (
 
-	// if no key was provided or if no type was provided, return NULL (abort validation)
-	IsEmpty ( ~key ) or IsEmpty ( ~LIST_dataTypes ) ; "" ; 
+	// evaluate basic cases for abort
+	IsEmpty ( ~key ) // no key was provided
+	or IsEmpty ( ~LIST_dataTypes ) // no type was provided
+	or PatternCount ( "¶" & JSONListKeys ( ~dataToValidate ; "." ) & "¶"; "¶" & ~key & "¶" ) = 0 ; // the key is missing
+		"" ; // return NULL (abort validation)
 
 	// if the current data type is invalid, return an error (abort validation)
 	PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) = 0 ; 
 
 		// else return an error object
 		Validate._errorCreate ( ~key ; "\"" & ~type & "\" is not a valid data type." );
+
 
 
 	// DEFAULT CASE CONDITION
