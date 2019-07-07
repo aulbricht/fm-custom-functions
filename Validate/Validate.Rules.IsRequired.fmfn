@@ -14,7 +14,7 @@
  * @requires {function} Validate._errorCreate()
  * @requires {function} Validate.Rule.IsOfType ()
  * 
- * @version 2.1.0
+ * @version 2.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
@@ -33,8 +33,9 @@ Let ([
 
 Case (
 
-	// if either A) the parameter data is NULL, return an error
-	IsEmpty ( ~dataToValidate ) ; Validate._errorCreate ( ~key ; "Required parameter is missing"  ) ; 
+	// if the parameter data is NULL or the specified key is missing from the parameter data, return an error
+	IsEmpty ( ~dataToValidate ) or PatternCount ( "¶" & JSONListKeys ( ~dataToValidate ; "." ) & "¶"; "¶" & ~key & "¶" ) = 0 ; 
+		Validate._errorCreate ( ~key ; "Required parameter is missing"  ) ; 
 
 	// if a data type parameter was included, validate that it matches the given value's data type
 	not IsEmpty ( ~list ) ; Validate.Rule.IsOfType ( ~key ; ~list ); 
