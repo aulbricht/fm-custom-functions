@@ -9,7 +9,7 @@
  * @private
  * @module Validate
  *
- * @version 1.1.1
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -21,6 +21,9 @@ Let ([
 	~value = value ;
 
 	~baseDataType = Case ( 
+
+				// empty value
+				IsEmpty ( ~value ) ; "null" ;
 
 				// JSON object types
 				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
@@ -51,6 +54,12 @@ Let ([
 
 				// date / text
 				~baseDataType = "date" ; "text" ;
+
+				// time / text
+				~baseDataType = "time" ; "text" ;
+
+				// timestamp / text
+				~baseDataType = "timestamp" ; "text" ;
 
 				); 
 
