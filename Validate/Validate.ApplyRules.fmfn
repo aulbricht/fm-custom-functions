@@ -10,7 +10,7 @@
  * @module Validate
  * @requires {function} Validate._errorCreate()
  * 
- * @version 1.0.1
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -19,13 +19,13 @@
 
 Let ([
 
-	~data = $validate.this ;
+	~data = $$validate.this ;
 	~LIST_errors = LIST_rules ;
 
 	~formattedData = If ( not IsEmpty ( ~data ) ; JSONFormatElements ( ~data ) );
 
 	// clear the known validation variable
-	$validate.this = ""
+	$$validate.this = ""
 
 ];
 

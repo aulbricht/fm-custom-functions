@@ -14,7 +14,7 @@
  * @requires {function} Validate._errorCreate()
  * @requires {function} Validate.Rule.IsOfType ()
  * 
- * @version 1.1.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
@@ -25,7 +25,7 @@ Let ([
 
 	~key = key ;
 	~list = LIST_dataTypes ;
-	~dataToValidate = $validate.this ;
+	~dataToValidate = $$validate.this ;
 
 	~value = JSONGetElement( ~dataToValidate ; ~key  )
 

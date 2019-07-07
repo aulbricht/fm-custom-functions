@@ -13,7 +13,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} Validate._errorCreate()
  * 
- * @version 1.3.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -24,7 +24,7 @@ Let ([
 	// Abstract parameters
 	~key = key ;
 	~LIST_dataTypes = UniqueValues ( LIST_dataTypes );
-	~dataToValidate = $validate.this ;
+	~dataToValidate = $$validate.this ;
 
 	// remove any trailing carriage returns
 	~LIST_dataTypes = If ( Right ( ~LIST_dataTypes ; 1 ) = "¶" ; 
@@ -54,7 +54,7 @@ Case (
 	not PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) > 0 ; 
 
 		// else return an error object
-		Validate._errorCreate ( ~key ; "\"" & ~type & "\" is not a valid data type.";
+		Validate._errorCreate ( ~key ; "\"" & ~type & "\" is not a valid data type." );
 
 
 	// DEFAULT CASE CONDITION

@@ -11,7 +11,7 @@
  * @module Validate
  * @requires {function} Validate._errorCreate()
  * 
- * @version 1.1.1
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -23,7 +23,7 @@ Let ([
 	~key = key ;
 	~list = LIST_values ;
 
-	~value = JSONGetElement(  $validate.this ; ~key  )
+	~value = JSONGetElement(  $$validate.this ; ~key  )
 
 ];
 
