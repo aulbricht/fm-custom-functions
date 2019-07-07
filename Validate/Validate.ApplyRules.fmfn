@@ -10,7 +10,7 @@
  * @module Validate
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.0.0
+ * @version 2.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -45,7 +45,8 @@ Case (
 
 	Case ( 
 		~numErrors > 1 ; ~ARRAY_errors ;
-		JSONFormatElements ( ~LIST_Errors )
+		Left ( JSONFormatElements ( ~LIST_Errors ) ; 1 ) ≠ "?" ; JSONFormatElements ( ~LIST_Errors ) ;
+		~LIST_Errors
 		)
 
 	)

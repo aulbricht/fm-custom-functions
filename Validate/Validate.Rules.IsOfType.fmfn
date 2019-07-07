@@ -4,7 +4,7 @@
  *
  * @param {string} key = the JSON key path to the value to test; if NULL, validation is aborted
  * @param {string} LIST_dataTypes = list of valid data types for the value; if NULL, any data type is accepted
- *				Valid types: text, number, boolean, date, time, timestamp, object, array
+ *				Valid types: text, number, boolean, date, time, timestamp, object, array, null
  *
  * @returnSuccess {NULL}
  * @returnError {object} Validate.Error: an error object
@@ -13,7 +13,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.0.0
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -33,7 +33,7 @@ Let ([
 			);
 
 	// All valid data types (which this function is able to validate)
-	~LIST_validDataTypes = List ( "text"; "number"; "boolean"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
+	~LIST_validDataTypes = List ( "null" ; "text"; "number"; "boolean"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
 
 	// Get the first type in the list to test
 	~type = GetValue ( ~LIST_dataTypes ; 1 );
@@ -47,11 +47,11 @@ Let ([
 
 Case (
 
-	// if no value was provided or if no type was provided, return NULL (abort validation)
-	IsEmpty ( ~key ) or IsEmpty ( ~value ) or IsEmpty ( ~LIST_dataTypes ) ; "" ; 
+	// if no key was provided or if no type was provided, return NULL (abort validation)
+	IsEmpty ( ~key ) or IsEmpty ( ~LIST_dataTypes ) ; "" ; 
 
 	// if the current data type is invalid, return an error (abort validation)
-	not PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) > 0 ; 
+	PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) = 0 ; 
 
 		// else return an error object
 		Validate._errorCreate ( ~key ; "\"" & ~type & "\" is not a valid data type." );
@@ -83,12 +83,12 @@ Case (
 
 
 				// else return an error object
-				Validate._errorCreate ( ~key ; "Value data type" & 
+				Validate._errorCreate ( ~key ; "The value's actual data type" & 
 					If ( ValueCount ( ~LIST_baseDataTypes ) > 1 ; 
 						"s (" & Substitute ( ~LIST_baseDataTypes ; "¶"; ", " ) & ") are"; 
 						" (" & ~LIST_baseDataTypes & ") is"
 						) 
-						& " not on the given list of allowed data types"  
+						& " not on the given list of allowed data types for the parameter."  
 					) 
 
 				)
