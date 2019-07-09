@@ -4,7 +4,7 @@
  *
  * @param (number) low - bottom of the random number range
  * @param (number) high - top of the random number range
- * @param (number) step - step size for result number
+ * @param (number) [step_size] - OPTIONAL: step size for result number, DEFAULT: 1
  *
  * @returnSuccess {text} updated value list
  * 
@@ -13,7 +13,7 @@
  * 
  * @module Number (Num)
  * 
- * @version 1.0.1
+ * @version 2.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -23,12 +23,15 @@
 Let ([
 
 	~high = high ;
-	~low= low ;
-	~step = Abs( stepSize );
+	~low = low ;
+	~step = Abs ( step_size );
+
+	// if no step was given, use the default value
+	~step = If ( IsEmpty ( ~step ) ; 1 ; ~step );
 
 	// if one or more of the range values are below zero, we have to adjust so both numbers are positive
 	~adjustment = If ( ~low < ~step or ~high < ~step ; 
-				Abs( Min ( ~low ; ~high )) + ~step ; 
+				Abs ( Min ( ~low ; ~high )) + ~step ; 
 				0 
 				);
 	~low = ~low + ~adjustment ;
@@ -38,8 +41,8 @@ Let ([
 	~low = Max ( ~low ; ~step );
 	~high = ~high + ~step - 1 ;
 	~numItems = ~high - ~low + 1 ;
-	~randomNum = Floor( Random * ~numItems ) + ~low ;
-	~result = ~randomNum - Mod( ~randomNum ; ~step ) - ~adjustment;
+	~randomNum = Floor ( Random * ~numItems ) + ~low ;
+	~result = ~randomNum - Mod ( ~randomNum ; ~step ) - ~adjustment;
 
 ~=""];
 
