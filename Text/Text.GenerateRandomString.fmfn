@@ -9,7 +9,7 @@
  * 
  * @module Text
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  **/
@@ -18,27 +18,28 @@
 While ( 
 
 	[ 
-		$numChars = numChars ;
-		$includeSymbols = includeSymbols ;
+		~numChars = numChars ;
+		~includeSymbols = includeSymbols ;
 
-		$data = "" ;
-		$chars = "01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" & If ( $includeSymbols ; "$-_.+!*'()," );
-		$i = 1
+		~data = "" ;
+		~chars = "01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" & If ( ~includeSymbols ; "$-_.+!*'()," );
+		~i = 1
 	]; 
 
-	$i ≤ $numChars ;
+	~i ≤ ~numChars ;
 
 	[
-		$data = $data &
+		~data = ~data &
 			Middle ( 
-				$chars ;
-				Round ( Random * Length ( $chars ) ; 0 );
+				~chars ;
+				Round ( Random * Length ( ~chars ) ; 0 );
 				1
 				);
 
-		$i = $i + 1
+		~i = ~i + 1
 	] ; 
 
-	$data
+	~data
 
 	)
+
