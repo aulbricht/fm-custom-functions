@@ -6,6 +6,7 @@
  * @param {text or number} cell - OPTIONAL: specify which array cell to test
  * 						Valid parameter values:
  * 							"any" / "all" [default]
+ * 							"first" / "n" - first array cell
  * 							"last" / "n" - last (most recent) array cell
  * 							1, 2..[n] - numeric cell value (1 = array cell 0, etc)
  * 
@@ -23,7 +24,7 @@
  * 
  * @module Error
  * 
- * @version 2.0.1
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -39,6 +40,7 @@ Let ([
 	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
 	~eo = Case (
 			not ~isArray ; ~eo ; // if the object is anything except an array, skip this step
+			~cell = "first" ; JSONGetElement ( ~eo ; "[0]" );
 			~cell = "last" ; JSONGetElement ( ~eo ; "[" & ValueCount ( JSONListKeys ( ~eo ; "." )) - 1 & "]" );
 			~cell > 0 and ~cell = GetAsNumber ( ~cell ) ; JSONGetElement ( ~eo ; Int ( ~cell ) - 1 );
 			~eo
@@ -47,8 +49,8 @@ Let ([
 	// account for alternative element names
 	~element = 
 		Case ( 
-			IsEmpty ( ~element ) ; "errorMessage";
-			~element = "message" ; "errorMessage";
+			IsEmpty ( ~element ) ; "message";
+			~element = "errorMessage" ; "message";
 			~element = "error" ; "errorCode";
 			~element = "code" ; "errorCode";
 			~element = "json" or ~element = "array" ; ".";
@@ -56,8 +58,11 @@ Let ([
 			);
 
 	// If errorObject is an ARRAY of errors
-	~isArray = Left ( ~eo ; 1 ) = "[" ;
-	~numCells = If ( ~isArray ; ValueCount ( JSONListKeys ( ~eo ; "." ) ) );
+	~numCells = 
+		If ( ~isArray ; 
+			ValueCount ( JSONListKeys ( ~eo ; "." ) );
+			1
+			);
 
 	// Get error message (if array: extract from the first element in the array)
 	~key = If ( ~isArray ; "[0]." ) & ~element ;
@@ -81,6 +86,8 @@ Let ([
 			);
 
 ~=""];
+
+
 
 Case (
 
