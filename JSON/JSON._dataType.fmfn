@@ -2,7 +2,7 @@
  *
  * Determine the JSON data type (e.g. numeric, string, etc) and return the corresponding numeral for the JSONSetElements data type argument
  *
- * @param {data} data - input data to analyze and detect the type
+ * @param {any} value - input data to analyze and detect the type
  *
  * @returnSuccess {text} JSON data type: text, number, time, timestamp, object, array
  * 
