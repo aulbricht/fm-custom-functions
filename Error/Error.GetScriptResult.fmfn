@@ -1,0 +1,62 @@
+/********
+ * 
+ * Get the last script result, optionally set a result variable, and if the result is an error then optionally add it to an error array variable
+ * 
+ * @param {text} [resultVariable] - OPTIONAL name of the variable which to set the result
+ * @param {text} [errorArrayVariable] - OPTIONAL name of the variable which to append the error array (if the result is an error)
+ * 
+ * @return {boolean} True if the result is an error
+ * 
+ * @note if either resultVariable and/or errorArrayVariable are provided, this script will set the respective results to those variables
+ * @note "$" is not required for the variable name(s)
+ * @note if not "$" is specified, one will be added to make it a valid local variable
+ * 
+ * @module Error
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ *******/
+
+
+Let ([
+
+	~resultVar = resultVariable ;
+	~errorVar = errorArrayVariable ;
+
+	~resultVar = 
+		Case ( 
+			IsEmpty ( ~resultVar ) ; Get ( UUID ) ;
+			Left ( ~resultVar ; 1 ) ≠ "$" ; "$" & ~resultVar ;
+			~resultVar
+			);
+
+	~errorVar =
+		Case ( 
+			IsEmpty ( ~errorVar ) ; Get ( UUID ) ;
+			Left ( ~errorVar ; 1 ) ≠ "$" ; "$" & ~errorVar ;
+			~errorVar
+			);
+
+
+	~result = Get ( ScriptResult ); 
+	~isError = Error.IsError ( ~result ; "" );
+
+
+	~eval_setResult = "Let (" & ~resultVar & "=" & Quote ( ~result ) & ";0)" ;
+	~result_setResultVar = If ( not IsEmpty ( ~resultVar ) ; Evaluate ( ~eval_setResult ) );
+
+	~eval_setError = 
+		If ( ~isError ;
+			"Let (" & ~errorVar & "=" & Quote ( Error.MergeErrorArrays ( Evaluate ( ~errorVar ) ; ~result ) ) & ";0)"
+			);
+	~result_setErrorVar =
+		If ( ~isError and not IsEmpty ( ~errorVar ) ; 
+			Evaluate ( ~eval_setError ) 
+			);
+
+~=""];
+
+~isError
+
+)
