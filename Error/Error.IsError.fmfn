@@ -15,7 +15,7 @@
  * 
  * @module Error
  * 
- * @version 2.0.2
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  ********/
@@ -26,77 +26,129 @@ Let ([
 	~eo = errorObject ;
 	~cell = cell ;
 
-	// process cell specification
-	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
-	~eo = Case (
-			not ~isArray ; ~eo ; // if the object is anything except an array, skip this step
-			~cell = "last" ; JSONGetElement ( ~eo ; "[" & ValueCount ( JSONListKeys ( ~eo ; "." )) - 1 & "]" );
-			~cell > 0 and ~cell = GetAsNumber ( ~cell ) ; JSONGetElement ( ~eo ; Int ( ~cell ) - 1 );
-			~eo
-			);
+	// determine if the cell parameter value is a valid integer or not
+	~isValid_cellInteger = ( ~cell = Int ( ~cell ) );
 
 	// determine error object input type
-	~isObject = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "{" ;
-	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
-	~isJSON = ~isObject or ~isArray ;
+	~eo_isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
+	~eo_isObject = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "{" ;
+	~eo_isJSON = ~eo_isObject or ~eo_isArray ;
 
-
-	~errorNonJSON = If ( not ( ~isJSON ) ; ~eo );
-	~LIST_keys = JSONListKeys ( ~eo ; "." );
-	~numKeys = Case ( 
-			~isJSON ; ValueCount ( ~LIST_keys ); 
+	// determine how many cells are in the error array
+	~eo_LIST_keys = JSONListKeys ( ~eo ; "." );
+	~eo_numKeys = 
+		Case ( 
+			~eo_isJSON ; ValueCount ( ~eo_LIST_keys ); 
 			IsEmpty ( ~eo ) ; 0 ;
 			1
 			);
 
-	~currentErrorCode = If ( ~isJSON ; 
-					JSONGetElement ( ~eo ;  If ( ~isArray ; "[0]." ) & "errorCode" );
-					~errorNonJSON 
+	// process specified cell
+	~eo_lastCellKey = "[" & ValueCount ( JSONListKeys ( ~eo ; "." )) - 1 & "]" ;
+	~eo_cell = 
+		Case (
+
+			// if the object is a non-array JSON object, use the entire passed object
+			~eo_isObject ; ~eo ; 
+			
+			// EVERYTHING PAST HERE ASSUMES ~eo IS AN ARRAY
+
+			// else if the cell option is "last", use the last cell of the array
+			~cell = "last" ; JSONGetElement ( ~eo ; ~eo_lastCellKey );
+
+			// else if the specified cell is a valid, non-zero integer, then use that cell
+			~isValid_cellInteger and ~cell > 0 ; JSONGetElement ( ~eo ; Int ( ~cell ) - 1 );
+
+			// else default: extract first cell
+			JSONGetElement ( ~eo ; "[0]" )
+
+			);
+
+	// determine if the extracted cell is a valid error object
+	~eo_cell_isErrorObject = 
+		Left ( JSONFormatElements ( ~eo_cell )  ; 1 ) = "{" 
+		and PatternCount ( "¶"& JSONListKeys ( ~eo_cell ; "." ) &"¶" ; "¶"& "errorCode" &"¶" ) > 0 ;
+
+	// extract the error code if the cell is a valid error object, else set null
+	~errorCode = If ( ~eo_cell_isErrorObject ; 
+					JSONGetElement ( ~eo_cell ; "errorCode" );
+					""
 					);
 
-	~errorCode = Case ( 
-			~isJSON ; 
+	// update errorCode based on cell option and recursion results
+	~errorCode = 
+		Case ( 
+
+			// if the error object is a valid array, determine whether to recurse or return an error code
+			~eo_isArray ; 
 				Case ( 
-					~numKeys > 1 ; Abs ( ~currentErrorCode ) + 
+
+					// if a specific cell was specified by number, we don't need to recurse
+					~isValid_cellInteger ; ~errorCode ;
+
+					// if the current cell is the last one left in the array, we don't need to recurse
+					~eo_numKeys = 1 ; ~errorCode ;
+
+					// if there are additional cells in the array, add the absolute value of the current error code to whatever the recursion returns
+					~eo_numKeys > 1 ; Abs ( ~errorCode ) + 
 
 						/////////////////////////////////////////////////////////
 						// RECURSION: ///////////////////////////////////////////
 
 						Error.IsError ( 
-							JSONDeleteElement ( 
-								~eo ; 
-								If ( ~isJSON ; GetValue ( ~LIST_keys ; 1 ) ; "[0]" ) 
+
+							// update the error object to pass forward into the recursive call
+							JSONDeleteElement ( ~eo ;
+								Case ( 
+
+									// if the current option is "last" (cell) and that cell is not a valid error object, remove it for the recursion (in case one of the other, remaing cells is a valid error object)
+									~cell = "last" and not ~eo_cell_isErrorObject ; ~eo_lastCellKey ;
+
+									// default: remove the first array cell
+									"[0]" 
+
+									) 
 								);
-							""
+
+							// passthrough the cell option
+							~cell
+
 							);
 
 						/////////////////////////////////////////////////////////
 						/////////////////////////////////////////////////////////
 
-					~numKeys = 1 ; JSONGetElement ( ~eo ; If ( ~isArray ; "[0]." ) & "errorCode" );
-					0
+					// else default: null
+					""
+
 					);
-				~errorNonJSON
-			);
+
+			// else default: simply use the extracted error code
+			~errorCode
+
+		);
 			
-	~errorCodeExists = not IsEmpty ( ~errorCode ) and ~errorCode ≠ 0 ;
+	// determine if the cell contained a non-zero error code
+	~errorCodeExists = Int ( Abs ( ~errorCode ) ) > 0 ;
 
 ~=""];
 
+
 Case (
 
-	// if there is no error object
-	IsEmpty ( ~eo ) ; False ;
+	// if there is no error object, return null
+	IsEmpty ( ~eo ) or IsEmpty ( ~eo_cell ) or not ~errorCodeExists ; "" ;
 
-	// if the error code(s) is/are 0
+	// if the error code is 0, return false (no error)
 	~errorCode = 0 ; False ;
 
-	// if a non-zero error code exists
+	// if a non-zero error code exists, return true (there is an error)
 	~errorCodeExists ; True ;
 
-	// default return false
+	// default: return false
 	False
 
 	)
+
 
 )
