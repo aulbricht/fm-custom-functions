@@ -18,9 +18,7 @@
  *
  * @param {text} value - value of the element to add
  * 
- * @return {array} updated error array
- * 
- * @note If error object is not an array, it will still return result as an array
+ * @return {array or object} updated error array (if the original object is a non-array JSON object, it will return the same type of object)
  * 
  * @module Error
  * 
