@@ -24,7 +24,7 @@
  * 
  * @module Error
  * 
- * @version 2.1.0
+ * @version 2.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -91,14 +91,8 @@ Let ([
 
 Case (
 
-	// invalid JSON
-	Left ( ~eo ; 1 ) = "?" ; 
-		JSONSetElement( "{}" ;
-			[ "errorCode"; "-2" ; JSONNumber ]; 
-			[ "type"; "Error.Message" ; JSONString ]; 
-			[ "scriptName" ; Get ( ScriptName ); JSONString ];
-			[ "message" ; List ( "Error object to validate is invalid JSON" ; ~eo ) ; JSONString ]
-			);
+	// invalid JSON, return NULL
+	Left ( ~eo ; 1 ) = "?" ; "" ;
 
 	// invalid result, return NULL
 	Left ( ~result ; 1 ) = "?" ; "" ;
