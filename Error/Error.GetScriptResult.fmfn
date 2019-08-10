@@ -13,7 +13,7 @@
  * 
  * @module Error
  * 
- * @version 1.0.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -21,6 +21,7 @@
 
 Let ([
 
+	~psError = Get ( LastError );
 	~resultVar = resultVariable ;
 	~errorVar = errorArrayVariable ;
 
@@ -39,7 +40,11 @@ Let ([
 			);
 
 
-	~result = Get ( ScriptResult ); 
+	~result = 
+		Case ( 
+			~psError ≠ 0 ; Error.Wrap ( ~psError ; "" ; "" ; "" ); // note: we don't need to include the error array variable here because it will get merged into the existing array in a subsequent step
+			Get ( ScriptResult )
+			);
 	~isError = Error.IsError ( ~result ; "" );
 
 
