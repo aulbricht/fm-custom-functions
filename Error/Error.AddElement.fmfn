@@ -1,0 +1,88 @@
+/********
+ * 
+ * Add a custom element to a specified error in the json array
+ * 
+ * @param {object} errorObject - the error JSON object or array
+ * @param {text or number} cell - OPTIONAL: specify which array cell to test
+ * 						Valid parameter values:
+ * 							"last" / "n" - [default] last (most recent) array cell
+ * 							"first" / "n" - first array cell
+ * 							1, 2..[n] - numeric cell value (1 = array cell 0, etc)
+ * 
+ * @param {text} element - OPTIONAL: the error element to add
+ *	 					Valid elements:
+ *	 						errorMessage / message [default]
+ *	 						errorCode / error / code
+ *	 						descriptor
+ *	 						json / array / .
+ *
+ * @param {text} value - value of the element to add
+ * 
+ * @return {array} updated error array
+ * 
+ * @note If error object is not an array, it will still return result as an array
+ * 
+ * @module Error
+ * 
+ * @version 2.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ *******/
+
+
+Let ([
+
+	~eo = errorObject ;
+	~cell = cell ;
+	~element = element ;
+	~value = value ;
+	
+	// process cell specification
+	~isArray = Left ( JSONFormatElements ( ~eo )  ; 1 ) = "[" ;
+	~numCells = ValueCount ( JSONListKeys ( ~eo ; "." ));
+	~lastCell = "[" & Max ( 0 ; ~numCells - 1 ) & "]" ;
+	~cellNum = Int ( ~cell ) ;
+	~cell = 
+		Case (
+			not ~isArray ; "" ; // if the object is anything except an array, skip this step
+			~cell = "first" or ~cell = 0 ; "[0]" ;
+			~cell = "last" ; ~lastCell ;
+			~cell = GetAsNumber ( ~cell ) and not IsEmpty ( ~cell ) ; "[" & Max ( 0 ; ~cellNum - 1 ) & "]" ;
+			~lastCell // default (for an array)
+			);
+
+	// account for alternative element names
+	~element = 
+		Case ( 
+			IsEmpty ( ~element ) ; "message";
+			~element = "errorMessage" ; "message";
+			~element = "error" ; "errorCode";
+			~element = "code" ; "errorCode";
+			~element = "json" or ~element = "array" ; ".";
+			~element
+			);
+
+	// create key for element to add/change
+	~key = ~cell & "." & ~element ;
+	~result = JSONSetElement ( ~eo ; ~key ; ~value ; JSONString );
+
+~=""];
+
+
+Case (
+
+	// invalid JSON, return original object
+	Left ( ~eo ; 1 ) = "?" ; ~eo ;
+
+	// invalid result, return original object
+	Left ( ~result ; 1 ) = "?" ; ~eo ;
+
+	// if the specified cell does not exist, return original object
+	~cellNum > ~numCells ; ~eo ;
+
+	// Return result or list of results; omitting empty results (instead of having a blank line)
+	JSONFormatElements ( ~result )
+
+	)
+	
+)
