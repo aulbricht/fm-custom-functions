@@ -9,7 +9,7 @@
  * @private
  * @module Validate
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -46,32 +46,51 @@ Let ([
 
 				);
 
-	// add check for higher order data types (e.g. "boolean" which could also be true if validating as "number") an special cases
-	~higherOrderDataType = Case ( 
 
-				// boolean / number
-				~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); "boolean" ;
+	///////////////////////////////////////////////////////////////////////////
+	// add check for higher order data types (e.g. "boolean" which could also be true if validating as "number") an special cases
+	///////////////////////////////////////////////////////////////////////////
+
+	// initialize variable
+	~LIST_higherOrderDataTypes = "" ;
+
+	// boolean / number
+	~LIST_higherOrderDataTypes = If ( 
+				~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); 
+				List ( ~LIST_higherOrderDataTypes ; "boolean" )
+				);
 
 				// number / text
-				~baseDataType = "number" ; "text" ;
+	~LIST_higherOrderDataTypes = If ( 
+				~baseDataType = "number" ;
+				List ( ~LIST_higherOrderDataTypes ; "text" )
+				);
 
 				// date / text
-				~baseDataType = "date" ; "text" ;
+	~LIST_higherOrderDataTypes = If ( 
+				~baseDataType = "date" ;
+				List ( ~LIST_higherOrderDataTypes ; "text" )
+				);
 
 				// time / text
-				~baseDataType = "time" ; "text" ;
+	~LIST_higherOrderDataTypes = If ( 
+				~baseDataType = "time" ; 
+				List ( ~LIST_higherOrderDataTypes ; "text" )
+				);
 
 				// timestamp / text
-				~baseDataType = "timestamp" ; "text" ;
-
-				); 
+	~LIST_higherOrderDataTypes = If ( 
+				~baseDataType = "timestamp" ; 
+				List ( ~LIST_higherOrderDataTypes ; "text" )
+				);
 
 ~=""];
+
 
 List (
 
 	~basedataType ;
-	~higherOrderDataType 
+	~LIST_higherOrderDataTypes 
 
 	)
 
