@@ -9,7 +9,7 @@
  * @private
  * @module Validate
  *
- * @version 2.1.0
+ * @version 2.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -57,31 +57,36 @@ Let ([
 	// boolean / number
 	~LIST_higherOrderDataTypes = If ( 
 				~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); 
-				List ( ~LIST_higherOrderDataTypes ; "boolean" )
+				List ( ~LIST_higherOrderDataTypes ; "boolean" );
+				~LIST_higherOrderDataTypes
 				);
 
 				// number / text
 	~LIST_higherOrderDataTypes = If ( 
 				~baseDataType = "number" ;
-				List ( ~LIST_higherOrderDataTypes ; "text" )
+				List ( ~LIST_higherOrderDataTypes ; "text" );
+				~LIST_higherOrderDataTypes
 				);
 
 				// date / text
 	~LIST_higherOrderDataTypes = If ( 
 				~baseDataType = "date" ;
-				List ( ~LIST_higherOrderDataTypes ; "text" )
+				List ( ~LIST_higherOrderDataTypes ; "text" );
+				~LIST_higherOrderDataTypes
 				);
 
 				// time / text
 	~LIST_higherOrderDataTypes = If ( 
 				~baseDataType = "time" ; 
-				List ( ~LIST_higherOrderDataTypes ; "text" )
+				List ( ~LIST_higherOrderDataTypes ; "text" );
+				~LIST_higherOrderDataTypes
 				);
 
 				// timestamp / text
 	~LIST_higherOrderDataTypes = If ( 
 				~baseDataType = "timestamp" ; 
-				List ( ~LIST_higherOrderDataTypes ; "text" )
+				List ( ~LIST_higherOrderDataTypes ; "text" );
+				~LIST_higherOrderDataTypes
 				);
 
 ~=""];
