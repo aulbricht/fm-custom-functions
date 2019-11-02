@@ -1,0 +1,40 @@
+/**
+ *
+ * Determine is a given search string value (or list of search string values) is/are present in the given value list
+ *
+ * @param {text} fullpath - full filepath, including the filename
+ * @param {boolean} [remove_extension] - if True, return the filename without an extension
+ *
+ * @returnSuccess {text} return filename
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+ 
+ 
+ 
+Let ([
+
+	// abstract parameters
+	~path = fullpath ;
+	~remove_extension = remove_extension ;
+
+	// extract full filename (including extension)
+	~numSlashes = PatternCount ( ~path ; "/" );
+	~posStart = Position ( ~path ; "/" ; 1 ; ~numSlashes ) ;
+	~posEnd = Length ( ~path );
+	~filename = Right ( ~path ; ~posEnd - ~posStart );
+
+	// remove extension from filename
+	~posExtStart = Position ( ~filename ; "." ; 1 ; PatternCount ( ~filename ; "." ) ) - 1 ;
+	~filename_noExt = Left ( ~filename ; ~posExtStart );
+
+~=""];
+
+If ( ~remove_extension ; ~filename_noExt ; ~filename )
+
+)
