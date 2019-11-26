@@ -1,15 +1,15 @@
 /**
  *
- * Determine is a given search string value (or list of search string values) is/are present in the given value list
+ * Extract the filename from a given filepath
  *
  * @param {text} fullpath - full filepath, including the filename
- * @param {boolean} [remove_extension] - if True, return the filename without an extension
+ * @param {boolean} [remove_extension] - OPTIONAL: if True, return the filename without an extension
  *
  * @returnSuccess {text} return filename
  * 
  * @module File
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
