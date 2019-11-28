@@ -1,0 +1,26 @@
+/**
+ *
+ * Remove all non-alphanumeric characters
+ *
+ * @param {text} text_string - any string of text
+ *
+ * @returnSuccess {text} returns only the alphanumeric characters in the input text string
+ *
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+
+	~text_string = text_string ;
+
+~=""];
+
+Filter ( ~text_string ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" )
+
+)
