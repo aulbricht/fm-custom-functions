@@ -9,7 +9,7 @@
  * 
  * @module File
  * 
- * @version 1.1.1
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -30,6 +30,7 @@ Let ([
 			Lower ( Left ( ~path ; 5 ) ) = "file:" ; Right ( ~path ; Length ( ~path ) - 5 );
 			Lower ( Left ( ~path ; 8 ) ) = "filewin:" ; Right ( ~path ; Length ( ~path ) - 8 );
 			Lower ( Left ( ~path ; 8 ) ) = "filemac:" ; Right ( ~path ; Length ( ~path ) - 8 );
+			~path
 
 			);
 
@@ -37,14 +38,26 @@ Let ([
 	~numSlashes = PatternCount ( ~path ; "/" );
 	~posStart = Position ( ~path ; "/" ; 1 ; ~numSlashes ) ;
 	~posEnd = Length ( ~path );
-	~filename = Right ( ~path ; ~posEnd - ~posStart );
+	~filename = 
+		Case ( 
+			~numSlashes > 0 ; Right ( ~path ; ~posEnd - ~posStart );
+			~path
+			);
 
 	// remove extension from filename
-	~posExtStart = Position ( ~filename ; "." ; 1 ; PatternCount ( ~filename ; "." ) ) - 1 ;
-	~filename_noExt = Left ( ~filename ; ~posExtStart );
+	~numDots = PatternCount ( ~filename ; "." );
+	~posExtStart = Position ( ~filename ; "." ; 1 ; ~numDots ) - 1 ;
+	~filename_noExt = 
+		Case ( 
+			~numDots > 0 ; Left ( ~filename ; ~posExtStart );
+			~filename
+			);
 
 ~=""];
 
 If ( ~remove_extension ; ~filename_noExt ; ~filename )
 
 )
+
+
+
