@@ -1,0 +1,115 @@
+/**
+ * 
+ * SQL query resulting in JSON object. The first SELECT field in the SQL query will be the key field
+ * 
+ * @param {text} sql - SQl query to process
+ * @param {text} [LIST_arguments] - OPTIONAL: value list where each value corresponds to a "?" argument in the SQL query
+ * @param {object} [initial_JSON] - OPTIONAL: initial JSON object to add the results to
+ * 
+ * @return {object} JSON object with results of SQL query
+ * 
+ * @module SQL
+ * 
+ * @version 1.2.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ( [
+
+	~sql = sql ;
+	~LIST_arguments = LIST_arguments ;
+	~initial_JSON = initial_JSON ;
+
+
+	// get temporary separator values
+	~colSub = Left ( Get ( UUIDNumber ) ; 10 );
+	~rowSub = Left ( Get ( UUIDNumber ) ; 10 );
+	~backslash = Left ( Get ( UUIDNumber ) ; 10 ); // backslash
+	~escQuote = Left ( Get ( UUIDNumber ) ; 10 ); // quotation mark
+
+	// define the column and row separators to use in the ExecuteSQL step
+	~col = "\"; \"" ;
+	~row = "\"; JSONString];¶	[\"";
+
+	// strip any trailing carriage return from the arguments list
+	~LIST_arguments = 
+		If ( Right ( ~LIST_arguments ; 1 ) = "¶" ; 
+			Left ( ~LIST_arguments ; Length ( ~LIST_arguments ) - 1 ) ; 
+			~LIST_arguments 
+			);
+
+	// format for evaluation step
+	~LIST_arguments = 
+		If ( not IsEmpty ( ~LIST_arguments ) ; ";" )
+			& Substitute ( ~LIST_arguments ; "¶" ; ";" ) ;
+
+	// set up the string for evaluation
+	~eval_sql = "ExecuteSQL(" & Quote ( ~sql ) & ";" & ~colSub & ";" & ~rowSub & ~LIST_arguments & ")" ;
+
+		// evaluate the query
+	~error = EvaluationError ( Evaluate ( ~eval_sql ) );
+	~sqlResultRaw = If ( not ~error ; Evaluate ( ~eval_sql ) );
+	~hasTwoCols = PatternCount ( ~sqlResultRaw ; ~colSub );
+
+	// correct for certain characters before turning into JSON object
+	~emptyKey = "[" & Char ( 34 ) & Char ( 34 ) & ";" ;
+	~sqlResult = Substitute ( ~sqlResultRaw ; 
+			[ ~emptyKey ; "[" & Quote ( "noKey" ) & ";" ];
+
+			// system characters
+			[ "\\" ; "\\\\" ];   
+			[ "\""; "\\\"" ];   
+			[ "¶" ; "\r" ];   
+			[ Char ( 9 ) ; "\t" ];   
+			[ "/" ; "\/" ];
+
+			// temporary seperator values
+			[ ~colSub ; ~col ];
+			[ ~rowSub ; ~row ];
+			[ Char ( 92 ) & Char ( 34 ) ; ~escQuote ];
+			[ Char ( 92 ) ; ~backslash ]
+
+			);
+
+	~jsonSetup = 
+		If ( not IsEmpty ( ~sqlResult ) ; 
+			"JSONSetElement( $jsonPrior; ¶" &
+				"[\"" & ~sqlResult & "\"; JSONString]¶)" 
+			);
+
+	~eval_json = 
+		Substitute ( ~jsonSetup ; 
+			[ ~emptyKey ; "[" & Quote ( "noStage" ) & ";" ]
+			);
+
+	// turn the SQL results into a JSON object
+	~error = If ( IsEmpty ( ~error ) ; EvaluationError ( Evaluate ( ~eval_json ) ) );
+	~result = If ( IsEmpty ( ~error ) and ~hasTwoCols ; Evaluate ( ~eval_json ) );
+	~result = 
+		Substitute ( ~result ;
+			[ ~backslash ; Char ( 92 ) ];
+			[ ~escQuote ; Char ( 92 ) & Char ( 34 ) ]
+			);
+
+~=""];
+
+
+Case ( 
+
+	// if the number of "?" arguments in the SQL statement doesn't match the number of arguments given in the function parameters
+	PatternCount ( ~sql ; "?" ) ≠ ValueCount ( ~LIST_arguments ); "PARAMETER ERROR: the number of \"?\" arguments in the SQL statement is different than the number of arguments provided in the function parameters.";
+
+	// if the given SQL statement has two and only two columns
+	not ~hasTwoCols ; "SQL ERROR: the sql statement must have 2 and only 2 columns (i.e. the SELECT fields)" ;
+
+	// if there are any errors detected
+	not IsEmpty ( ~error ) ; ~error ;
+
+	// return results as JSON
+	~result
+
+	)
+
+)
