@@ -2,12 +2,16 @@
  * 
  * SQL query resulting in JSON object. The first SELECT field in the SQL query will be the key field
  * 
- * @param {text} sql - SQl query to process
+ * @param {text} sql - SQl query to process. The SELECT line must contain 2 and only 2 fields.
  * @param {text} [LIST_arguments] - OPTIONAL: value list where each value corresponds to a "?" argument in the SQL query
  * @param {object} [initial_JSON] - OPTIONAL: initial JSON object to add the results to
  * 
  * @return {object} JSON object with results of SQL query
  * 
+ * @note The SELECT line must contain 2 and only 2 fields:
+ * @note 	The first field becomes the JSON element key.
+ * @note 	The second field becomes the JSON element value.
+ *
  * @module SQL
  * 
  * @version 1.2.0
