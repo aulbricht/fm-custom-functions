@@ -1,0 +1,49 @@
+/**
+ *
+ * Extract the filename from a given filepath
+ *
+ * @param {text} fullpath - full filepath, including the filename
+ *
+ * @returnSuccess {text} return filename
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+ 
+ 
+ 
+Let ([
+
+	// abstract parameters
+	~path = fullpath ;
+
+	// remove any preceding FileMaker specifications in the path
+	~path = 
+		Case (
+
+			Lower ( Left ( ~path ; 5 ) ) = "file:" ; Right ( ~path ; Length ( ~path ) - 5 );
+			Lower ( Left ( ~path ; 8 ) ) = "filewin:" ; Right ( ~path ; Length ( ~path ) - 8 );
+			Lower ( Left ( ~path ; 8 ) ) = "filemac:" ; Right ( ~path ; Length ( ~path ) - 8 );
+			~path
+
+			);
+
+	// extract full filename (including extension)
+	~numSlashes = PatternCount ( ~path ; "/" );
+	~posLastSlash = Position ( ~path ; "/" ; 1 ; ~numSlashes ) ;
+
+~=""];
+
+Case ( 
+	~numSlashes > 0 ; Left ( ~path ; ~posLastSlash );
+	~path
+	)
+
+)
+
+
+

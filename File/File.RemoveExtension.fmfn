@@ -1,0 +1,37 @@
+/**
+ *
+ * Remove the extension from a given filepath or filename
+ *
+ * @param {text} filenameOrPath - filepath including the filename, or just the filename
+ *
+ * @returnSuccess {text} return filename or path without the file extension
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+ 
+ 
+ 
+Let ([
+
+	// abstract parameters
+	~path = filenameOrPath ;
+
+	// isolate and remove extension
+	~numDots = PatternCount ( ~path ; "." );
+	~posExtStart = Position ( ~path ; "." ; 1 ; ~numDots ) - 1 ;
+	~filename_noExt = 
+		Case ( 
+			~numDots > 0 ; Left ( ~path ; ~posExtStart );
+			~path
+			);
+
+~=""];
+
+~filename_noExt
+
+)
