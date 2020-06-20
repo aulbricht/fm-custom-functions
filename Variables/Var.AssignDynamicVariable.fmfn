@@ -6,13 +6,14 @@
  * @param {string} value - value to assign to the variable
  * @param {string} [scope] - OPTIONAL: global ($$) or local ($) or private (~). DEFAULT is local ($).
  * 
- * @note If the varName contains scope symbols (e.g. $ or ~) and the scope parameter is specified, the scope parameter will override the contained scope.
+ * @note If the varName contains scope symbols (e.g. $ or ~) and the scope parameter is specified, the scope parameter will override the contained scope. 
+ * @note If the varName is empty and the scope parameter is specified with scope symbols, that scope will be honored. 
  * 
  * @return {boolean} False if the variable was successfully assigned
  * 
  * @module Variables (Var)
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  **/
@@ -24,13 +25,23 @@ Let ([
 	~value = value ;
 	~scope = scope ;
 
-	~scopeSym = Let ( ~containedScope = Filter ( ~scope ; "$" ); 
+	~scopeSym = 
+		Let ([ 
+
+			~specifiedScope = Filter ( ~scope ; "$~" ); 
+			~containedScope = Filter ( ~variable ; "$~" )
+
+			]; 
+
 			Case ( 
 				~scope = "global" ; "$$" ;
 				~scope = "local" ; "$" ;
 				~scope = "private" ; "~" ;
+				Length ( ~specifiedScope ) > 0 ; ~specifiedScope ;
 				Length ( ~containedScope ) > 0 ; ~containedScope ;
-				"$DEFAULT"
+
+				"$" // DEFAULT
+
 				)
 			);
 
@@ -38,7 +49,13 @@ Let ([
 
 	~evalStr = Substitute ( ~subStr ;
 			[ "{{scope}}" ; ~scopeSym ];
-			[ "{{variable}}" ; ~variable ];
+			[ "{{variable}}" ; 
+				Substitute ( 
+					~variable ; 
+					[ "$" ; "" ];
+					[ "~" ; If ( Left ( ~variable ; 1 ) = "~" ; "" ; "~" ) ]
+					) 
+					];
 			[ "{{value}}" ; ~value ]
 			);
 
