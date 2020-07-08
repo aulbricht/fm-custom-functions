@@ -3,24 +3,25 @@
  * Convert value list to a JSON array
  *
  * @param {text} valueList - return delimited value list
- * @param {text} format - "object" or "array"
- * @param {text} preKey - key string under which to store the values, e.g. "names.first" (or "." for root)
- * @param {text} postKey - if you want an additional key string after the array cell, e.g. "[3].names.last"; note: only for an array
+ * @param {text} format - "object" or "array", default is object
+ * @param {text} [preKey] - OPTIONAL: key string under which to store the values, e.g. "names.first" (or "." for root)
+ * @param {text} [postKey - OPTIONAL: if you want an additional key string after the array cell, e.g. "[3].names.last"; note: only for an array
  *
  * @returnSuccess {number} length of the array
  * 
  * @module ValueList
  * 
- * @version 1.0.1
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
  */
 
-Let([
+Let ([
 
 	~list = valueList ;
 	~format = format ;
+	~format = If ( IsEmpty ( ~format ) ; "object" ; ~format );
 	~preKey = preKey ;
 	~postKey = postKey ;
 
@@ -28,7 +29,7 @@ Let([
 	~value = If ( Right ( ~value ; 1 ) = "¶" ; Left ( ~value ; Length ( ~value ) - 1 ); ~value );
 	~count = ValueCount ( ~list );
 	~listUpdated = LeftValues ( ~list ; ~count - 1 );
-	~jsonInitString =  If ( ~format = "object" ; "{}" ; "[]" );
+	~jsonInitString =  If ( ~format = "array" ; "[]" ; "{}" );
 
 ~=""];
 
@@ -42,7 +43,7 @@ Case (
 
 			// array cell
 			~preKey & If ( Right ( ~preKey ; 1 ) ≠ "." ; "." ) & 
-			If ( ~format = "object" ; ~count ; "[" & ~count - 1 & "]" ) &
+			If ( ~format = "array" ; "[" & ~count - 1 & "]" ; ~count ) &
 			If ( Left ( ~postKey ; 1 ) ≠ "." ; "." ) & ~postKey ;
 
 			// value to store
@@ -58,6 +59,6 @@ Case (
 				)
 	 	)
 
-)
+	)
 
 )

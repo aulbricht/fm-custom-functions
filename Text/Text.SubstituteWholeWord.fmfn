@@ -1,0 +1,84 @@
+/**
+ *
+ * Substitute whole word only, if adjacent to valid characters
+ *
+ * @param {text} text - full text string to search within
+ * @param {text} searchString - search for this string in the text
+ * @param {text} replaceWithString - replace with this string
+ *
+ * @returnSuccess {text} updated text string with whole word replacements
+ * 
+ * @note e.g. replace "test" when it's a whole word, but not when those 4 characters appear in a larger string like "testing"
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+
+Let ([
+
+	~f = text ;
+	~targetStr = searchString ;
+	~replaceStr = replaceWithString ;
+
+	~validAdjacentChars = " '\";:<>[]/,.&+-=*" ;
+
+~=""];
+
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~result = ~f ;
+		~targetCount = PatternCount ( ~f ; ~targetStr );
+		~numItems = ~targetCount ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// loop condition ///////
+	~i ≤ ~numItems ; 
+
+	//// logic ////////////////
+	[ 
+
+		~pos_start = 
+			Max ( 
+				Position ( ~f ; ~targetStr ; 1 ; ~i ); 
+				0 
+				);
+		~length = Length ( ~targetStr );
+		~candidateStr = Middle ( ~f ; ~pos_start - 1 ; ~length + 2 );
+		~remainderStr = Replace ( ~candidateStr ; 2 ; ~length ; "" ); 
+		~adjacentCharsCheck = Filter ( ~remainderStr ; ~validAdjacentChars );
+		~validAdjChars = Length ( ~adjacentCharsCheck ) = 2;
+
+		~result = 
+			If ( ~validAdjChars ; 
+				Replace ( ~result ; ~pos_start ; ~length ; ~replaceStr );
+				~result
+				);
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	Case ( 
+
+		IsEmpty ( ~f ) ; "" ;
+		IsEmpty ( ~targetStr ) ; ~f ;
+		~result
+
+		)
+
+	)
+
+
+)

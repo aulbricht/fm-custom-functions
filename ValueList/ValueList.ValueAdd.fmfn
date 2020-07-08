@@ -17,13 +17,17 @@
 
 
 Let ([
+
 	~list = valueList;
 	~value = valueToAdd
+
 ];
 
 List (
+
 	~list;
 	~value
-)
+
+	)
 
 )

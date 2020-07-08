@@ -55,6 +55,6 @@ If (
 	// If we didn't find the valueToRemove in the list, just return the original value list
 	~originalList
 
-)
+	)
 
 )

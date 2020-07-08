@@ -1,0 +1,107 @@
+/**
+ *
+ * Generate a list of all tables (TOs) represented by fields on the current layout
+ * 
+ * @returnSuccess {list} list of tables
+ * 
+ * @module System (Sys)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([ 
+
+	~layoutTable = Get ( LayoutTableName ) ;
+	~list_tables = $list_tables_29812334 ;
+	~list_tables = Case (
+
+		// if the first value is the current layout table, then it means we've already done the table definition process
+		// so skip this process and clear the globals used in it
+		GetValue ( ~list_tables ; 1 ) = ~layoutTable ;
+					Let ([ 
+						$list_layoutFields_23846238 = "" ;
+						$list_allTables_59384753 = "" ;
+					~=""];
+						~list_tables 
+					);
+
+		// define the list of tables represented by fields on the current layout
+		Let ([
+
+			// get extended tables (e.g. if there are any portals or objects referring to other tables)
+			~list_allTables = $list_allTables_59384753 ;
+			~list_layoutFields = $list_layoutFields_23846238 ;
+
+			// if there is not yet a list of layout fields yet, initialize one
+			// note: we also check ~list_layoutFields here because if it's empty, we can assume this is the first iteration
+			~list_allTables = If ( IsEmpty ( ~list_allTables ) and IsEmpty ( ~list_layoutFields ) ; 
+								TableNames ( Get ( FileName ) ) ;
+								~list_allTables
+								);
+
+			// if there is not yet a list of layout fields yet, initialize one
+			~list_layoutFields = If ( IsEmpty ( ~list_layoutFields ) ; 
+								FieldNames ( Get ( FileName ) ; Get ( LayoutName ) ) ;
+								~list_layoutFields
+								);
+
+			// filter the list, value by value (recursively), to filter down to the table names
+			~numTables = ValueCount ( ~list_allTables ) ;
+
+			~table = GetValue ( ~list_allTables ; 1 );
+
+			// if the table exists in the list of current layout fields, add it to the list
+			~table = If ( PatternCount ( ~list_layoutFields ; ~table & "::" ) > 0 ; ~table ; "" );
+
+			// remove top value from all-tables list
+			~list_allTables = Let ( ~list = RightValues ( ~list_allTables ; ValueCount ( ~list_allTables ) - 1 );
+							Left ( ~list ; Length ( ~list ) - 1 ) // remove trailing carriage return
+							);
+
+			// re-set local variables
+			$list_layoutFields_23846238 = ~list_layoutFields ;
+			$list_allTables_59384753 = ~list_allTables ;
+
+		~=""];
+
+		// create list of tables
+		List ( 
+
+			If ( 
+
+				~numTables > 0 ; 
+
+					////////////////////////////////////////////////////////////////////////
+					// RECURSE ///////////////////////////////////////////////////////////
+					////////////////////////////////////////////////////////////////////////
+
+					Sys.TablesRepresented ;
+
+					////////////////////////////////////////////////////////////////////////
+
+					~layoutTable 
+
+				) ; //end if
+
+			~table
+
+			) // end list
+
+		) // end let
+
+	); // end case
+
+	// after the table list is complete, set it to a local variable
+	$list_tables_29812334 = UniqueValues ( ~list_tables );
+
+
+~=""];
+
+~list_tables
+
+)
+

@@ -6,6 +6,8 @@
  * @param {string} LIST_dataTypes = list of valid data types for the value; if NULL, any data type is accepted
  *				Valid types: text, number, boolean, date, time, timestamp, object, array, null
  *
+ * @note for this validation, "null" is always assumed to be a valid key value type
+ *
  * @returnSuccess {NULL}
  * @returnError {object} Validate.Error: an error object
  * 
@@ -13,7 +15,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.1.0
+ * @version 2.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -23,11 +25,15 @@ Let ([
 
 	// Abstract parameters
 	~key = key ;
-	~LIST_dataTypes = UniqueValues ( LIST_dataTypes );
+	~LIST_dataTypes = LIST_dataTypes ;
 	~dataToValidate = $$validate.this ;
 
+	// filter list to unique values so we don't waste time checking duplicate data types
+	~LIST_dataTypes = UniqueValues ( ~LIST_dataTypes );
+
 	// remove any trailing carriage returns
-	~LIST_dataTypes = If ( Right ( ~LIST_dataTypes ; 1 ) = "¶" ; 
+	~LIST_dataTypes = 
+		If ( Right ( ~LIST_dataTypes ; 1 ) = "¶" ; 
 			Left ( ~LIST_dataTypes ; Length ( ~LIST_dataTypes ) - 1  );
 			~LIST_dataTypes
 			);
@@ -47,11 +53,17 @@ Let ([
 
 Case (
 
+	// if the value is NULL, abort without error since that's allowed for this validation type
+	IsEmpty ( ~value ) ; "" ;
+
+
 	// evaluate basic cases for abort
 	IsEmpty ( ~key ) // no key was provided
 	or IsEmpty ( ~LIST_dataTypes ) // no type was provided
 	or PatternCount ( "¶" & JSONListKeys ( ~dataToValidate ; "." ) & "¶"; "¶" & ~key & "¶" ) = 0 ; // the key is missing
 		"" ; // return NULL (abort validation)
+
+
 
 	// if the current data type is invalid, return an error (abort validation)
 	PatternCount ( "¶" & ~LIST_validDataTypes & "¶"; "¶" & ~type & "¶" ) = 0 ; 

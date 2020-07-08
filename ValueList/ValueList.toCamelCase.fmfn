@@ -17,15 +17,17 @@
 
 Let ([ 
 	~list = valueList;
-	~value = Proper( GetValue( ~list; 1 ));
-	~value = Substitute ( ~value ; " "; "" );
-	~value = Replace ( ~value ; 1; 1; Lower ( Left ( ~value ; 1 )) );
-	~remainderList = RightValues ( ~list; ValueCount ( ~list ) - 1 )
+	~value = Proper ( GetValue ( ~list; 1 ) );
+	~value = Substitute ( ~value ; " " ; "" );
+	~value = Replace ( ~value ; 1 ; 1 ; Lower ( Left ( ~value ; 1 ) ) );
+	~remainderList = RightValues ( ~list ; ValueCount ( ~list ) - 1 )
 ];
 
-List( 
+List ( 
+
 	~value; 
 	If( ValueCount( ~list ) > 1; ValueList.toCamelCase ( ~remainderList ) )
-)
+
+	)
 
 )

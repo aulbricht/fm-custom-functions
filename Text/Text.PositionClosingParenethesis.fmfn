@@ -1,0 +1,124 @@
+/**
+ *
+ * For a specified opening parenthesis, find the position of its closing parenthesis
+ *
+ * @param {text} text - full text string to search within
+ * @param {number} openingParenthesisOccurrence - occurence of opening parentheses to start with
+ *
+ * @returnSuccess {number} position - position of the closing parenthesis for the specified open parenthesis
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+
+Let ([
+
+	~str = text ;
+	~occurrence = openingParenthesisOccurrence ;
+	
+~=""];
+
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~numChars = Length ( ~str );
+		~pos_start = 
+			Max ( 
+				Position ( ~str ; "(" ; 1 ; ~occurrence ); 
+				1 
+				);
+
+		~num_openSets = 0 ;
+		~result_pos = 0 ;
+		~state_ignore = False ;
+		~state_rawText = False ;
+		~state_commentBlock = False ;
+		~state_inlineComment = False ;
+		~char = "" ;
+		~char_previous = "" ;
+		
+		~i = ~pos_start ;
+		
+		~=""] ; 
+
+	//// loop condition ///////
+	~i ≤ ~numChars and ~result_pos = 0 ; 
+
+	//// logic ////////////////
+	[ 
+
+		~char_previous = ~char ;
+		~char = Middle ( ~str ; ~i ; 1 );
+
+		// HANDLE QUOTATION MARKS / RAW TEXT STRING
+		~is_validQuoteBookend = 
+			~char_previous ≠ "\\" 
+			and ~char = "\"" ;
+		~state_rawText = 
+			Case (
+				~is_validQuoteBookend and not ~state_rawText and not ~state_ignore ; True ;
+				~is_validQuoteBookend and ~state_rawText ; False ;
+				~is_validQuoteBookend
+				);
+
+		// HANDLE COMMENT BLOCKS
+		~is_commentBookend = 
+			( ~char_previous = "/" and ~char = "*" )
+			or ( ~char_previous = "*" and ~char = "/" );
+		~state_commentBlock = 
+			Case (
+				~is_commentBookend and not ~state_commentBlock and not ~state_ignore ; True ;
+				~is_commentBookend and ~state_commentBlock ; False ;
+				~is_commentBookend 
+				);
+
+
+		// HANDLE INLINE COMMENTS
+		~is_inlineCommentBookend = 
+			~char_previous = "/" and ~char = "/" 
+			or Code ( ~char ) = 10 or Code ( ~char ) = 13 ;
+		~state_inlineComment = 
+			Case (
+				~is_inlineCommentBookend and not ~state_inlineComment and not ~state_ignore ; True ;
+				~is_inlineCommentBookend and ~state_inlineComment ; False ;
+				~is_inlineCommentBookend 
+				);
+
+		// GENERAL IGNORE STATE
+		// (roll-up of other states)
+		~state_ignore = 
+			Case (
+				~state_rawText or ~state_commentBlock or ~state_inlineComment ; True ;
+				False
+				); 
+
+		// at the current parsing position, update how many open parentheses sets we have
+		~num_openSets =
+			Case ( 
+				~char = "(" and not ~state_ignore ; ~num_openSets + 1 ;
+				~char = ")" and not ~state_ignore ; ~num_openSets - 1 ;
+				~num_openSets
+				);
+
+		~result_pos = If ( ~char = ")" and ~num_openSets = 0 ; ~i ; 0 );
+
+		~i = ~i + 1 ;
+
+
+		~=""] ; 
+
+	//// result ///////////////
+	~result_pos
+
+	)
+
+
+)

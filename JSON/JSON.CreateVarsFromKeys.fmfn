@@ -1,0 +1,91 @@
+/**
+ *
+ * Create local variables for JSON object root keys
+ *
+ * @param {text} json - JSON object
+ *
+ * @returnSuccess {boolean} returns False if no errors
+ *
+ * @returnError {number} returns -2 if invalid JSON
+ * @returnError {number} returns 1204 one of the JSON root keys did not conform to the FileMaker naming
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ * @credit Forked from custom function by Mislav Kos
+ *
+ */
+
+
+
+Case ( 
+
+	// If JSON is empty, return 0 ("no error")
+	IsEmpty ( json ) ; 0 ; 
+	
+	// If JSON is invalid, return 5 ("command is invalid")
+	Left ( JSONFormatElements ( json ) ; 1 ) = "?" ; 5 ; 
+	
+	Let ([ 
+		// Get keys from JSON document's root node
+		~keys = JSONListKeys ( json ; "." ) ; 
+		
+		// Process keys starting with the last one; otherwise JSON arrays won't process correctly
+		~key = GetValue ( ~keys ; ValueCount ( ~keys ) ) 
+	]; 
+		
+		If ( 
+		
+			// If the JSON document's root node doesn't contain any keys, return 0 ("no error")
+			IsEmpty ( ~key ) ; 0 ; 
+			
+			// Create variable based on key, then delete key from JSON, and then recursively call this function again to process remaining keys
+			Let ([ 
+				
+				// Get value for key
+				~value = JSONGetElement ( json ; ~key ) ; 
+				
+				// Ensure correct typecasting of value; without this, everything would get typecast as text
+				~text = GetAsText ( ~value ) ; 
+				~number = GetAsNumber ( ~value ) ; 
+				~validDate = IsValid ( GetAsDate ( ~text ) ) and not IsEmpty ( ~number ) ; 
+				~validTime = IsValid ( GetAsTime ( ~text ) ) and Position ( ~text ; ":" ; 1 ; 1 ) > 0 and not IsEmpty ( ~number ) ;
+				~value = Case ( 
+					~value = "" or ~value = "?" ; Quote ( ~value ) ;
+					~validTime and ~validDate ; "GetAsTimestamp ( " & Quote ( ~value ) & " )" ;
+					~validTime ; "GetAsTime ( " & Quote ( ~value ) & " )" ;
+					~validDate ; "GetAsDate ( " & Quote ( ~value ) & " )" ;
+					~text ≠ GetAsText ( ~number ) ; Quote ( ~value ) ; 
+					~number
+				) ; 
+
+				
+				// Create variable based on key and value
+				~error = EvaluationError ( 
+								Evaluate ( "Let ( $" & ~key & " = " & ~value & " ; \"\" ) " ) 
+								) 
+
+			] ; 
+
+				If ( 
+
+					// If we encountered an error, return the error code and don't bother processing the rest of the keys
+					~error ≠ 0 ; ~error ; 
+					
+					Let ( 
+
+						// Delete key from JSON
+						json = JSONDeleteElement ( json ; ~key ) ; 
+
+						// RECURSE ///////////////////////////
+						JSON.CreateVarsFromKeys ( json ) 
+						////////////////////////////////////////
+
+					)
+				)
+			)
+		)
+	)
+)

@@ -1,0 +1,49 @@
+/**
+ *
+ * Extract the table name from the fully qualified reference (e.g. "table1" from "table1::fieldA")
+ *
+ * @param {text} text - text string within which to highlight a substring
+ * @param {text} highlightString - Substring to highlight
+ * @param {text} color - what color should the highlight text be, e.g. "blue" or "RGB ( 0; 100; 255 )"
+ * @param {text} style - what style should the highlight text be, e.g. "bold, italic"
+ *
+ * @returnSuccess {text} table name
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let([
+	~existingString = Text ;
+	~searchString = HighlightString ;
+	~color = Case ( IsEmpty ( Color ) ; RGB ( 0; 100; 255 ) ; Color );
+	~style= Style ;
+	~style = Case ( 
+			/* IF*/ not IsEmpty ( ~style ); 
+			/*THEN*/ Substitute ( ~style ; [ "," ; "+" ] ; [";" ; "+" ] ); 
+			/*ELSE*/ "plain"
+		);
+
+	~numChars = Length ( ~existingString );
+
+	~posStart = Position ( ~existingString ; ~searchString ; 1 ; 1 );
+	~numSearchChars = Length ( ~searchString );
+	~posEnd = ~posStart + ~numSearchChars ;
+
+	~replacementString = Middle ( ~existingString ; ~posStart ; ~numSearchChars );
+	~newString =
+		Left ( ~existingString ; ~posStart - 1 )  & 	
+		TextStyleAdd ( 
+			TextColor ( ~replacementString ; ~color );
+			Evaluate ( ~style )
+		) &
+		Middle ( ~existingString; ~posEnd ; ~numChars )
+
+];
+
+If ( PatternCount ( ~existingString; ~searchString ) > 0; ~newString ; ~existingString ) 
+
+)

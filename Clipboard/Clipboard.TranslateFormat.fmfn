@@ -1,4 +1,4 @@
-/********
+/**
  * 
  * Translate clipboard format to human readable description
  * 
@@ -13,7 +13,7 @@
  * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
- *******/
+ */
 
 
 Let ([

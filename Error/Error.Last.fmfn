@@ -2,13 +2,13 @@
  * 
  * Wrap the last error in a JSON Object
  * 
- * @param {object} [errorObject] - optional include an existing array or object to create or add to an error array
+ * @param {object} [errorObject] - OPTIONAL include an existing array or object to create or add to an error array
  * 
  * @return {array} an array of errors. Note: if there is only one error, it will be a normal JSON object
  * 
  * @module Error
  * 
- * @version 1.1.1
+ * @version 1.1.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/

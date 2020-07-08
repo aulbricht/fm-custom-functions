@@ -1,0 +1,63 @@
+/**
+ *
+ * Extract the filename from a given filepath
+ *
+ * @param {text} fullpath - full filepath, including the filename
+ * @param {boolean} [remove_extension] - OPTIONAL: if True, return the filename without an extension
+ *
+ * @returnSuccess {text} return filename
+ * 
+ * @module File
+ * 
+ * @version 1.2.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+ 
+ 
+ 
+Let ([
+
+	// abstract parameters
+	~path = fullpath ;
+	~remove_extension = remove_extension ;
+
+	// remove any preceding FileMaker specifications in the path
+	~path = 
+		Case (
+
+			Lower ( Left ( ~path ; 5 ) ) = "file:" ; Right ( ~path ; Length ( ~path ) - 5 );
+			Lower ( Left ( ~path ; 8 ) ) = "filewin:" ; Right ( ~path ; Length ( ~path ) - 8 );
+			Lower ( Left ( ~path ; 8 ) ) = "filemac:" ; Right ( ~path ; Length ( ~path ) - 8 );
+			~path
+
+			);
+
+	// extract full filename (including extension)
+	~numSlashes = PatternCount ( ~path ; "/" );
+	~posStart = Position ( ~path ; "/" ; 1 ; ~numSlashes ) ;
+	~posEnd = Length ( ~path );
+	~filename = 
+		Case ( 
+			~numSlashes > 0 ; Right ( ~path ; ~posEnd - ~posStart );
+			~path
+			);
+
+	// remove extension from filename
+	~numDots = PatternCount ( ~filename ; "." );
+	~posExtStart = Position ( ~filename ; "." ; 1 ; ~numDots ) - 1 ;
+	~filename_noExt = 
+		Case ( 
+			~numDots > 0 ; Left ( ~filename ; ~posExtStart );
+			~filename
+			);
+
+~=""];
+
+If ( ~remove_extension ; ~filename_noExt ; ~filename )
+
+)
+
+
+

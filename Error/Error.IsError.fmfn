@@ -3,7 +3,7 @@
  * Tests the object for an errorCode
  * 
  * @param {object} errorObject - JSON error object or array
- * @param {text or number} cell - OPTIONAL: specify which array cell to test
+ * @param {text or number} [cell] - OPTIONAL: specify which array cell to test
  * 									Valid parameter values:
  * 										"last" / "n" - last (most recent) array cell
  * 										1, 2..[n] - numeric cell value (1 = array cell 0, etc)

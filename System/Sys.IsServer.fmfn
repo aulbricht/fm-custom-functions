@@ -1,11 +1,12 @@
 /**
- * 
+ *
  * Determine if the calculation is being run in the a server-side context (e.g. PSOS or server scheduled script)
- * 
+ *
  * @returnSuccess {boolean} True if it is a server-side context, False if not.
- * @returnError {boolean} "" this function does not return errors
  * 
- * @version 1.0.0
+ * @module System (Sys)
+ * 
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *

@@ -1,0 +1,31 @@
+/**
+ * 
+ * Get local time in milliseconds
+ * 
+ * @return {number} current local time in milliseconds
+ * 
+ * @note Time
+ * 
+ * @module Time
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+	~currentTS = Get ( CurrentHostTimestamp );
+	~time_MS = Get ( CurrentTimeUTCMilliseconds ) ;
+
+	~currentTS_MS = GetAsNumber ( ~currentTS );
+	~UTCTime_MS = Floor ( ~time_MS / 1000 );
+
+	~timezoneConversion_MS = ~currentTS_MS - ~UTCTime_MS ;
+
+~=""];
+
+( ~UTCTime_MS + ~timezoneConversion_MS ) * 1000
+
+)

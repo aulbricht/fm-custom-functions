@@ -1,4 +1,4 @@
-/********
+/**
  * 
  * Convert clipboard format between Mac and Windows
  * 
@@ -13,7 +13,7 @@
  * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
- *******/
+ */
 
 
 Let ([

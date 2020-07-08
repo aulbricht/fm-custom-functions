@@ -26,17 +26,26 @@ Let ([
 	~phoneAsNumber = Abs ( GetAsNumber ( ~phone ) );
 	~digitCount = Length ( ~phoneAsNumber );
 
+	~validDigits = ~digitCount ≥ 10 or ~digitCount = 7 ;
+
+	~lengthLineNumber = Min ( 4 ; ~digitCount );
+	~lengthPrefix = Min ( 3 ; ~digitCount - ~lengthLineNumber );
+	~lengthAreaCode = Min ( 3 ; ~digitCount - ~lengthLineNumber - ~lengthPrefix );
+
 	// determine what features the phone number contains
 	~hasExt = Max ( PatternCount ( ~phone ; "ext" ); PatternCount ( ~phone ; "x" ) ) > 0 ;
 	~hasCountryCode = Let ( ~left = Left ( ~phoneFiltered ; 1 ); ~left = "+" or ~left = "0" or ~left = "1" );
 
 	~format = Case (
 
+			// not a valid number of digits
+			not ~validDigits ; List ( 0 ; 0 ; 0 ; Length ( ~phone ) ; 0 );
+
 			// no country code (but could have an extension)
-			not ~hasCountryCode ; List ( 0 ; 3 ; 3 ; 4 ; Max ( 0 ; ~digitCount - 10 ) );
+			not ~hasCountryCode ; List ( 0 ; ~lengthAreaCode ; ~lengthPrefix ; ~lengthLineNumber ; Max ( 0 ; ~digitCount - 10 ) );
 
 			// has a country code and no extension
-			~hasCountryCode and not ~hasExt; List ( Max ( 0 ; ~digitCount - 10 ) ; 3 ; 3 ; 4 ; 0 );
+			~hasCountryCode and not ~hasExt; List ( Max ( 0 ; ~digitCount - 10 ) ; ~lengthAreaCode ; ~lengthPrefix ; ~lengthLineNumber ; 0 );
 
 			// has a country code and an extension
 			Let ([
@@ -50,7 +59,7 @@ Let ([
 
 				];
 
-				List ( ~lengthCountryCode ; 3 ; 3 ; 4 ; ~lengthExt )
+				List ( ~lengthCountryCode ; ~lengthAreaCode ; ~lengthPrefix ; ~lengthLineNumber ; ~lengthExt )
 
 				)
 
@@ -99,7 +108,13 @@ Let ([
 	~start = Evaluate ( Substitute ( MiddleValues ( ~format ; 1 ; ~section - 1 ); "¶" ; "+" ) & 0 ) + 1
 	];
 
-	If ( ~digits > 0 ; Middle ( ~phoneAsNumber ; ~start ; ~digits ))
+	Case ( 
+
+		// if there are not a valid number of digits, pass through
+		not ~validDigits ; ~phone ;
+
+		// if there are any line number digits, process normally
+		~digits > 0 ; Middle ( ~phoneAsNumber ; ~start ; ~digits ))
 
 	) &
 

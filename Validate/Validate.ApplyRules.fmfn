@@ -10,7 +10,7 @@
  * @module Validate
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.0.1
+ * @version 2.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  *
@@ -41,15 +41,22 @@ Case (
 	Let ([
 		~numErrors = ValueCount ( ~LIST_errors );
 		~ARRAY_errors = "[" & Substitute( ~LIST_errors ; "¶" ; "," ) & "]" 
-	];
+		];
 
-	Case ( 
-		~numErrors > 1 ; ~ARRAY_errors ;
-		Left ( JSONFormatElements ( ~LIST_Errors ) ; 1 ) ≠ "?" ; JSONFormatElements ( ~LIST_Errors ) ;
-		~LIST_Errors
+		Case ( 
+			
+			// if there are errors, return the error array
+			~numErrors > 1 ; ~ARRAY_errors ;
+
+			// if the error list is valid JSON, return that
+			Left ( JSONFormatElements ( ~LIST_Errors ) ; 1 ) ≠ "?" ; JSONFormatElements ( ~LIST_Errors ) ;
+
+			// default: just return the list of errors
+			~LIST_Errors
+
+			)
 		)
 
 	)
-)
 
 )
