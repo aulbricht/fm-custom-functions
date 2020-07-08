@@ -3,8 +3,12 @@
  * Convert value list to comma-delimited string
  *
  * @param {text} valueList - value list (¶ delimited)
+ * @param {string}	valueList = value list (¶ delimited)
  *
  * @returnSuccess {text} comma delimited string
+ * 
+ * @returnSuccess {string} comma delimited string
+ * @returnError {boolean} "" this function does not return errors
  * 
  * @module ValueList
  * 
@@ -13,7 +17,7 @@
  * @website http://northcoastsoftware.com
  *
  */
-
+ 
 
 Let ([
   ~list = valueList;
