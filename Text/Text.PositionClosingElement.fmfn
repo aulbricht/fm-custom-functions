@@ -1,0 +1,109 @@
+/**
+ *
+ * For a specified opening element, find the position of its closing partner, e.g. "(" and ")"
+ *
+ * @param {text} text - full text string to search within
+ * @param {text} openChars - character that opens the section, e.g. "("
+ * @param {text} closeChars - character that closes the section, e.g. ")"
+ * @param {number} [occurrence] - occurence of opening element pair to locate; DEFAULT = 1
+ * @param {boolean} [includeQuotedSections] - if True, also look inside quoted text strings; DEFAULT = False
+ 
+ * @returnSuccess {number} position - position of the first character after the closing element
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+
+Let ([
+
+	~str = text ;
+	~openChars = openChars ;
+	~closeChars = closeChars ;
+	~occurrence = Max ( occurrence ; 1 );
+	~includeQuoted = GetAsBoolean ( includeQuotedSections );
+
+~=""];
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~numChars = Length ( ~str );
+		~lengthOC = Length ( ~openChars );
+		~lengthCC = Length ( ~closeChars );
+		~pos_start = 1 ;
+
+		~num_openSets = 0 ;
+		~result_pos = 0 ;
+		~char = "" ;
+		~charStr_OC = "" ;
+		~charStr_CC = "" ;
+		~char_previous = "" ;
+		~state_ignore = False ;
+		~state_inSet = False ;
+		
+		~i = ~pos_start ;
+
+		~=""] ; 
+
+	//// loop condition ///////
+	~i ≤ ~numChars and ~result_pos = 0 ; 
+
+	//// logic ////////////////
+	[ 
+
+		~char_previous = ~char ;
+		~char = Middle ( ~str ; ~i ; 1 );
+		~charStr_OC = Middle ( ~str ; ~i ; ~lengthOC );
+		~charStr_CC = Middle ( ~str ; ~i ; ~lengthCC );
+
+		~foundOpenStr = ( ~charStr_OC = ~openChars );
+		~foundCloseStr = ( ~charStr_CC = ~closeChars );
+
+		// HANDLE QUOTATION MARKS / RAW TEXT STRING
+		~is_validQuoteBookend = 
+			~char_previous ≠ "\\" 
+			and ~char = "\"" ;
+		~state_ignore = 
+			Case (
+				~includeQuoted ; False ;
+				~is_validQuoteBookend and not ~state_ignore ; True ;
+				~is_validQuoteBookend and ~state_ignore ; False ;
+				~state_ignore
+				);
+
+		// at the current parsing position, update how many open parentheses sets we have
+		~num_openSets_prev = ~num_openSets ;
+		~num_openSets =
+			Case ( 
+				not ~state_ignore and ~foundOpenStr ; ~num_openSets + 1 ;
+				not ~state_ignore and ~foundCloseStr and ~num_openSets_prev ; ~num_openSets - 1 ;
+				~num_openSets
+				);
+
+		~result_pos = 
+			If ( not ~state_ignore and ~foundCloseStr and ~num_openSets = 0 and ~num_openSets_prev > 0 ;
+				~i + ~lengthCC ;
+				~result_pos
+				);
+
+		~i = ~i + 1 ;
+
+
+		~=""] ; 
+
+	//// result ///////////////
+	~result_pos
+
+	)
+
+
+)
