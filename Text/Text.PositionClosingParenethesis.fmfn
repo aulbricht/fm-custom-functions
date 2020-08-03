@@ -9,7 +9,7 @@
  * 
  * @module Text
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -66,7 +66,7 @@ While (
 			Case (
 				~is_validQuoteBookend and not ~state_rawText and not ~state_ignore ; True ;
 				~is_validQuoteBookend and ~state_rawText ; False ;
-				~is_validQuoteBookend
+				~state_rawText
 				);
 
 		// HANDLE COMMENT BLOCKS
@@ -77,7 +77,7 @@ While (
 			Case (
 				~is_commentBookend and not ~state_commentBlock and not ~state_ignore ; True ;
 				~is_commentBookend and ~state_commentBlock ; False ;
-				~is_commentBookend 
+				~state_commentBlock 
 				);
 
 
@@ -89,7 +89,7 @@ While (
 			Case (
 				~is_inlineCommentBookend and not ~state_inlineComment and not ~state_ignore ; True ;
 				~is_inlineCommentBookend and ~state_inlineComment ; False ;
-				~is_inlineCommentBookend 
+				~state_inlineComment 
 				);
 
 		// GENERAL IGNORE STATE
