@@ -1,0 +1,154 @@
+/**
+ *
+ * For a specified string, find the next "unencumbered" position, i.e. not within parentheses, quotation marks, or in a comment
+ *
+ * @param {text} text - full text string to search within
+ * @param {text} searchString - the substring to find
+ * @param {object} [optionsObject] - object containing options, defined below:
+ * @param {number} [optionsObject.pos_start] - position to begin search from; DEFAULT = 1
+ * @param {number} [optionsObject.occurrence] - occurence of searchString to locate; DEFAULT = 1
+ * @param {boolean} [optionsObject.includeParenthetic] - if True, also search inside parentheses; DEFAULT = False
+ * @param {boolean} [optionsObject.includeQuoted] - if True, also search inside quoted text strings; DEFAULT = False
+ * @param {boolean} [optionsObject.includeCommented] - if True, also search inside comment strings; DEFAULT = False
+ *
+ * @returnSuccess {number} position - position of the first character of the searchString
+ * 
+ * @module Parse
+ * @dependency Parse.PositionClosingElement
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~t = text ;
+	~ss = searchString ;
+	~options = optionsObject ;
+
+	// get options and set to variables
+	~options = 
+		If ( 
+			IsEmpty ( ~options ) or Left ( JSONFormatElements ( ~options ) ; 1 ) = "?" ; 
+			"{}" ; 
+			~options 
+			);
+	~pos_start = Max ( JSONGetElement ( ~options ; "pos_start" ) ; 1 );
+	~occurrence = Max ( JSONGetElement ( ~options ; "occurrence" ) ; 1 );
+	~includeParenthetic = GetAsBoolean ( JSONGetElement ( ~options ; "includeParenthetic" ) );
+	~includeQuoted = GetAsBoolean ( JSONGetElement ( ~options ; "includeQuoted" ) );
+	~includeCommented = GetAsBoolean ( JSONGetElement ( ~options ; "includeCommented" ) );
+
+~=""];
+
+
+// loop through each character in the text
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~numChars = Length ( ~t );
+		~lengthSS = Length ( ~ss );
+
+		~char = "" ;
+		~charStr = "" ;
+		~foundStr = False ;
+		~nextPos = 1 ;
+
+		~i = ~pos_start ;
+
+		~=""] ; 
+
+	//// loop condition ///////
+	not ~foundStr and ~i ≤ ~numChars ; 
+
+	//// logic ////////////////
+	[ 
+
+		~char_previous = ~char ;
+		~char = Middle ( ~t ; ~i ; 1 );
+		~charStr = Middle ( ~t ; ~i ; ~lengthSS );
+
+		~foundStr = ( ~charStr = ~ss );
+
+
+		~pos_nextSemi = Let ( ~p = Position ( ~t ; ";" ; ~i ; 1 ) ; If ( ~p > 0 ; ~p ; ~numChars ) );
+		~pos_nextQuote = Let ( ~p = Position ( ~t ; "\"" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
+		~pos_nextOpenPar = Let ( ~p = Position ( ~t ; "(" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
+		~pos_nextCommentInline = Let ( ~p = Position ( ~t ; "//" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
+		~pos_nextCommentBlock = Let ( ~p = Position ( ~t ; "/*" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
+
+		~isNext_semi = ~pos_nextSemi < Min ( ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_quote = ~pos_nextQuote < Min ( ~pos_nextSemi ; ~pos_nextOpenPar ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_par = ~pos_nextOpenPar < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_commentInline = ~pos_nextCommentInline < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentBlock );
+		~isNext_commentBlock = ~pos_nextCommentBlock < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentInline );
+
+
+		// HANDLE PARENTHESES /////////////////////////
+		~nextPos = 
+			Case ( 
+				~includeParenthetic ; ~nextPos ; // if option to include this type, ignore
+				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
+				~isNext_par and ~char = "(" ;
+					Parse.PositionClosingElement ( ~t ; "(" ; ")" ; 
+						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
+						) + Length ( ")" )
+				);
+		///////////////////////////////////////////////
+
+
+		// HANDLE QUOTATION MARKS / RAW TEXT STRING ///
+		~nextPos = 
+			Case ( 
+				~includeQuoted ; ~nextPos ; // if option to include this type, ignore
+				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
+				~isNext_quote and ~char = "\"" and ~char_previous ≠ "\\" ;
+					Parse.PositionClosingElement ( ~t ; "\"" ; "\"" ; 
+						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
+						) + Length ( "\"" )
+				);
+		///////////////////////////////////////////////
+
+
+		// HANDLE COMMENTS ////////////////////////////
+		// inline comment
+		~nextPos = 
+			Case ( 
+				~includeCommented ; ~nextPos ; // if option to include this type, ignore
+				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
+				~isNext_commentInline and Middle ( ~t ; ~i ; 2 ) = "//" ;
+					Parse.PositionClosingElement ( ~t ; "//" ; "¶" ; 
+						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
+						) + Length ( "¶" )
+				);
+		// comment block
+		~nextPos = 
+			Case ( 
+				~includeCommented ; ~nextPos ; // if option to include this type, ignore
+				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
+				~isNext_commentBlock and Middle ( ~t ; ~i ; 2 ) = "/*" ;
+					Parse.PositionClosingElement ( ~t ; "/*" ; "*/" ; 
+						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
+						) + Length ( "*/" )
+				);
+
+		///////////////////////////////////////////////
+
+
+		~i = If ( ~nextPos > ~i ; ~nextPos ; ~i + 1 );
+
+		~=""] ; 
+
+
+	//// result ///////////////
+	~i - If ( ~i = ~numChars and not ~nextPos ; 0 ; 1 ) 
+
+	) // END WHILE
+
+) // END LET
+
+
