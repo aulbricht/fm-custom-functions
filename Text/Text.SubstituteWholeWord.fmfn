@@ -12,7 +12,7 @@
  * 
  * @module Text
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -26,7 +26,11 @@ Let ([
 	~targetStr = searchString ;
 	~replaceStr = replaceWithString ;
 
-	~validAdjacentChars = " '\";:<>[]/,.&+-=*" ;
+	~validAdjacentChars = 
+		" " // space 
+		& "	" // tab 
+		& "\"" // quotation mark
+		& "¶;:'<>[]/,.&+-=*" ;
 
 ~=""];
 
@@ -36,26 +40,33 @@ While (
 	[ 
 		
 		~result = ~f ;
-		~targetCount = PatternCount ( ~f ; ~targetStr );
-		~numItems = ~targetCount ;
+		~candidateCount = PatternCount ( ~f ; ~targetStr );
+		~length = Length ( ~targetStr );
+		~pos_start = 1 ;
 		~i = 1 ;
 		
 		~=""] ; 
 
 	//// loop condition ///////
-	~i ≤ ~numItems ; 
+	~i ≤ ~candidateCount ; 
 
 	//// logic ////////////////
 	[ 
 
+		~prev_pos_end = ~pos_start + If ( ~i > 1 ; ~length );
 		~pos_start = 
 			Max ( 
-				Position ( ~f ; ~targetStr ; 1 ; ~i ); 
-				0 
+				Position ( ~result ; ~targetStr ; ~prev_pos_end ; 1 ); 
+				1 
 				);
-		~length = Length ( ~targetStr );
-		~candidateStr = Middle ( ~f ; ~pos_start - 1 ; ~length + 2 );
+
+		// get the candidate for substitution with the adjacent characters, front and back
+		~candidateStr = Middle ( ~result ; ~pos_start - 1 ; ~length + 2 );
+		
+		// remove the candidate string, so all that's remaining are the adjascent characters
 		~remainderStr = Replace ( ~candidateStr ; 2 ; ~length ; "" ); 
+
+		// test to make sure the adjscent characters are valid
 		~adjacentCharsCheck = Filter ( ~remainderStr ; ~validAdjacentChars );
 		~validAdjChars = Length ( ~adjacentCharsCheck ) = 2;
 
