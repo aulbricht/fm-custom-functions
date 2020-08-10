@@ -1,0 +1,91 @@
+/**
+ *
+ * For a given text string, parse and remove all comments
+ *
+ * @param {text} calculationText - full text string to search/remove within
+ *  
+ * @returnSuccess {text} updatedText - with comments removed
+ * 
+ * @dependency Text.PositionClosingElement
+ * 
+ * @module Text
+ * 
+ * @version 1.0.3
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~t = calculationText ;
+
+		~maxPossibleComments = PatternCount ( ~t ; "//" ) + PatternCount ( ~t ; "/*" );
+
+		~stopNow = IsEmpty ( ~t ) ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	( 
+		PatternCount ( ~t ; "/*" ) > 0 
+		or PatternCount ( ~t ; "//" ) > 0 
+	)
+	and not ~stopNow
+	and ~i ≤ ~maxPossibleComments ;
+
+	//// logic ////////////////
+	[ 
+
+		~length = Length ( ~t );
+
+		~openStr = 
+			If ( 
+				PatternCount ( ~t ; "/*" ) > 0 ; 
+				"/*" ; 
+				"//" 
+				); 
+
+		~closeStr = If ( ~openStr = "/*" ; "*/" ; "¶" );
+
+		// for inline comments, nesting is not possible
+		~ignoreNesting = GetAsBoolean ( ~openStr = "//" and ~closeStr = "¶" );
+
+		~optionsObject = 
+			JSONSetElement ( "{}" ;
+				[ "occurrence" ; 1 ; JSONNumber ];
+				[ "includeQuoted" ; 0 ; JSONNumber ];
+				[ "ignoreNesting" ; ~ignoreNesting ; JSONNumber ]
+				);
+
+		~pos_start = Position ( ~t ; ~openStr ; 1 ; 1 );
+		~pos_end = Parse.PositionClosingElement ( ~t ; ~openStr ; ~closeStr ; ~optionsObject );
+		~stopNow = ~pos_end ≤ ~pos_start ;
+
+		~t = 
+			If ( not ~stopNow ;
+				
+				Left ( ~t ; ~pos_start - 1 )
+				& Right ( ~t ; Length ( ~t ) - ~pos_end  );
+
+				~t
+
+				);
+
+		// if nothing changed, quit now so we don't end up in an infinite loop
+		~stopNow = ~stopNow or Length ( ~t ) = ~length ;
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~t
+
+	)
