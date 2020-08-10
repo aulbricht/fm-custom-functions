@@ -8,6 +8,7 @@
  * @param {number} [optionsObject.pos_start] - position to begin search from; DEFAULT = 1
  * @param {number} [optionsObject.occurrence] - occurence of searchString to locate; DEFAULT = 1
  * @param {boolean} [optionsObject.includeParenthetic] - if True, also search inside parentheses; DEFAULT = False
+ * @param {boolean} [optionsObject.includeCrotcheted] - if True, also search inside crotchets (square parentheses); DEFAULT = False
  * @param {boolean} [optionsObject.includeQuoted] - if True, also search inside quoted text strings; DEFAULT = False
  * @param {boolean} [optionsObject.includeCommented] - if True, also search inside comment strings; DEFAULT = False
  *
@@ -16,32 +17,10 @@
  * @module Parse
  * @dependency Parse.PositionClosingElement
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
-
-
-Let ([
-
-	~t = text ;
-	~ss = searchString ;
-	~options = optionsObject ;
-
-	// get options and set to variables
-	~options = 
-		If ( 
-			IsEmpty ( ~options ) or Left ( JSONFormatElements ( ~options ) ; 1 ) = "?" ; 
-			"{}" ; 
-			~options 
-			);
-	~pos_start = Max ( JSONGetElement ( ~options ; "pos_start" ) ; 1 );
-	~occurrence = Max ( JSONGetElement ( ~options ; "occurrence" ) ; 1 );
-	~includeParenthetic = GetAsBoolean ( JSONGetElement ( ~options ; "includeParenthetic" ) );
-	~includeQuoted = GetAsBoolean ( JSONGetElement ( ~options ; "includeQuoted" ) );
-	~includeCommented = GetAsBoolean ( JSONGetElement ( ~options ; "includeCommented" ) );
-
-~=""];
 
 
 // loop through each character in the text
@@ -50,20 +29,42 @@ While (
 	//// initial variables ////
 	[ 
 		
+		// abstract parameters
+		~t = text ;
+		~ss = searchString ;
+		~options = optionsObject ;
+
+		// get options and set to variables
+		~options = 
+			If ( 
+				IsEmpty ( ~options ) or Left ( JSONFormatElements ( ~options ) ; 1 ) = "?" ; 
+				"{}" ; 
+				~options 
+				);
+		~pos_start = Max ( JSONGetElement ( ~options ; "pos_start" ) ; 1 );
+		~occurrence = Max ( JSONGetElement ( ~options ; "occurrence" ) ; 1 );
+		~includeParenthetic = GetAsBoolean ( JSONGetElement ( ~options ; "includeParenthetic" ) );
+		~includeCrotcheted = GetAsBoolean ( JSONGetElement ( ~options ; "includeCrotcheted" ) );
+		~includeQuoted = GetAsBoolean ( JSONGetElement ( ~options ; "includeQuoted" ) );
+		~includeCommented = GetAsBoolean ( JSONGetElement ( ~options ; "includeCommented" ) );
+
+		// set key vars
 		~numChars = Length ( ~t );
 		~lengthSS = Length ( ~ss );
 
+		// init vars
 		~char = "" ;
 		~charStr = "" ;
 		~foundStr = False ;
 		~nextPos = 1 ;
+		~foundOccurrence = 0 ;
 
 		~i = ~pos_start ;
 
 		~=""] ; 
 
 	//// loop condition ///////
-	not ~foundStr and ~i ≤ ~numChars ; 
+	~foundOccurrence < ~occurrence and ~i ≤ ~numChars ; 
 
 	//// logic ////////////////
 	[ 
@@ -73,22 +74,38 @@ While (
 		~charStr = Middle ( ~t ; ~i ; ~lengthSS );
 
 		~foundStr = ( ~charStr = ~ss );
+		~foundOccurrence = If ( ~foundStr ; ~foundOccurrence + 1 ; ~foundOccurrence );
 
 
 		~pos_nextSemi = Let ( ~p = Position ( ~t ; ";" ; ~i ; 1 ) ; If ( ~p > 0 ; ~p ; ~numChars ) );
 		~pos_nextQuote = Let ( ~p = Position ( ~t ; "\"" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
 		~pos_nextOpenPar = Let ( ~p = Position ( ~t ; "(" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
+		~pos_nextOpenCro = Let ( ~p = Position ( ~t ; "[" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
 		~pos_nextCommentInline = Let ( ~p = Position ( ~t ; "//" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
 		~pos_nextCommentBlock = Let ( ~p = Position ( ~t ; "/*" ; ~i ; 1 ); If ( ~p > 0 ; ~p ; ~numChars ) );
 
-		~isNext_semi = ~pos_nextSemi < Min ( ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
-		~isNext_quote = ~pos_nextQuote < Min ( ~pos_nextSemi ; ~pos_nextOpenPar ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
-		~isNext_par = ~pos_nextOpenPar < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
-		~isNext_commentInline = ~pos_nextCommentInline < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentBlock );
-		~isNext_commentBlock = ~pos_nextCommentBlock < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentInline );
+		~isNext_semi = ~pos_nextSemi < Min ( ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextOpenCro ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_quote = ~pos_nextQuote < Min ( ~pos_nextSemi ; ~pos_nextOpenPar ; ~pos_nextOpenCro ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_par = ~pos_nextOpenPar < Min ( ~pos_nextSemi ; ~pos_nextQuote ; ~pos_nextOpenCro ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_cro = ~pos_nextOpenCro < Min ( ~pos_nextSemi ; ~pos_nextOpenPar ; ~pos_nextQuote ; ~pos_nextCommentInline ; ~pos_nextCommentBlock );
+		~isNext_commentInline = ~pos_nextCommentInline < Min ( ~pos_nextSemi ; ~pos_nextOpenCro ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentBlock );
+		~isNext_commentBlock = ~pos_nextCommentBlock < Min ( ~pos_nextSemi ; ~pos_nextOpenCro ; ~pos_nextQuote ; ~pos_nextOpenPar ; ~pos_nextCommentInline );
 
 
 		// HANDLE PARENTHESES /////////////////////////
+		~nextPos = 
+			Case ( 
+				~includeCrotcheted ; ~nextPos ; // if option to include this type, ignore
+				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
+				~isNext_cro and ~char = "[" ;
+					Parse.PositionClosingElement ( ~t ; "[" ; "]" ; 
+						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
+						) + Length ( ")" )
+				);
+		///////////////////////////////////////////////
+
+
+		// HANDLE CROTCHETS ///////////////////////////
 		~nextPos = 
 			Case ( 
 				~includeParenthetic ; ~nextPos ; // if option to include this type, ignore
@@ -96,7 +113,7 @@ While (
 				~isNext_par and ~char = "(" ;
 					Parse.PositionClosingElement ( ~t ; "(" ; ")" ; 
 						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
-						) + Length ( ")" )
+						) + Length ( "]" )
 				);
 		///////////////////////////////////////////////
 
@@ -148,7 +165,4 @@ While (
 	~i - If ( ~i = ~numChars and not ~nextPos ; 0 ; 1 ) 
 
 	) // END WHILE
-
-) // END LET
-
 
