@@ -1,0 +1,69 @@
+/**
+ *
+ * For a specified string, find the next "non-space" position, where "non-space" includes carriage returns and tabs
+ *
+ * @param {text} text - full text string to search within
+ * @param {number} [pos_start] - position to start the search ; DEFAULT = 1
+ * @param {boolean} [searchForward] - if True, search forward; if False, search backward; DEFAULT = True (forward)
+ *
+ * @returnSuccess {number} position - position of the first character of the searchString
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		// abstract parameters
+		~t = text ;
+		~pos_start = pos_start ;
+		~searchForward = GetAsBoolean ( Max ( 0 ; Min ( searchForward ; 1 ) ) );
+		
+		// critical vars
+		~numChars = Length ( ~t );
+		~spaceChars = 
+			Char ( 32 ) // space
+			& Char ( 9 ) // tab
+			& Char ( 10 ) // carriage return
+			& Char ( 13 ) // line feed
+			;
+
+		// init vars
+		~foundNext = False ;
+		~i = Max ( 1 ; ~pos_start );
+
+		~=""] ; 
+
+	//// loop condition ///////
+	not ~foundNext 
+	and ~i ≥ 1 
+	and ~i ≤ ~numChars 
+	; 
+
+	//// logic ////////////////
+	[ 
+
+		~char = Middle ( ~t ; ~i ; 1 );
+
+		// if the character is not in the list of spaceChars, then we've found the next character
+		~foundNext = not PatternCount ( ~spaceChars ; ~char );
+
+		~i = 
+			If ( not ~foundNext ; 
+				~i + If ( ~searchForward ; 1 ; -1 ); 
+				~i 
+				);
+
+		~=""] ; 
+
+	//// result ///////////////
+	~i
+
+	) // END WHILE
