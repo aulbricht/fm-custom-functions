@@ -15,7 +15,7 @@
  * 
  * @module Parse
  * 
- * @version 1.3.0
+ * @version 1.4.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -112,7 +112,7 @@ While (
 			Case ( 
 				~foundCloseStr and not ~state_ignore and ~num_openSets_prev > 0 ; Max ( ~num_openSets - 1 ; 0 );
 				~foundOpenStr and ~ignoreNesting ; 1 ;
-				~foundOpenStr and not ~state_ignore ; Min ( ~num_openSets + 1 ; 1 );
+				~foundOpenStr and not ~state_ignore ; Max ( ~num_openSets + 1 ; 1 );
 				~num_openSets
 				);
 
