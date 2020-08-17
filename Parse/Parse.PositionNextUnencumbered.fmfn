@@ -7,17 +7,17 @@
  * @param {object} [optionsObject] - object containing options, defined below:
  * @param {number} [optionsObject.pos_start] - position to begin search from; DEFAULT = 1
  * @param {number} [optionsObject.occurrence] - occurence of searchString to locate; DEFAULT = 1
- * @param {boolean} [optionsObject.includeParenthetic] - if True, also search inside parentheses; DEFAULT = False
- * @param {boolean} [optionsObject.includeCrotcheted] - if True, also search inside crotchets (square parentheses); DEFAULT = False
- * @param {boolean} [optionsObject.includeQuoted] - if True, also search inside quoted text strings; DEFAULT = False
- * @param {boolean} [optionsObject.includeCommented] - if True, also search inside comment strings; DEFAULT = False
+ * @param {boolean} [optionsObject.includeParenthetic] - if True, search inside parentheses; DEFAULT = False
+ * @param {boolean} [optionsObject.includeCrotcheted] - if True, search inside crotchets (square parentheses); DEFAULT = False
+ * @param {boolean} [optionsObject.includeQuoted] - if True, search inside quoted text strings; DEFAULT = False
+ * @param {boolean} [optionsObject.includeCommented] - if True, search inside comment strings; DEFAULT = False
  *
  * @returnSuccess {number} position - position of the first character of the searchString
  * 
  * @module Parse
  * @dependency Parse.PositionClosingElement
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -95,12 +95,12 @@ While (
 		// HANDLE PARENTHESES /////////////////////////
 		~nextPos = 
 			Case ( 
-				~includeCrotcheted ; ~nextPos ; // if option to include this type, ignore
+				~includeParenthetic ; ~nextPos ; // if option to include this type, ignore
 				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
-				~isNext_cro and ~char = "[" ;
-					Parse.PositionClosingElement ( ~t ; "[" ; "]" ; 
+				~isNext_par and ~char = "(" ;
+					Parse.PositionClosingElement ( ~t ; "(" ; ")" ; 
 						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
-						) + Length ( ")" )
+						) + Length ( "]" )
 				);
 		///////////////////////////////////////////////
 
@@ -108,10 +108,10 @@ While (
 		// HANDLE CROTCHETS ///////////////////////////
 		~nextPos = 
 			Case ( 
-				~includeParenthetic ; ~nextPos ; // if option to include this type, ignore
+				~includeCrotcheted ; ~nextPos ; // if option to include this type, ignore
 				~nextPos > ~i ; ~nextPos ; // if something else already changed "nextPos", don't change it
-				~isNext_par and ~char = "(" ;
-					Parse.PositionClosingElement ( ~t ; "(" ; ")" ; 
+				~isNext_cro and ~char = "[" ;
+					Parse.PositionClosingElement ( ~t ; "[" ; "]" ; 
 						JSONSetElement ( "{}" ; "pos_start" ; ~i ; JSONNumber ) 
 						) + Length ( "]" )
 				);
