@@ -1,10 +1,12 @@
 /**
  * 
- * Merge two JSON arrays
+ * Merge two JSON arrays (all elements in cell 0 of each array will be in cell 0 of the merged array, and so on)
  *
  * @param {array} array1 - JSON array
  * @param {array} array2 - JSON array
  *
+ * @note if both arrays contain identical elements, array2 will overwrite array1 for those elements
+ * 
  * @returnSuccess {object} merged JSON object
  * 
  * @returnError {array} error[n].code - error code
@@ -12,82 +14,126 @@
  * 
  * @module JSON
  * 
- * @version 1.1.0
+ * @version 1.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
- Let ([
+While ( 
 
-	// Abstract the input variables
-	~array1 = array1 ;
-	~array2 = array2 ;
+	//// initial variables ////
+	[ 
+		
+		// Abstract the input variables
+		~array1 = array1 ;
+		~array2 = array2 ;
 
-	// Validate the array variables are valid JSON
-	~jsonValidate1 = JSONFormatElements ( ~array1 );
-	~jsonValidate2 = JSONFormatElements ( ~array2 );
+		// Validate the array variables are valid JSON
+		~jsonValidate1 = JSONFormatElements ( ~array1 );
+		~jsonValidate2 = JSONFormatElements ( ~array2 );
 
-	// Validate the JSON variables are arrays (rather than standard JSON objects)
-	~isArray1 = Left ( ~array1 ; 1 ) = "[" ;
-	~isArray2 = Left ( ~array2 ; 1 ) = "[" ;
+		// Validate the JSON variables are arrays (rather than standard JSON objects)
+		~isArray1 = Left ( ~array1 ; 1 ) = "[" ;
+		~isArray2 = Left ( ~array2 ; 1 ) = "[" ;
 
-	// Handle any validation errors
-	~error = Case (
+		// Handle any validation errors
+		~error = Case (
 
-				Left ( ~jsonValidate1 ; 1 ) = "?" or Left ( ~jsonValidate2 ; 1 ) = "?"; 
-					JSONSetElement ("{}"; 
-						[ "errorCode"; -3; JSONNumber ]; 
-						[ "descriptor"; "JSON invalid"; JSONString ]
-						);
+					Left ( ~jsonValidate1 ; 1 ) = "?" or Left ( ~jsonValidate2 ; 1 ) = "?"; 
+						JSONSetElement ("{}"; 
+							[ "errorCode"; -3; JSONNumber ]; 
+							[ "descriptor"; "JSON invalid"; JSONString ]
+							);
 
-				not ( ~isArray1 and ~isArray2 ) ; 
-					JSONSetElement ("{}"; 
-						[ "errorCode"; -3; JSONNumber ]; 
-						[ "descriptor"; "JSON is not a valid array"; JSONString ]
-						);
+					not ( ~isArray1 and ~isArray2 ) ; 
+						JSONSetElement ("{}"; 
+							[ "errorCode"; -3; JSONNumber ]; 
+							[ "descriptor"; "JSON is not a valid array"; JSONString ]
+							);
+
+					);
+
+		~LIST_keysArray1 = JSONListKeys ( ~array1 ; "." );
+		~LIST_keysArray2 = JSONListKeys ( ~array2 ; "." );
+		~numCells = 
+			Max ( 
+				GetValue ( ~LIST_keysArray1 ; ValueCount ( ~LIST_keysArray1 ) );
+				GetValue ( ~LIST_keysArray2 ; ValueCount ( ~LIST_keysArray2 ) );
+				) + 1 ;
+
+		// init vars
+		~arrayMerged = "" ;
+		~cellMerged = "" ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numCells ; 
+
+	//// logic ////////////////
+	[ 
+
+		~arrayKeyBase = "[" & ~i - 1 & "]." ;
+
+		~cell1 = JSONGetElement ( ~array1 ; ~arrayKeyBase );
+		~cell1 = If ( Left ( JSONFormatElements ( ~cell1 ); 1 ) = "?" ; "{}" ; ~cell1 );
+
+		~cell2 = JSONGetElement ( ~array2 ; ~arrayKeyBase );
+		~cell2 = If ( Left ( JSONFormatElements ( ~cell2 ); 1 ) = "?" ; "{}" ; ~cell2 );
+
+		~cellMerged =
+			While ( 
+
+				//// initial variables ////
+				[ 
+
+					~LIST_elements = JSONListKeys ( ~cell2 ; "." );					
+					~numElements = ValueCount ( ~LIST_elements );
+					~cellMerged = ~cell1 ;
+					~e = 1 ;
+					
+					~=""] ; 
+
+				//// "while this is true" loop condition ///////
+				~e ≤ ~numElements ; 
+
+				//// logic ////////////////
+				[ 
+
+
+					~element = GetValue ( ~LIST_elements ; ~e );
+					~value = JSONGetElement ( ~cell2 ; ~element );
+
+					~cellMerged = 
+						JSONSetElement ( ~cellMerged ; ~element ; ~value ; "" );
+
+					~e = ~e + 1 ;
+
+					~=""] ; 
+
+				//// result ///////////////
+				~cellMerged
 
 				);
 
-	
-	// Determine the next array cell number to merge data into
-	// Note: since array cells start at zero (not one), the next array cell will be equal to the count of current cells, so we don't need a "+1"
-	~nextArrayCell = ValueCount ( JSONListKeys ( ~array1 ; "." ) );
+		~arrayMerged = 
+			JSONSetElement ( ~arrayMerged ; ~arrayKeyBase ; ~cellMerged ; "" );
 
+		~i = ~i + 1 ;
 
-	// Get the next array2 cell data to be merged (the first cell)
-	~value = JSONGetElement ( ~array2 ; "[0]" );
+		~=""] ; 
 
-	// Determine the data type which to set the data to the combined JSON object
-	~type = JSON._dataType ( ~value );
+	//// result ///////////////
 
-	// Merge the next data bit from array2 into array1
-	~jsonMerged = JSONSetElement ( ~array1 ; "[" & ~nextArrayCell & "]" ; ~value ; ~type );
+	Case ( 
 
-	// Remove the array2 cell we just merged (the first cell)
-	~jsonRemaining = JSONDeleteElement ( ~array2 ; "[0]" );
+		// If this iteration had an error, return it instead of a number
+		not IsEmpty ( ~error ); ~error; 
 
-	// Determine how many more values remain to be merged
-	~valuesRemaining = ValueCount ( JSONListKeys ( ~jsonRemaining ; "." ) ) ;
-	
-~=""];
+		// If there are no additional keys left to merge, return the final merged object
+		~arrayMerged 
 
-Case ( 
+		)
 
-	// If this iteration had an error, return it instead of a number
-	not IsEmpty ( ~error ); ~error; 
-
-	// If there are more keys in array2 to merge, recurse to process the next cell
-	~valuesRemaining > 0 ; 
-
-		// RECURSE ///////////////////////////
-		JSON.MergeArrays ( ~jsonMerged ; ~jsonRemaining ) ; 
-		////////////////////////////////////////
-
-
-	// If there are no additional keys left to merge, return the final merged object
-	~jsonMerged 
-
-)
-
-)
+	)

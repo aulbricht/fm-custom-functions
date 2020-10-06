@@ -8,11 +8,10 @@
  * 
  * @dependency Text.PositionClosingElement
  * 
- * @module Text
+ * @module Parse
  * 
- * @version 1.0.3
+ * @version 1.0.4
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 

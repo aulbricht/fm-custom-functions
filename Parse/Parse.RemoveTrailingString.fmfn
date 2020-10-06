@@ -1,0 +1,78 @@
+/**
+ *
+ * For a given text string, parse and remove the given trailing character(s)
+ *
+ * @param {text} text - full text string
+ * @param {text} trailingStringToRemove - the trailing string to remove from the text
+ *  
+ * @returnSuccess {text} updatedText
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While ( 
+
+//// initial variables ////
+[ 
+	
+	~t = text ;
+	~removeStr = trailingStringToRemove ;
+
+	~lengthText = Length ( ~t ) ;
+	~lengthRS = Length ( ~removeStr ) ;
+
+	~foundRemoveStr = False ;
+	~foundOtherChar = False ;
+	~i = ~lengthText ;
+	
+	~=""] ; 
+
+//// "while this is true" loop condition ///////
+~i > 0 
+and not ~foundRemoveStr 
+and not ~foundOtherChar ; 
+
+//// logic ////////////////
+[ 
+
+	~char = Middle ( ~t ; ~i ; 1 );
+	~str = 
+		Middle ( 
+			~t ; 
+			~i - ~lengthRS + 1 ; 
+			~lengthRS
+			);
+
+	// True if we found the string to remove, at the end of the text
+	~foundRemoveStr = ( ~str = ~removeStr );
+
+	// True if we found a predefined chars/symbols to ignore (e.g. spaces) at the end of the text 
+	~foundIgnoreChar = 
+		~char = Char ( 9 ) // tab
+		or ~char = Char ( 10 ) // line feed
+		or ~char = Char ( 13 ) // carriage return
+		or ~char = Char ( 32 ); // space
+
+	// True if we found a character at the end of the text other than what is to be removed or ignored
+	~foundOtherChar = not ( ~foundRemoveStr or ~foundIgnoreChar );
+
+	~t = 
+		Case (
+			~foundRemoveStr ; Left ( ~t ; ~lengthText - ~lengthRS );
+			~foundIgnoreChar ; Left ( ~t ; ~lengthText - 1 );
+			~t
+			);
+
+	~i = ~i - 1 ;
+	~lengthText = Length ( ~t ) ;
+
+	~=""] ; 
+
+//// result ///////////////
+~t
+
+)

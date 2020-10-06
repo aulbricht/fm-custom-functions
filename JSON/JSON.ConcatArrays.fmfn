@@ -1,0 +1,92 @@
+/**
+ * 
+ * Concatenate two JSON arrays
+ *
+ * @param {array} array1 - JSON array
+ * @param {array} array2 - JSON array
+ *
+ * @returnSuccess {object} merged JSON object
+ * 
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
+ * 
+ * @module JSON
+ * 
+ * @version 1.1.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+ Let ([
+
+	// Abstract the input variables
+	~array1 = array1 ;
+	~array2 = array2 ;
+
+	// Validate the array variables are valid JSON
+	~jsonValidate1 = JSONFormatElements ( ~array1 );
+	~jsonValidate2 = JSONFormatElements ( ~array2 );
+
+	// Validate the JSON variables are arrays (rather than standard JSON objects)
+	~isArray1 = Left ( ~array1 ; 1 ) = "[" ;
+	~isArray2 = Left ( ~array2 ; 1 ) = "[" ;
+
+	// Handle any validation errors
+	~error = Case (
+
+				Left ( ~jsonValidate1 ; 1 ) = "?" or Left ( ~jsonValidate2 ; 1 ) = "?"; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON invalid"; JSONString ]
+						);
+
+				not ( ~isArray1 and ~isArray2 ) ; 
+					JSONSetElement ("{}"; 
+						[ "errorCode"; -3; JSONNumber ]; 
+						[ "descriptor"; "JSON is not a valid array"; JSONString ]
+						);
+
+				);
+
+	
+	// Determine the next array cell number to merge data into
+	// Note: since array cells start at zero (not one), the next array cell will be equal to the count of current cells, so we don't need a "+1"
+	~nextArrayCell = ValueCount ( JSONListKeys ( ~array1 ; "." ) );
+
+
+	// Get the next array2 cell data to be merged (the first cell)
+	~value = JSONGetElement ( ~array2 ; "[0]" );
+
+	// Determine the data type which to set the data to the combined JSON object
+	~type = JSON._dataType ( ~value );
+
+	// Merge the next data bit from array2 into array1
+	~jsonMerged = JSONSetElement ( ~array1 ; "[" & ~nextArrayCell & "]" ; ~value ; ~type );
+
+	// Remove the array2 cell we just merged (the first cell)
+	~jsonRemaining = JSONDeleteElement ( ~array2 ; "[0]" );
+
+	// Determine how many more values remain to be merged
+	~valuesRemaining = ValueCount ( JSONListKeys ( ~jsonRemaining ; "." ) ) ;
+	
+~=""];
+
+Case ( 
+
+	// If this iteration had an error, return it instead of a number
+	not IsEmpty ( ~error ); ~error; 
+
+	// If there are more keys in array2 to merge, recurse to process the next cell
+	~valuesRemaining > 0 ; 
+
+		// RECURSE ///////////////////////////
+		JSON.MergeArrays ( ~jsonMerged ; ~jsonRemaining ) ; 
+		////////////////////////////////////////
+
+
+	// If there are no additional keys left to merge, return the final merged object
+	~jsonMerged 
+
+)
+
+)

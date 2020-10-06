@@ -15,7 +15,7 @@
  * 
  * @module Parse
  * 
- * @version 1.4.1
+ * @version 1.5.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -53,7 +53,7 @@ While (
 		~numChars = Length ( ~t );
 		~lengthOC = Length ( ~openChars );
 		~lengthCC = Length ( ~closeChars );
-//		~pos_start = Max ( 1 ; Position ( ~t ; ~openChars ; ~pos_start ; ~occurrence ) );
+		~pos_start = Max ( 1 ; Position ( ~t ; ~openChars ; ~pos_start ; ~occurrence ) );
 
 		// init vars
 		~num_openSets = 0 ;
