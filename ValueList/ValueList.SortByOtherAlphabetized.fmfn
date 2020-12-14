@@ -1,0 +1,132 @@
+/**
+ *
+ * Sort list A by an alphebetized list B
+ *
+ * @param {text} sortThisList - value list (¶ delimited) to resort
+ * @param {text} byThisListAlphabetized - alphabetize this list and sort list A list-position matching values
+ *
+ * @returnSuccess {text} alphabetized value list
+ * 
+ * @note if list A and B are not same number of values, the least value count will be used
+ * @note if there are duplicate values in the list, they will stay in the given order relative to one another
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~listA = valueListA_toSort ;
+		~listB = valueListB_sortByAlphabetized ;
+
+		~listB_sorted = SortValues ( ~listB );
+
+		~numItems = Min ( ValueCount ( ~listA ); ValueCount ( ~listB ) );
+		~LIST_usedPositions = "" ;
+		~updatedList = "" ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numItems ; 
+
+	//// logic ////////////////
+	[ 
+
+		~valueB_sorted = GetValue ( ~listB_sorted ; ~i );
+
+		// get the value position in listB the corresponding value in the sorted list
+		~position_valueB = 
+			While ( 
+
+				//// initial variables ////
+				[ 
+					
+					~position = "" ;
+					~n = 1 ;
+					
+					~=""] ; 
+
+				//// "while this is true" loop condition ///////
+				( IsEmpty ( ~position ) or ~position = 0 ) and ~n ≤ ~numItems ; 
+
+				//// logic ////////////////
+				[ 
+
+					~value = GetValue ( ~listB ; ~n );
+
+					~position = 
+						Case ( 
+
+							// if the value position already exists, skip it (this is for handling duplicate values)
+							PatternCount ( "¶" & ~LIST_usedPositions & "¶" ; "¶" & ~n & "¶" ) > 0 ; "" ;
+
+							// if the value matches the sorted list current value, use this position
+							~value = ~valueB_sorted ; ~n ;
+
+							// default
+							""
+
+							);
+
+					~n = ~n + 1 ;
+
+					~=""]; 
+
+				//// result ///////////////
+				~position
+
+				);
+
+		~LIST_usedPositions = List ( ~LIST_usedPositions ; ~position_valueB );
+		~value_listA = GetValue ( ~listA ; ~position_valueB );
+		~updatedList = List ( ~updatedList ; ~value_listA );
+
+		
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~updatedList
+
+	)
+
+
+
+
+
+			Let ([ 
+
+				~sql = "
+					SELECT {{fromField}}
+					FROM {{fromTable}}
+					WHERE {{whereField}} = ?
+					";
+
+				~sqlQuery = 
+					Substitute ( ~sql ;
+						[ "{{fromTable}}" ; SQL.TableName ( fieldPath ) ];
+						[ "{{fromField}}" ; SQL.FieldName ( fieldPath ) ];
+						[ "{{whereField}}" ; SQL.FieldName ( fieldPath ) ]
+						);
+
+				~result = 
+					ExecuteSQL ( ~sqlQuery ; "" ; "" ;
+						$condition
+						)
+
+			];
+
+			~result
+
+			)

@@ -1,0 +1,71 @@
+/**
+ *
+ * Extract the raw path (sans prefix, e.g. "file://") from a given filepath
+ *
+ * @param {text} fullpath - full filepath, including the filename
+ *
+ * @returnSuccess {text} return filename
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+ 
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		~path = pathToFile;
+		~is_charSlash = False ;
+		~null = "" ;
+
+		~path =
+			Substitute ( ~path ;
+
+				[ "fmnet:" ; ~null ];
+				[ "fmp:" ; ~null ];
+				[ "filewin:" ; ~null ];
+				[ "filemac:" ; ~null ];
+				[ "file:" ; ~null ]
+				
+				);
+
+		~firstChar = "" ;
+		~maxIterations = Length ( ~path );
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	( ~i = 1 or ~is_charSlash ) and ~i ≤ ~maxIterations ; 
+
+	//// logic ////////////////
+	[ 
+
+		~char = Left ( ~path ; 1 );
+		~firstChar = If ( IsEmpty ( ~firstChar ) ; ~char ; ~firstChar );
+		~is_charSlash = ( ~char = "\\" ) or ( ~char = "/" );
+		~path = 
+			If ( ~is_charSlash ; 
+				Right ( ~path ; Length ( ~path ) - 1 ) ; 
+				~path 
+				);
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	Case (
+		IsEmpty ( ~firstChar ) ; "/" ;
+		~firstChar = "/" ; "/" ;
+		~firstChar = "\\" ; "\\" ;
+		""
+		)
+	& ~path
+
+	)

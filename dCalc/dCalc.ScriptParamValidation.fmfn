@@ -1,0 +1,213 @@
+/**
+ * 
+ * Validate script parameters and convert into local variables
+ * @note: this is a DYNAMIC CALCULATION, meant to called using locally-set variables, e.g. dCalc_scriptParamValidation ( "$scriptParametersVarName" ; "$validationRulesVarName"  )
+ * 
+ * @parameter {string} varName_scriptParameters = local script variable name for script parameters, e.g. $myVariable = Get ( ScriptParameter )
+ * @parameter {string} varName_validationRules = local script variable name for validation rules, e.g. $myVariable = Validate.IsRequired ( "parameterName" ; "text" )
+ * 
+ * @note Parameters can optionally include "$" or "$$" in front of the variable names. If they are omitted, a single "$" will be added, assuming it to be a local variable
+ * 
+ * @resultSuccess {NULL}
+ * 
+ * @returnError {object} Validate.Error: an error object
+ * 
+ * @note: This calculation could be done as a custom function, but in case of large script parameter data/values, it's done as a dynamic calculation (since FileMaker inexplicably takes a long time to pass in/out large variables)
+ * 
+ * @module dCalc
+ * @requires {module} Validate
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ */
+
+Let ([
+
+	// get script parameters & validation rules
+	~varName_scriptParams = varName_scriptParameters ;
+	~varName_validationRules = varName_validationRules ;
+	
+	~paramsVarName = If ( Left ( ~varName_scriptParams ; 1 ) ≠ "$" ; "$" ) & ~varName_scriptParams ;
+	~params = Evaluate ( ~paramsVarName );
+	~validationRulesVarName = If ( Left ( ~varName_validationRules ; 1 ) ≠ "$" ; "$" ) & ~varName_validationRules ;
+	~validationRules_raw = Evaluate ( ~validationRulesVarName );
+
+	// test for invalid JSON in parameters object
+	~is_invalidJSON = ( Left ( JSONFormatElements ( ~params ) ; 1 ) = "?" );
+
+	~numRules = ValueCount ( ~validationRules_raw );
+
+	~validationRules = 
+		While ( 
+
+			//// initial variables ////
+			[ 
+
+				~LIST_rules = "" ;
+				~i = 1 ;
+				
+				~=""] ; 
+
+			//// "while this is true" loop condition ///////
+			~i ≤ ~numRules ; 
+
+			//// logic ////////////////
+			[ 
+
+				~rule_raw = GetValue ( ~validationRules_raw ; ~i );
+				~rule_trimmed = TrimAll ( ~rule_raw ; True ; 0 );
+				~rule = 
+					~rule_trimmed
+					& If ( 
+						Right ( ~rule_trimmed ; 1 ) = ")" ; 
+							 If ( ~i ≠ ~numRules ; "; " )
+						);
+				~LIST_rules = 
+					List (
+						~LIST_rules ;
+						~rule
+						);
+
+				~i = ~i + 1 ;
+
+				~=""] ; 
+
+			//// result ///////////////
+			If ( not IsEmpty ( ~LIST_rules ) ; 
+				Substitute ( ~LIST_rules ; 
+					[ "¶" ; "" ]
+					)
+				)
+
+			);
+
+	~validationEvalString = 
+		If ( ~numRules > 1 ; "Validate.ApplyRules ( ¶List ( ¶" )
+			& ~validationRules
+			& If ( ~numRules > 1 ; " ¶) ¶)"
+			);
+
+	// setup the rules for validation functions
+	~_void = If ( not IsEmpty ( ~validationRules ) ; Validate.This ( ~params ) );
+
+	// perform the evaluate
+	~validationResult = 
+		Case (
+			IsEmpty ( ~validationRules ); "" ;
+			Evaluate ( ~validationEvalString )
+			);
+
+	~jsonError = 
+		Case ( 
+			/* IF CONDITION */
+			~validationResult = "?" ;
+
+				/* THEN */ 
+				JSONSetElement ( "{}" ;
+					["errorCode" ; -1 ; JSONNumber ];
+					["message" ; "Error in validation rules for script \"" & Get ( ScriptName ) & "\"" ; JSONString ]
+					);
+
+			/* IF CONDITION */
+			not IsEmpty ( ~params ) 
+				and not IsEmpty ( ~validationRules )
+				and ~is_invalidJSON ; 
+
+				/* THEN */ 
+				JSONSetElement ( "{}" ;
+					["errorCode" ; 1710 ; JSONNumber ];
+					["message" ; "Invalid JSON in script parameter for \"" & Get ( ScriptName ) & "\"" ; JSONString ]
+					)
+			);
+	~error = 	
+		If ( not IsEmpty ( ~jsonError ) ; 
+			~jsonError ;
+			~validationResult
+			);
+~=""];
+
+// set external, local variables
+Let ([
+
+	// LOCAL VARIABLES TO SET ////////////////////////////////////////////////
+
+	$this.scriptParameter = ~params ;
+	$errors = ~error ;
+
+	/////////////////////////////////////////////////////////////////////////////////
+
+~=""];"")
+
+// convert JSON parameter elements into local variables
+& Case ( 
+
+	not IsEmpty ( ~error ) ; ~error ; 
+
+	While ( 
+
+		//// initial variables ////
+		[ 
+			
+			~keys = JSONListKeys ( ~params ; "." ) ; 
+			~numKeys = ValueCount ( ~keys ) ;
+			~i = 1 ;
+			
+			~=""] ; 
+
+		//// "while this is true" loop condition ///////
+		~i ≤ ~numKeys ; 
+
+		//// logic ////////////////
+		[ 
+
+			~key = GetValue ( ~keys ; ~i );
+			~result =
+				Case ( 
+				
+					// if the JSON document's root node doesn't contain any keys, return 0 ("no error")
+					IsEmpty ( ~key ) ; 0 ; 
+					
+					// create variable based on key and then continue looping to process remaining keys
+					Let ([ 
+
+						~value = JSONGetElement ( ~params ; ~key ) ; 
+						
+						~text = GetAsText ( ~value ) ; 
+						~number = GetAsNumber ( ~value ) ; 
+						~validDate = IsValid ( GetAsDate ( ~text ) ) and not IsEmpty ( ~number ) ; 
+						~validTime = IsValid ( GetAsTime ( ~text ) ) and Position ( ~text ; ":" ; 1 ; 1 ) > 0 and not IsEmpty ( ~number ) ;
+						~value = 
+							Case ( 
+								~value = "" or ~value = "?" ; Quote ( ~value ) ;
+								~validTime and ~validDate ; "GetAsTimestamp ( " & Quote ( ~value ) & " )" ;
+								~validTime ; "GetAsTime ( " & Quote ( ~value ) & " )" ;
+								~validDate ; "GetAsDate ( " & Quote ( ~value ) & " )" ;
+								~text ≠ GetAsText ( ~number ) ; Quote ( ~value ) ; 
+								~number
+								); 
+
+						// create variable based on JSON key/value pair
+						~error = 
+							EvaluationError ( 
+								Evaluate ( "Let ( $" & ~key & " = " & ~value & " ; 0 ) " ) 
+								);
+						~=""]; 
+
+						If ( ~error ≠ 0 ; ~error ; "" )
+
+						)
+					);
+
+			~i = ~i + 1 ;
+
+			~=""] ; 
+
+		//// result ///////////////
+		~result
+
+		) // end WHILE
+
+	) // end CASE
+
+) // end LET
