@@ -17,7 +17,7 @@
  * @module dCalc
  * @requires {module} Validate
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  */
@@ -58,15 +58,27 @@ Let ([
 				~rule_raw = GetValue ( ~validationRules_raw ; ~i );
 				~rule_trimmed = TrimAll ( ~rule_raw ; True ; 0 );
 				~rule = 
-					~rule_trimmed
-					& If ( 
-						Right ( ~rule_trimmed ; 1 ) = ")" ; 
-							 If ( ~i ≠ ~numRules ; "; " )
+					Case (
+
+						// if there is only one rule and it ends with a semicolon, remove the semicolon 
+						~numRules = 1 and Right ( ~rule_trimmed ; 1 ) = ";" ;
+							Left ( ~rule_trimmed ; Length ( ~rule_trimmed ) - 1 );
+
+						// if there are multiple rules and any except the last one do not end with semicolon, add one
+						Right ( ~rule_trimmed ; 1 ) = ")" and ~i ≠ ~numRules ; 
+							~rule_trimmed & "; " ;
+
+						// default: do nothing else to the rule
+						~rule_trimmed
+
 						);
 				~LIST_rules = 
-					List (
-						~LIST_rules ;
-						~rule
+					If ( 
+						~numRules = 1 ; ~rule ;
+						List (
+							~LIST_rules ;
+							~rule
+							)
 						);
 
 				~i = ~i + 1 ;
