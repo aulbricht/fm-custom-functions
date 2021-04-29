@@ -12,7 +12,7 @@
  * 
  * @module JSON
  * 
- * @version 1.0.1
+ * @version 1.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -25,22 +25,21 @@ Let ([
 	~jsonVal = JSONFormatElements ( ~json );
 	~jsonAltered = JSONDeleteElement ( ~json; ~key );
 	~result = Case (
-				Left ( ~jsonVal; 1 ) = "?"; 
-					JSONSetElement ("{}"; 
-						[ "errorCode"; -3; JSONNumber ]; 
-						[ "descriptor"; "JSON invalid"; JSONString ]
+				Left ( ~jsonVal; 1 ) = "?" ; 
+					JSONSetElement ( "{}" ; 
+						[ "errorCode" ; -3; JSONNumber ]; 
+						[ "descriptor" ; "JSON invalid"; JSONString ]
 						);
 				~key = "" ; 
 					JSONSetElement ( ~json; 
-						[ "errorCode"; -3; JSONNumber ]; 
-						[ "descriptor"; "JSON invalid key"; JSONString ]
-						)
-					);
+						[ "errorCode" ; -3; JSONNumber ]; 
+						[ "descriptor" ; "JSON invalid key" ; JSONString ]
+						);
 				~jsonAltered
 				);
 	~left = Left ( ~result; 1 );
 ~=""];
 
-If ( ~left = "{" or ~left = "["; JSONFormatElements ( ~result ); ~result )
+If ( ~left = "{" or ~left = "[" ; JSONFormatElements ( ~result ) ; ~result )
 
 )

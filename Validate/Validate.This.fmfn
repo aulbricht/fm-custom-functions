@@ -2,11 +2,11 @@
  *
  * Set the JSON-to-be-validated to a known var
  *
- * @param {object} json
+ * @param {object} JSON_scriptParameters
  * 
  * @module Validate
  * 
- * @version 2.0.1
+ * @version 2.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 

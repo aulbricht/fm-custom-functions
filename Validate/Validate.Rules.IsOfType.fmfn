@@ -15,7 +15,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.2.0
+ * @version 2.2.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -54,7 +54,7 @@ Let ([
 Case (
 
 	// if the value is NULL, abort without error since that's allowed for this validation type
-	IsEmpty ( ~value ) ; "" ;
+	IsEmpty ( ~value ) or IsEmpty ( ~dataToValidate ); "" ;
 
 
 	// evaluate basic cases for abort

@@ -14,9 +14,8 @@
  * 
  * @module JSON
  * 
- * @version 1.0.1
+ * @version 1.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
@@ -53,8 +52,7 @@
 					JSONSetElement ( ~json; 
 						[ "errorCode"; -3; JSONNumber ]; 
 						[ "descriptor"; "JSON invalid key: If you meant to set the root key, use a \".\" to do so"; JSONString ]
-						)
-					);
+						);
 				~jsonAltered
 				);
 	~left = Left ( ~result; 1 );

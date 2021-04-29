@@ -17,7 +17,7 @@
  * @module dCalc
  * @requires {module} Validate
  * 
- * @version 1.1.0
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  */
@@ -36,7 +36,7 @@ Let ([
 	// test for invalid JSON in parameters object
 	~is_invalidJSON = ( Left ( JSONFormatElements ( ~params ) ; 1 ) = "?" );
 
-	~numRules = ValueCount ( ~validationRules_raw );
+	~numLines = ValueCount ( ~validationRules_raw );
 
 	~validationRules = 
 		While ( 
@@ -50,7 +50,7 @@ Let ([
 				~=""] ; 
 
 			//// "while this is true" loop condition ///////
-			~i ≤ ~numRules ; 
+			~i ≤ ~numLines ; 
 
 			//// logic ////////////////
 			[ 
@@ -60,12 +60,14 @@ Let ([
 				~rule = 
 					Case (
 
+						Left ( ~rule_raw ; 8 ) ≠ "validate" ; "" ;
+
 						// if there is only one rule and it ends with a semicolon, remove the semicolon 
-						~numRules = 1 and Right ( ~rule_trimmed ; 1 ) = ";" ;
+						~numLines = 1 and Right ( ~rule_trimmed ; 1 ) = ";" ;
 							Left ( ~rule_trimmed ; Length ( ~rule_trimmed ) - 1 );
 
 						// if there are multiple rules and any except the last one do not end with semicolon, add one
-						Right ( ~rule_trimmed ; 1 ) = ")" and ~i ≠ ~numRules ; 
+						Right ( ~rule_trimmed ; 1 ) ≠ ";" and (~i = 1 or ~i ≠ ~numLines ); 
 							~rule_trimmed & "; " ;
 
 						// default: do nothing else to the rule
@@ -74,7 +76,7 @@ Let ([
 						);
 				~LIST_rules = 
 					If ( 
-						~numRules = 1 ; ~rule ;
+						~numLines = 1 ; ~rule ;
 						List (
 							~LIST_rules ;
 							~rule
@@ -86,27 +88,27 @@ Let ([
 				~=""] ; 
 
 			//// result ///////////////
-			If ( not IsEmpty ( ~LIST_rules ) ; 
-				Substitute ( ~LIST_rules ; 
-					[ "¶" ; "" ]
-					)
-				)
+			~LIST_rules
 
 			);
+
+
+	~numRules = ValueCount ( ~validationRules );
 
 	~validationEvalString = 
-		If ( ~numRules > 1 ; "Validate.ApplyRules ( ¶List ( ¶" )
+		"Validate.ApplyRules ( ¶List ( ¶"
 			& ~validationRules
-			& If ( ~numRules > 1 ; " ¶) ¶)"
-			);
+			& If ( ~numRules = 1 ; "¶\"\"" )
+			& " ¶) ¶)"
+			;
 
 	// setup the rules for validation functions
-	~_void = If ( not IsEmpty ( ~validationRules ) ; Validate.This ( ~params ) );
+	~_void = Validate.This ( ~params ); //If ( not IsEmpty ( ~validationRules ) ; Validate.This ( ~params ) );
 
 	// perform the evaluate
 	~validationResult = 
 		Case (
-			IsEmpty ( ~validationRules ); "" ;
+			~numRules = 0 or IsEmpty ( ~validationRules ) ; "" ;
 			Evaluate ( ~validationEvalString )
 			);
 
@@ -137,6 +139,7 @@ Let ([
 			~jsonError ;
 			~validationResult
 			);
+
 ~=""];
 
 // set external, local variables
@@ -174,6 +177,7 @@ Let ([
 		[ 
 
 			~key = GetValue ( ~keys ; ~i );
+
 			~result =
 				Case ( 
 				
