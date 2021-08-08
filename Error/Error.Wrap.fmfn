@@ -28,6 +28,10 @@ Let ([
 			0 
 			);
 
+	~param = Get (  ScriptParameter );
+	~paramFormatted = JSONFormatElements ( ~param );
+	~paramIsJSON = Left ( ~paramFormatted ; 1 ) ≠ "?" ;
+
 	~error = errorCode ;
 	~error = If ( IsEmpty ( ~error ) ; 0 ; GetAsNumber ( ~error ) );
 
@@ -40,16 +44,21 @@ Let ([
 		JSONSetElement ( "{}" ;
 			[ "accountName" ; Get ( AccountName ) ; JSONString ];
 			[ "accountPrivilegeSetName" ; Get ( AccountPrivilegeSetName ) ; JSONString ];
+			[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
+			[ "activeFieldTableName" ; Get ( ActiveFieldTableName ) ; JSONString ];
+			[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
+			[ "activeLayoutObjectName" ; Get ( ActiveLayoutObjectName ) ; JSONString ];
 			[ "filename" ; Get ( FileName ) ; JSONString ];
-			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
-			[ "lastODBCError" ; Get ( LastExternalErrorDetail ) ; JSONString ];
 			[ "layoutName" ; Get ( LayoutName ) ; JSONString ];
 			[ "layoutTableName" ; Get ( LayoutTableName ) ; JSONString ];
 			[ "recordOpenCount" ; Get ( RecordOpenCount ) ; JSONNumber ];
+			[ "scriptParameter " ; 
+				If ( ~paramIsJSON = True ; ~paramFormatted ; ~param ) ; 
+				If ( ~paramIsJSON = True ; JSONObject ; JSONString ) 
+				];
 			[ "recordModificationCount" ; Get ( RecordModificationCount ) ; JSONNumber ];
-			[ "activeFieldName" ; Get ( ActiveFieldName ) ; JSONString ];
-			[ "activeFieldTableName" ; Get ( ActiveFieldTableName ) ; JSONString ];
-			[ "activeLayoutObjectName" ; Get ( ActiveLayoutObjectName ) ; JSONString ]
+			[ "scriptName" ; Get ( ScriptName ) ; JSONString ];
+			[ "userCount " ; Get ( UserCount ) ; JSONNumber ]
 			);
 	
 	// Determine the datatype for anything included in the "data" parameter
@@ -107,4 +116,3 @@ Case (
 	)
 
 )
-

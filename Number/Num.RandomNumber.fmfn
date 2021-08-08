@@ -2,9 +2,9 @@
  *
  * Return a random number in the given range, within a given step size
  *
- * @param (number) low - bottom of the random number range
- * @param (number) high - top of the random number range
- * @param (number) [step_size] - OPTIONAL: step size for result number, DEFAULT: 1
+ * @param {number} low - bottom of the random number range
+ * @param {number} high - top of the random number range
+ * @param {number} [step_size] - OPTIONAL: step size for result number, DEFAULT: 1
  *
  * @returnSuccess {text} updated value list
  * 
@@ -15,7 +15,6 @@
  * 
  * @version 2.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 

@@ -18,20 +18,20 @@
  
 Let ([
 
-	// abstract parameters
-	~path = filenameOrPath ;
+    // abstract parameters
+    ~path = filenameOrPath ;
 
-	// isolate and remove extension
-	~numDots = PatternCount ( ~path ; "." );
-	~posExtStart = Position ( ~path ; "." ; 1 ; ~numDots ) - 1 ;
-	~filename_noExt = 
-		Case ( 
-			~numDots > 0 ; Left ( ~path ; ~posExtStart );
-			~path
-			);
+    // isolate and remove extension
+    ~numDots = PatternCount ( ~path ; "." );
+    ~posExtStart = Position ( ~path ; "." ; 1 ; ~numDots ) - 1 ;
+    ~extension = 
+        Case ( 
+            ~numDots > 0 ; Right ( ~path ; Length ( ~path ) - ~posExtStart - 1 );
+            ~path
+            );
 
 ~=""];
 
-~filename_noExt
+~extension
 
 )

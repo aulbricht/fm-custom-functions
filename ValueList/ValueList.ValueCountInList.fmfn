@@ -1,0 +1,33 @@
+/**
+ *
+ * Count the number of matching values in a value list
+ *
+ * @param {text} valueList - value list (¶ delimited) to search
+ * @param {text} searchString - search sub-string
+ *
+ * @returnSuccess {number} aggregate count of values in the list matching the search string
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
+ *
+ */
+
+
+Let ([
+
+	~list= ValueList ;
+	~search = ValueSearch ;
+	~search = "¶" & ~search & "¶";
+	~list = "¶" & ~list & "¶";  // add a carriage return to the beginning and end so the first and last values are included in our search
+	~numValues = PatternCount( ~list ; ~search );
+
+~=""];
+
+~numValues
+
+)
+
+

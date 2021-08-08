@@ -1,0 +1,15 @@
+/**
+ *
+ * Determine if the current user has full access privileges
+ *
+ * @returnSuccess {boolean} True if user is Full Access
+ * 
+ * @module System
+ * 
+ * @version 1.0.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Get ( AccountPrivilegeSetName ) = "[Full Access]"

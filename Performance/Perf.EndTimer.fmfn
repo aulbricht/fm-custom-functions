@@ -1,0 +1,64 @@
+/**
+ *
+ * End performance time measurement and record results to a JSON object
+ *
+ * @param {text} tag - unique tag that the end timer function will reference
+ * @param {text} objectVarName - the performance JSON object or array
+ * @param {text} [alternateElementKey] - OPTIONAL: JSON element key under which to store the result ; DEFAULT = tag
+ *
+ * @module Performance (Perf)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~tag = tag ;
+	~objName = objectVarName ;
+	~key = alternateElementKey ;
+
+	~key = If ( IsEmpty ( ~key ) ; ~tag ; ~key );
+	~tagVar = "performance." & Lower ( ~tag );
+
+	~end_ms = Get ( CurrentTimeUTCMilliseconds );
+	~start_ms = Let ( ~v = Evaluate ( "$$" & ~tagVar ); If ( IsEmpty ( ~v ); ~end_ms ; ~v ) );
+	~elapsed_ms = ~end_ms - ~start_ms ;
+
+	~objScope = Filter ( ~objName ; "$" );
+	~objectVar = If ( IsEmpty ( ~objScope ) ; "$" ) & ~objName ;
+	~objectVarValue = Evaluate ( ~objectVar );
+
+	~subStr = 
+		"Let ([¶
+			{{objectVar}} = If ( Left ( {{objVarValue}} ; 1 ) = \"?\" ; \"{}\" ; {{objVarValue}} );¶
+			{{objectVar}} = ¶
+				JSONSetElement ( {{objectVar}} ;¶
+					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.end_ms\" ; {{end_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.elapsed_ms\" ; {{elapsed_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.elapsed_s\" ; {{elapsed_s}} ; JSONNumber ]¶
+					);¶
+			$${{tagVar}} = \"\"¶
+			]; \"\" )";
+	~evalStr = 
+		Substitute ( ~subStr ;
+			[ "{{tagVar}}" ; ~tagVar ];
+			[ "{{objectVar}}" ; ~objectVar ];
+			[ "{{objVarValue}}" ; Quote ( ~objectVarValue ) ];
+			[ "{{key}}" ; ~key ];
+			[ "{{start_ms}}" ; ~start_ms ];
+			[ "{{end_ms}}" ; ~end_ms ];
+			[ "{{elapsed_ms}}" ; ~elapsed_ms ];
+			[ "{{elapsed_s}}" ; Round ( ~elapsed_ms / 1000 ; 3 ) ]
+			);
+
+	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
+
+~=""];
+
+""
+
+)

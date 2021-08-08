@@ -1,0 +1,33 @@
+/**
+ *
+ * Start performance time measurement
+ *
+ * @param {text} tag - unique tag that the end timer function will reference
+ *
+ * @module Performance (Perf)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~tag = tag ;
+
+	~varName = "performance." & Lower ( ~tag );
+	~subStr = "Let( $${{tagVar}} = {{value}} ; \"\")";
+	~evalStr = 
+		Substitute ( ~subStr ;
+			[ "{{tagVar}}" ; ~varName ];
+			[ "{{value}}" ; Get ( CurrentTimeUTCMilliseconds ) ]
+			);
+
+	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
+
+~=""];
+
+""
+
+)
