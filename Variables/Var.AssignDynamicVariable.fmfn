@@ -13,7 +13,7 @@
  * 
  * @module Variables (Var)
  * 
- * @version 1.2.0
+ * @version 1.3.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  **/
@@ -45,7 +45,7 @@ Let ([
 				)
 			);
 
-	~subStr = "Let( {{scope}}{{variable}} = \"{{value}}\" ; False)";
+	~subStr = "Let ( {{scope}}{{variable}} = Quote ( {{value}} ) ; False )";
 
 	~evalStr = Substitute ( ~subStr ;
 			[ "{{scope}}" ; ~scopeSym ];
