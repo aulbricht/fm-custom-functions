@@ -8,9 +8,8 @@
  * 
  * @module Date
  * 
- * @version 1.0.1
+ * @version 1.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
@@ -25,10 +24,10 @@ Let ([
 
 ~=""];
 
-~y 
+Right ( "0000" & ~y ; 4 )
 & "-" & 
-Right ( "0" & ~m ; 2 )
+Right ( "00" & ~m ; 2 )
 & "-" & 
-Right ( "0" & ~d ; 2 )
+Right ( "00" & ~d ; 2 )
 
 )

@@ -1,0 +1,25 @@
+/**
+ * 
+ * Convert SQL native date format (e.g. 2018-01-02) to FileMaker native date format (e.g. 01/02/2018) 
+ *
+ * @param {date} sqlDate - SQL formatted date
+ *
+ * @returnSuccess {text} converted date
+ * 
+ * @module Date
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ( ~date = sqlDate ;
+
+    Date ( 
+        Month ( ~date ) ; 
+        Day ( ~date ) ; 
+        Year ( ~date ) 
+        )
+
+    )
