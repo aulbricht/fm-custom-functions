@@ -1,0 +1,79 @@
+/**
+ *
+ * Add/change to the appropriate path prefix (e.g. "file://") based on the platform
+ *
+ * @param {text} path
+ *
+ * @returnSuccess {text} platform-specific filepath (e.g. Windows/Mac)
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+
+Let ([
+
+	~fp = path ;
+
+	~platform = Get ( SystemPlatform );
+	~prefix = 
+		Case (
+
+			~platform = 1 ; "file:/" ;
+			~platform = -2 ; "file:/" ;
+			~platform = 3 ; "file:/" ; //fmp://~/" ;
+
+			);
+
+	~filepath_curated = 
+		Substitute ( ~fp ;
+			[ "file:" ; "" ];
+			[ "filewin:" ; "" ];
+			[ "filemac:" ; "" ];
+			[ "fmp:" ; "" ]
+			);
+
+	~filepath_curated = 
+		While ( 
+
+			//// initial variables ////
+			[ 
+				
+				~fpc = ~filepath_curated ;
+				~char = Left ( ~fpc ; 1 );
+				~numChars = Length ( ~fpc );
+				~i = 1 ;
+				
+				~=""] ; 
+
+			//// "while this is true" loop condition ///////
+			~i ≤ ~numChars and ~char = "/" ; 
+
+			//// logic ////////////////
+			[ 
+
+				~char = Left ( ~fpc ; 1 );
+				~fpc = 
+					If ( ~char = "/" ; 
+						Right ( ~fpc ; Length ( ~fpc ) - 1 );
+						~fpc
+						);
+
+
+				~i = ~i + 1 ;
+
+				~=""] ; 
+
+			//// result ///////////////
+			~fpc
+
+			);
+
+~=""];
+
+~prefix & ~filepath_curated
+
+)

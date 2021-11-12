@@ -1,0 +1,109 @@
+/**
+ *
+ * Convert a given element in a JSON array to a value list (carriage return delimited)
+ *
+ * @param {text} LIST_values - Value List of numbers to use for calculating the moving average
+ * @param {text} [LIST_referenceValues_OPTIONAL] - OPTIONAL: reference values (the x-axis for a graph), e.g. timestamp -- if null, return a value list instead of an array
+ * @param {number} length - length of the moving average, e.g. 50 = MA50 (50 day ma)
+ * @param {number} [weight_OPTIONAL] - OPTIONAL: decimal 0-1 representing the bias for recent candles; DEFAULT: if null, use standard forumla
+ * @param {number} [digits_OPTIONAL] - OPTIONAL: integer representing the digits to round to; DEFAULT: 10
+ *
+ * @returnSuccess {array} returns an array if parameters include a list of reference values
+ * @returnSuccess {text} if the list of reference values is null, return a value list of MA values instead of the array
+ * 
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+ 
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~LIST_values = LIST_values ;
+		~LIST_references = LIST_referenceValues_OPTIONAL ;
+		~length = length_MA ;
+		~digits = digits_OPTIONAL ;
+		~digits = 
+			If ( not IsEmpty ( ~digits );
+				~digits ;
+				10 // default 
+				);
+		~weight = weight_OPTIONAL ;
+		~weight = 
+			If ( IsEmpty ( ~weight );
+				2 / ( 1 + ~length );
+				~weight 
+				);
+
+		~numValues = ValueCount ( ~LIST_values );
+		~do_array = not IsEmpty ( ~LIST_references );
+		~do_valueList = IsEmpty ( ~LIST_references );
+
+		~LIST_ma = "" ;
+		~ARRAY_ma = "" ;
+		~prevMean = "" ;
+		~i = 1 ;
+
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numValues ; 
+
+	//// logic ////////////////
+	[ 
+
+		~value = GetValue ( ~LIST_values ; ~i );
+		~newValue = 
+			Case (
+
+				~weight < 0 or ~weight > 1 ;
+					"?";
+
+				IsEmpty ( ~prevMean ); 
+					~value ;
+
+				// EMA formula //
+				( ~value * ~weight ) + ( ~prevMean * ( 1 - ~weight ) )
+
+				);
+
+		~newValueRounded = Round ( ~newValue ; ~digits );
+		~prevMean = ~newValueRounded ;
+
+
+		// This is a much faster way to build a JSON array than using FM's native JSONSetElement for building the array
+		~ARRAY_ma = 
+			If ( ~do_array ;
+				Let ([
+					~keyBase = "[" & ~i - 1 &  "]." ;
+					~JSON_segment = 
+						JSONSetElement ( "{}" ;
+							[ "x" ; GetValue ( ~LIST_values ; ~i ); JSONNumber ];
+							[ "y" ; ~newValueRounded ; JSONNumber ]
+							);
+					~=""];
+					~ARRAY_ma & If ( ~i > 1 ; "," ) & ~JSON_segment 
+					)
+
+				);
+
+		~LIST_ma = If ( ~do_valueList ; List ( ~LIST_ma ; ~newValueRounded ) );
+
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	Case ( 
+		~do_array ; "[" & ~ARRAY_ma & "]" ;
+		~do_valueList ; ~LIST_ma ;
+		"?"
+		)
+
+	)

@@ -1,0 +1,54 @@
+/**
+ *
+ * Convert a given element in a JSON array to a value list (carriage return delimited)
+ *
+ * @param {text} array - JSON array
+ * @param {text} key - key of the element for which to make the list
+ *
+ * @returnSuccess {text} returns a value list
+ * 
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+ 
+While ( 
+
+	//// initial variables ////
+	[ 
+		
+		////////////////////////////////////
+		~ARRAY_data = array ;
+		~dataKey = key ;
+		////////////////////////////////////
+
+
+		~isArray = 
+			Left ( ~ARRAY_data ; 1 ) = "[" and Left ( JSONFormatElements ( ~ARRAY_data ) ; 1 ) ≠ "?" ; 
+
+		~numItems = ValueCount ( JSONListKeys ( ~ARRAY_data ; "." ) );
+		~LIST_data = "" ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numItems and ~isArray ; 
+
+	//// logic ////////////////
+	[ 
+
+		~key = "[" & ~i -1 & "]." & ~dataKey ;
+		~element = JSONGetElement ( ~ARRAY_data ; ~key );
+		~LIST_data = List ( ~LIST_data ; ~element );
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	If ( ~isArray ; ~LIST_data ; "" )
+
+	)

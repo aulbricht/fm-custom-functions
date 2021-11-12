@@ -1,0 +1,68 @@
+/**
+ * 
+ * Assign an existing variable value to a dynamic variable name
+ * 
+ * @param {string} varName_read - name of the variable containing data
+ * @param {string} varName_write - name of the variable to receive the data
+ * @param {string} [scope] - OPTIONAL: global ($$) or local ($) or private (~). DEFAULT is local ($).
+ * 
+ * @note If the varName_write contains scope symbols (e.g. $ or ~) and the scope parameter is specified, the scope parameter will override the contained scope. 
+ * @note If the varName_write is empty and the scope parameter is specified with scope symbols, that scope will be honored. 
+ * 
+ * @return {boolean} False if the variable was successfully assigned
+ * 
+ * @module Variables (Var)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([ 
+
+	~var_read = varName_read ;
+	~var_write = varName_write ;
+
+	~scope = scope ;
+
+	~scopeSym = 
+		Let ([ 
+
+			~specifiedScope = Filter ( ~scope ; "$~" ); 
+			~containedScope = Filter ( ~var_write ; "$~" )
+
+			]; 
+
+			Case ( 
+				~scope = "global" ; "$$" ;
+				~scope = "local" ; "$" ;
+				~scope = "private" ; "~" ;
+				Length ( ~specifiedScope ) > 0 ; ~specifiedScope ;
+				Length ( ~containedScope ) > 0 ; ~containedScope ;
+
+				"$" // DEFAULT
+
+				)
+			);
+	~subStr = "Let ( {{scope}}{{var_write}} = {{var_read}} ; False )";
+	~evalStr = 
+		Substitute ( ~subStr ;
+			[ "{{scope}}" ; ~scopeSym ];
+			[ "{{var_write}}" ; 
+				Substitute ( 
+					~var_write ; 
+					[ "$" ; "" ];
+					[ "~" ; If ( Left ( ~var_write ; 1 ) = "~" ; "" ; "~" ) ]
+					) 
+					];
+			[ "{{var_read}}" ; ~var_read ]
+			);
+
+	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) )
+
+];
+
+~evalResult
+
+)
