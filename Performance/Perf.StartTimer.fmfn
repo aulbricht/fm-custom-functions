@@ -6,7 +6,7 @@
  *
  * @module Performance (Perf)
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -16,11 +16,12 @@ Let ([
 
 	~tag = tag ;
 
-	~varName = "performance." & Lower ( ~tag );
+	~tag_converted = Filter ( Base64Encode ( ~tag ) ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
+	~varName_temp = "performance." & ~tag_converted ;
 	~subStr = "Let( $${{tagVar}} = {{value}} ; \"\")";
 	~evalStr = 
 		Substitute ( ~subStr ;
-			[ "{{tagVar}}" ; ~varName ];
+			[ "{{tagVar}}" ; ~varName_temp ];
 			[ "{{value}}" ; Get ( CurrentTimeUTCMilliseconds ) ]
 			);
 

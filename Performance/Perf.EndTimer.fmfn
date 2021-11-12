@@ -8,7 +8,7 @@
  *
  * @module Performance (Perf)
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -16,15 +16,19 @@
 
 Let ([
 
+	//////////////////////////////////////////
 	~tag = tag ;
 	~objName = objectVarName ;
 	~key = alternateElementKey ;
+	//////////////////////////////////////////
 
+
+	~tag_converted = Filter ( Base64Encode ( ~tag ) ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
+	~varName_temp = "performance." & ~tag_converted ;
 	~key = If ( IsEmpty ( ~key ) ; ~tag ; ~key );
-	~tagVar = "performance." & Lower ( ~tag );
 
 	~end_ms = Get ( CurrentTimeUTCMilliseconds );
-	~start_ms = Let ( ~v = Evaluate ( "$$" & ~tagVar ); If ( IsEmpty ( ~v ); ~end_ms ; ~v ) );
+	~start_ms = Let ( ~v = Evaluate ( "$$" & ~varName_temp ); If ( IsEmpty ( ~v ); ~end_ms ; ~v ) );
 	~elapsed_ms = ~end_ms - ~start_ms ;
 
 	~objScope = Filter ( ~objName ; "$" );
@@ -33,7 +37,7 @@ Let ([
 
 	~subStr = 
 		"Let ([¶
-			{{objectVar}} = If ( Left ( {{objVarValue}} ; 1 ) = \"?\" ; \"{}\" ; {{objVarValue}} );¶
+			{{objectVar}} = If ( Left ( {{objectVar}} ; 1 ) = \"?\" ; \"{}\" ; {{objVarValue}} );¶
 			{{objectVar}} = ¶
 				JSONSetElement ( {{objectVar}} ;¶
 					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ];¶
@@ -41,11 +45,9 @@ Let ([
 					[ \"{{key}}.elapsed_ms\" ; {{elapsed_ms}} ; JSONNumber ];¶
 					[ \"{{key}}.elapsed_s\" ; {{elapsed_s}} ; JSONNumber ]¶
 					);¶
-			$${{tagVar}} = \"\"¶
-			]; \"\" )";
+			~=\"\"]; \"\" )";
 	~evalStr = 
 		Substitute ( ~subStr ;
-			[ "{{tagVar}}" ; ~tagVar ];
 			[ "{{objectVar}}" ; ~objectVar ];
 			[ "{{objVarValue}}" ; Quote ( ~objectVarValue ) ];
 			[ "{{key}}" ; ~key ];
@@ -55,10 +57,12 @@ Let ([
 			[ "{{elapsed_s}}" ; Round ( ~elapsed_ms / 1000 ; 3 ) ]
 			);
 
+	~_void = Evaluate ( "Let ( $$" & ~varName_temp & "=\"\" ; \"\" )" );
+
 	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
 
 ~=""];
 
-""
+~elapsed_ms
 
 )
