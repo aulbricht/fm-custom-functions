@@ -8,7 +8,7 @@
  *
  * @module Text
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -17,7 +17,7 @@
 
 Let ([
 
-	~text_string = text_string ;
+    ~text_string = textString ;
 
 ~=""];
 
