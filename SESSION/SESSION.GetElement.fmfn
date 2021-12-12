@@ -1,0 +1,45 @@
+/**
+ * 
+ * Get element value from the SESSION object
+ * 
+ * @param {string} key - key for the element to get
+ * 
+ * @module SESSION
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([ 
+
+
+	// OPTIONS /////////////////////////////////////
+	~sessionVarName = "session" ;
+	///////////////////////////////////////////////////
+
+
+	// capture parameters
+	~key = key ;
+	
+	// strip any illegal symbols from the var name as well as scoping symbols (i.e. "$$")
+	~sessionVarName = Filter ( ~sessionVarName ; "01234556789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_." );
+
+	// check for existing and valid SESSION object
+	~session = Evaluate ( "$$" & ~sessionVarName );
+	~session = 
+		If ( 
+			IsEmpty ( ~session ) 
+				or Left ( JSONFormatElements ( ~session ) ; 1 ) = "?" ;
+			"{}" ;
+			~session
+			);
+	
+	~value = JSONGetElement ( ~session ; ~key );
+
+~=""];
+
+~value
+
+)

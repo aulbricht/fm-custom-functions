@@ -1,0 +1,37 @@
+/**
+ * 
+ * Convert UTC milliseconds (FMP format) to Timestamp
+ * 
+ * @param {number} UTCinMilliseconds - current UTC time in milliseconds
+ * @param {boolean} [convertToLocalTime] - OPTIONAL: if True, convert the result to local timezone; default to FALSE
+ * 
+ * @return {timestamp} converted into timestamp format
+ * 
+ * @module Time
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+    ///////////////////////////////////////
+    ~timeUTC_ms = UTCinMilliseconds;
+    ~convertToLocalTime = convertToLocalTime ;
+    ///////////////////////////////////////
+
+    ~currentTS = Get ( CurrentTimestamp );
+    ~currentTS_ms = GetAsNumber ( ~currentTS );
+    ~UTCTime_MS = Floor ( ~timeUTC_ms / 1000 );
+    ~timezoneConversion_ms = ~currentTS_ms - ~UTCTime_ms ;
+
+~=""];
+
+GetAsTimestamp ( 
+    ~timeUTC_ms / 1000
+    + If ( ~convertToLocalTime ; ~timezoneConversion_MS )
+    )
+
+)
