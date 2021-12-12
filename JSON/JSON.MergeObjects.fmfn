@@ -1,0 +1,153 @@
+
+/**
+ * 
+ * List the values in a JSON object or nested object
+ *
+ * @param {object} json_original - initial JSON object
+ * @param {object} json_toMerge - JSON object to merge into the initial one
+ * @param {boolean} [preserveExistingData] - OPTIONAL: if True, merge in a non-destructive way, i.e. do not overwrite existing elements/data in the original JSON object.
+ *
+ * @returnSuccess {object} merged JSON object
+ *
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
+ * 
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~json = JSON_original ;
+		~json_toMerge = json_toMerge ;
+		~preserveExisting = preserveExistingData ;
+
+		// check for existing and valid original object
+		~json = 
+			If ( 
+				IsEmpty ( ~json ) 
+					or Left ( JSONFormatElements ( ~json ) ; 1 ) = "?" ;
+				"{}" ;
+				~json
+				);
+
+		// check for existing and valid add/merge object
+		~json_toMerge = 
+			If ( 
+				IsEmpty ( ~json_toMerge ) 
+					or Left ( JSONFormatElements ( ~json_toMerge ) ; 1 ) = "?" ;
+				"{}" ;
+				~json_toMerge
+				);
+
+
+		~json_merged = ~json ;
+		~key_prev = "." ;
+		~key_prev_level = "." ;
+
+		~key_rootFinal = 
+			Let ( ~list = JSONListKeys ( ~json_toMerge ; "." );
+				GetValue ( ~list ; ValueCount ( ~list ) ) 
+				);
+
+		// set the maximum number of iterations as a safety catch against inifite loops
+		~maxItems = 1000 ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~json_toMerge ≠ "{}" and not IsEmpty ( ~json_toMerge ) and ~i ≤ ~maxItems ; 
+
+	//// logic ////////////////
+	[ 
+
+
+		////////////////////////////////////////////////////////////////
+		// get the next deepest key, else get the next root key
+		// note: the current key is always the deepest, next child key in the object
+
+		~key = 
+			While ( 
+
+				//// initial variables ////
+				[ 
+		
+					~key_deepestElement = "" ;
+					~element = "." ; // note: this needs a starting value so the loop doesn't insta-exit
+					~maxNestedLevels = 32 ;
+					~n = 1 ;
+		
+					~=""] ; 
+
+				//// "while this is true" loop condition ///////
+				not IsEmpty ( ~element ) and ~n ≤ ~maxNestedLevels ; 
+
+				//// logic ////////////////
+				[ 
+
+					~element =
+						Let ( ~list_nextNestedElements = JSONListKeys ( ~json_toMerge ; ~key_deepestElement );
+							GetValue ( ~list_nextNestedElements ; 1 )
+							);
+					~key_deepestElement = ~key_deepestElement & If ( not IsEmpty ( ~key_deepestElement ) ; "." ) & ~element ;
+
+					~n = ~n + 1 ;
+
+					~=""] ; 
+
+				//// result ///////////////
+
+				~key_deepestElement
+
+				);
+
+		////////////////////////////////////////////////////////////////
+
+
+
+		// get value for the current key
+		~value = JSONGetElement ( ~json_toMerge ; ~key );
+
+		// if there are nested elements, don't overwrite them
+		// 	also, if no_overwrite option is True, check for existing key/data
+		~skipThisKey = 
+			Let ( ~nestedKeys = JSONGetElement ( ~json_toMerge ; ~key );
+				ValueCount ( ~nestedKeys ) = 0
+				or ~nestedKeys = "{}" 
+				or ( ~preserveExisting = True and not IsEmpty ( ~value ) )
+				);
+				
+		// determine the type of JSON data
+		~jsonType = 
+			Case ( 
+				GetAsTime ( ~value ) = ~value ; JSONNumber ; // note: GetAsTime works for more edge cases than GetAsNumber
+				JSONString 
+				);
+
+		// merge current key pair into original object
+		~json_merged = 
+			If ( ~skipThisKey ; 
+				~json_merged ;
+				JSON.Format ( JSONSetElement ( ~json_merged ; ~key ; ~value ; ~jsonType ) )
+				);
+
+		// after the key has been integrated, delete that element beofer starting again with the next, deepest element in the object
+		~json_toMerge = JSON.Format ( JSONDeleteElement ( ~json_toMerge ; ~key ) );
+
+		// track the number iterations
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+
+	~json_merged
+
+	)

@@ -10,9 +10,11 @@
  * @returnError {array} error[n].code - error code
  * @returnError {array} error[n].descriptor - description of error
  * 
+ * @note the first cell of array2 will be the next one after the last cell of array1 in the concatenated result array
+ * 
  * @module JSON
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
