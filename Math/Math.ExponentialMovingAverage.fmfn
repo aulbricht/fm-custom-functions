@@ -83,7 +83,7 @@ While (
 					~keyBase = "[" & ~i - 1 &  "]." ;
 					~JSON_segment = 
 						JSONSetElement ( "{}" ;
-							[ "x" ; GetValue ( ~LIST_values ; ~i ); JSONNumber ];
+							[ "x" ; GetValue ( ~LIST_references ; ~i ); JSONNumber ];
 							[ "y" ; ~newValueRounded ; JSONNumber ]
 							);
 					~=""];
