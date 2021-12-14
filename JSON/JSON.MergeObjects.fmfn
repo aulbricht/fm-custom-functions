@@ -114,14 +114,22 @@ While (
 
 		// get value for the current key
 		~value = JSONGetElement ( ~json_toMerge ; ~key );
+		~value_original = JSONGetElement ( ~json ; ~key );
 
 		// if there are nested elements, don't overwrite them
 		// 	also, if no_overwrite option is True, check for existing key/data
 		~skipThisKey = 
 			Let ( ~nestedKeys = JSONGetElement ( ~json_toMerge ; ~key );
+
+				// if there are no nested keys
 				ValueCount ( ~nestedKeys ) = 0
+
+				// if there is only a blank JSON object
 				or ~nestedKeys = "{}" 
-				or ( ~preserveExisting = True and not IsEmpty ( ~value ) )
+
+				// if preserveExistingData is true and both original and merge values for the key have data
+				or ( ~preserveExisting = True and not IsEmpty ( ~value_original ) and not IsEmpty ( ~value ) )
+				
 				);
 				
 		// determine the type of JSON data
