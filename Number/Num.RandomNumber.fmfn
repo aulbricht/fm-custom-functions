@@ -41,7 +41,7 @@ Let ([
 	~high = ~high + ~step - 1 ;
 	~numItems = ~high - ~low + 1 ;
 	~randomNum = Floor ( Random * ~numItems ) + ~low ;
-	~result = ~randomNum - Mod ( ~randomNum ; ~step ) - ~adjustment;
+	~result = ~randomNum - Mod ( ~randomNum ; ~step ) - ~adjustment ;
 
 ~=""];
 
