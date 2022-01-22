@@ -1,0 +1,114 @@
+/**
+ *
+ * For a given text string, parse and remove all comments
+ *
+ * @param {text} function - calculation function from whcih to extract variables
+ *  
+ * @returnSuccess {text} value list of variable names
+ * 
+ * @note the returned list does not allow a variable to be a symbol without any alphanumeric characters, even though FileMaker technically allows it
+ * 
+ * @module Parse
+ * 
+ * @version 1.2.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		////////////////////////////////////////////////////////////////////
+		// OPTIONS:
+
+		// valid alphanumeric chars for the var name, where at least one of these characters is required to make a valid var name
+		~validVarNameChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
+
+		// these symbols are valid as part of the variable name, but they can't stand alone, e.g. "~" is not a valid var name, but "~n" is valid
+		~validSymbols = "_.`'~!@#$%?" ;
+
+
+		////////////////////////////////////////////////////////////////////
+
+
+		~function = function ;
+		~numSymbols = PatternCount ( ~function ; "=" );
+		~LIST_vars = "" ;
+		~pos_start = 1 ;
+		~pos_end = 1 ;
+		~s = 1 ;
+		~strAggregate = "" ;
+
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~s ≤ ~numSymbols ; 
+
+	//// logic ////////////////
+	[ 
+
+		////////////////////////////////////////////////////////////////////
+		// LOOP THROUGH EACH INSTANCE OF A "=" SYMBOL
+
+		~is_equalsCharExists = PatternCount ( ~function ; "=" ) > 0 ;
+
+		~varName = 
+			While ( 
+
+				//// initial variables ////
+				[ 
+
+					~pos = Position ( ~function ; "=" ; 1 ; ~s );
+					~pos_end = ~pos ;
+					~char = "";
+					~is_validChar = False ;
+					~is_seekMode = True ;
+					~is_normalMode = False ;
+					
+					~=""] ; 
+
+				//// "while this is true" loop condition ///////
+				~pos > 0 
+				and ~is_equalsCharExists 
+				and ( ~is_validChar or ~is_seekMode ); //>>>>>> note: seek mode just means we're seeking the first valid character before the "=" symbol, skipping over spaces, carriage returns, tabs, etc.
+
+				//// logic ////////////////
+				[ 
+
+					~pos = ~pos - 1 ;
+					~char = Middle ( ~function ; ~pos ; 1 );
+					~is_validChar = PatternCount ( ~validVarNameChars & ~validSymbols ; ~char ) > 0 ;
+					~is_seekMode = not ~is_validChar and not ~is_normalMode ;
+					~is_normalMode = not ~is_seekMode or ~is_normalMode ;
+					~pos_end = If ( ~is_seekMode ; ~pos ; ~pos_end );
+
+					~=""] ; 
+
+				//// result ///////////////
+				Middle ( ~function ; ~pos + 1 ; ~pos_end - ~pos - 1 )
+
+				);
+
+		// if the detected variable starts with a number, then it's not a valid variable
+		~is_validVariable = 
+			PatternCount ( "0123456789" ; Left ( ~varName ; 1 ) ) = 0  // leftmost character cannot be a number
+			and Length ( Filter ( ~varName; ~validVarNameChars ) ) > 0 ; // leftmost character cannot be a number
+					
+		~LIST_vars = List ( ~LIST_vars ; If ( ~is_validVariable ; ~varName ) );
+
+		////////////////////////////////////////////////////////////////////
+
+
+
+		~s = ~s + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+
+	UniqueValues ( ~LIST_vars )
+
+	)
