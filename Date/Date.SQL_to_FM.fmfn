@@ -8,18 +8,27 @@
  * 
  * @module Date
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
 
-Let ( ~date = sqlDate ;
+Let ([	~date = sqlDate ;	~list = Substitute ( ~date ; "-" ; "¶" );	~y = GetValue ( ~list ; 1 );	~m = GetValue ( ~list ; 2 );	~d = GetValue ( ~list ; 3 );
 
-    Date ( 
-        Month ( ~date ) ; 
-        Day ( ~date ) ; 
-        Year ( ~date ) 
-        )
+	~date =
+		Date ( 
+			Month ( ~date ) ; 
+			Day ( ~date ) ; 
+			Year ( ~date ) 
+			);
 
-    )
+	~date = 
+		If ( ~date = "?" ; 
+			Date ( 
+				~m ;
+				~d ; 
+				~y
+				);
+	~=""];	~date
+	)

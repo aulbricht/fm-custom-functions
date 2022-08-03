@@ -6,13 +6,14 @@
  *
  * @returnSuccess {text} field name
  *
- * @version 1.0.1
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
 
-GetValue ( 
+"\"" 
+& GetValue ( 
 	Substitute ( 
 		GetFieldName ( fieldRef ) ; 
 		"::" ; 
@@ -20,3 +21,4 @@ GetValue (
 		);
 	2 
 )
+& "\""

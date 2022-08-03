@@ -6,14 +6,14 @@
  * @param {number} high - top of the random number range
  * @param {number} [step_size] - OPTIONAL: step size for result number, DEFAULT: 1
  *
- * @returnSuccess {text} updated value list
+ * @returnSuccess {number}
  * 
  * @returnError {array} error[n].code - error code
  * @returnError {array} error[n].descriptor - description of error
  * 
  * @module Number (Num)
  * 
- * @version 2.0.2
+ * @version 2.0.3
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */

@@ -1,0 +1,30 @@
+/**
+ *
+ * Return a number with the decimal position moved a relative number of positions +/-
+ *
+ * @param {number} baseNumber - initial number 
+ * @param {number} relativeNumPositions - positions left or right to move the decimal (positive or negative number)
+ *
+ * @returnSuccess {number}
+ * 
+ * @returnError {array} error[n].code - error code
+ * @returnError {array} error[n].descriptor - description of error
+ * 
+ * @module Number (Num)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~base = baseNumber ;
+	~pos = relativeNumPositions ;
+
+~=""];
+
+~base * ( 10 ^ ~pos )
+
+)
