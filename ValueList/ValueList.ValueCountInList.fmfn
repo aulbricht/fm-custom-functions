@@ -9,7 +9,7 @@
  * 
  * @module ValueList
  * 
- * @version 1.0.1
+ * @version 1.0.2
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @website http://northcoastsoftware.com
  *
@@ -18,8 +18,8 @@
 
 Let ([
 
-	~list= ValueList ;
-	~search = ValueSearch ;
+	~list= valueList ;
+	~search = searchString ;
 	~search = "¶" & ~search & "¶";
 	~list = "¶" & ~list & "¶";  // add a carriage return to the beginning and end so the first and last values are included in our search
 	~numValues = PatternCount( ~list ; ~search );
