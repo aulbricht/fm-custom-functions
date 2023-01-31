@@ -1,0 +1,94 @@
+/**
+ *
+ * Create local variables for JSON object root keys
+ *
+ * @param {text} json - JSON object
+ * @param {boolean} [doAddLeadingUnderscore] - OPTIONAL: if True, add an underscore "_" prefix to the variable name, if not already present
+ *
+ * @returnSuccess {boolean} returns False if no errors
+ *
+ * @returnError {number} returns -2 if invalid JSON
+ *
+ * @module JSON
+ * 
+ * @version 2.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While ( 
+
+	//// initial variables ////
+	[ 
+	
+		// convert parameters to private variables
+		~json = json ;
+		~doAddLeadingUnderscore = doAddLeadingUnderscore ;
+
+		// error check
+		~error = 
+			Case ( 
+				
+				// if JSON is empty, return 0 ("no error")
+				IsEmpty ( ~json ) ; 0 ; 
+				
+				// if JSON is invalid, return 5 ("command is invalid")
+				Left ( JSONFormatElements ( ~json ) ; 1 ) = "?" ; -2 
+
+				); 
+
+		// Get keys from JSON document's root node
+		~LIST_keys = JSONListKeys ( ~json ; "." ) ; 
+
+		~numVars = ValueCount ( ~LIST_keys );
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numVars and IsEmpty ( ~error ); 
+
+	//// logic ////////////////
+	[ 
+
+		~key = GetValue ( ~LIST_keys ; ~i );
+
+		// setup variable from JSON key
+		~varName = If ( ~doAddLeadingUnderscore and Left ( ~key ; 1 ) ≠ "_" ; "_" ) & ~key ;
+
+		// attempt to typecast the value
+		~value = 
+			Let ([
+				~value = JSONGetElement ( ~json ; ~key ); 
+				~text = GetAsText ( ~value ); 
+				~number = GetAsNumber ( ~value ); 
+				~validDate = IsValid ( GetAsDate ( ~text ) ) and not IsEmpty ( ~number ); 
+				~validTime = IsValid ( GetAsTime ( ~text ) ) and Position ( ~text ; ":" ; 1 ; 1 ) > 0 and not IsEmpty ( ~number );
+			~=""];
+	
+			Case ( 
+				~value = "" or ~value = "?" ; Quote ( ~value );
+				~validTime and ~validDate ; "GetAsTimestamp ( " & Quote ( ~value ) & " )" ;
+				~validTime ; "GetAsTime ( " & Quote ( ~value ) & " )" ;
+				~validDate ; "GetAsDate ( " & Quote ( ~value ) & " )" ;
+				~text ≠ GetAsText ( ~number ) ; Quote ( ~value ); 
+				~number
+				) 
+			); 
+
+		// create the variable
+		~error = 
+			EvaluationError ( 
+					Evaluate ( "Let ( $" & ~key & " = " & ~value & " ; \"\" ) " ) 
+					);
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	
+	// return any error code (or 0 if no errors)
+	Max ( ~error ; 0 )
+
+	)
