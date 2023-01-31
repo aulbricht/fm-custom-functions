@@ -1,14 +1,14 @@
 /********
  * 
- * Wrap the last error in a JSON Object
+ * Wrap the last error into an error array
  * 
  * @param {object} [errorObject] - OPTIONAL include an existing array or object to create or add to an error array
  * 
- * @return {array} an array of errors. Note: if there is only one error, it will be a normal JSON object
+ * @return {array} an array of errors
  * 
  * @module Error
  * 
- * @version 1.1.2
+ * @version 1.1.3
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  *******/
@@ -17,4 +17,4 @@ Let ( ~error = Get ( LastError ) ;
 
 	Error.Wrap ( ~error ; Error._getDescriptor ( ~error ) ; "" ; errorObject )
 
-)
+    )
