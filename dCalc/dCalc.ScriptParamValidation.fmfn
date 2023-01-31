@@ -15,9 +15,12 @@
  * @note: This calculation could be done as a custom function, but in case of large script parameter data/values, it's done as a dynamic calculation (since FileMaker inexplicably takes a long time to pass in/out large variables)
  * 
  * @module dCalc
+ * @requires {constant} cVar.errorsArray
+ * @requires {module} Error
  * @requires {module} Validate
+ * @requires {module} Variable
  * 
- * @version 2.1.0
+ * @version 2.2.3
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  */
@@ -28,6 +31,7 @@ Let ([
 	~varName_scriptParams = varName_scriptParameters ;
 	~varName_validationRules = varName_validationRules ;
 	
+
 	~paramsVarName = If ( Left ( ~varName_scriptParams ; 1 ) ≠ "$" ; "$" ) & ~varName_scriptParams ;
 	~params = Evaluate ( ~paramsVarName );
 	~validationRulesVarName = If ( Left ( ~varName_validationRules ; 1 ) ≠ "$" ; "$" ) & ~varName_validationRules ;
@@ -57,17 +61,15 @@ Let ([
 
 				~rule_raw = GetValue ( ~validationRules_raw ; ~i );
 				~rule_trimmed = TrimAll ( ~rule_raw ; True ; 0 );
+				~rule_noSpaces = Substitute ( ~rule_raw ; " " ; "" );
 				~rule = 
 					Case (
 
 						Left ( ~rule_raw ; 8 ) ≠ "validate" ; "" ;
 
-						// if there is only one rule and it ends with a semicolon, remove the semicolon 
-						~numLines = 1 and Right ( ~rule_trimmed ; 1 ) = ";" ;
-							Left ( ~rule_trimmed ; Length ( ~rule_trimmed ) - 1 );
-
 						// if there are multiple rules and any except the last one do not end with semicolon, add one
-						Right ( ~rule_trimmed ; 1 ) ≠ ";" and (~i = 1 or ~i ≠ ~numLines ); 
+						// note: we expect even a single line to have a semicolon at the end because later it's inserted into a List() statement
+						Right ( ~rule_noSpaces ; 1 ) ≠ ";" and ( ~i = 1 or ~i ≠ ~numLines ); 
 							~rule_trimmed & "; " ;
 
 						// default: do nothing else to the rule
@@ -92,7 +94,6 @@ Let ([
 
 			);
 
-
 	~numRules = ValueCount ( ~validationRules );
 
 	~validationEvalString = 
@@ -112,15 +113,17 @@ Let ([
 			Evaluate ( ~validationEvalString )
 			);
 
-	~jsonError = 
+	~ARRAY_error = 
 		Case ( 
 			/* IF CONDITION */
 			~validationResult = "?" ;
 
 				/* THEN */ 
-				JSONSetElement ( "{}" ;
-					["errorCode" ; -1 ; JSONNumber ];
-					["message" ; "Error in validation rules for script \"" & Get ( ScriptName ) & "\"" ; JSONString ]
+				Error.Wrap ( 
+					-1 ; // error code
+					"Error in validation rules for script \"" & Get ( ScriptName ) & "\"" ; //error message
+					"" ; // additional data
+					cValue.ErrorsArray
 					);
 
 			/* IF CONDITION */
@@ -129,14 +132,16 @@ Let ([
 				and ~is_invalidJSON ; 
 
 				/* THEN */ 
-				JSONSetElement ( "{}" ;
-					["errorCode" ; 1710 ; JSONNumber ];
-					["message" ; "Invalid JSON in script parameter for \"" & Get ( ScriptName ) & "\"" ; JSONString ]
+				Error.Wrap ( 
+					1710 ; // error code
+					"Invalid JSON in script parameter for \"" & Get ( ScriptName ) & "\"" ; //error message
+					"" ; // additional data
+					cValue.ErrorsArray
 					)
 			);
 	~error = 	
-		If ( not IsEmpty ( ~jsonError ) ; 
-			~jsonError ;
+		Case ( 
+			not IsEmpty ( ~ARRAY_error ) ; ~ARRAY_error ;
 			~validationResult
 			);
 
@@ -148,7 +153,7 @@ Let ([
 	// LOCAL VARIABLES TO SET ////////////////////////////////////////////////
 
 	$this.scriptParameter = ~params ;
-	$errors = ~error ;
+	~_void = Var.DynamicAssignVar ( cVar.errorsArray ; ~error ; "" );
 
 	/////////////////////////////////////////////////////////////////////////////////
 
