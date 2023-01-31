@@ -1,0 +1,32 @@
+/**
+ *
+ * Create ID (primary key) value
+ *
+ * @param {text} [prefixOverride] - OPTIONAL: if not null, use this value as the prefix instead of deriving it from the table name
+ *
+ * @returnSuccess {text} ID/key value
+ *
+ * @module System
+ * 
+ * @version 2.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+    ~prefixOverride = prefixOverride ;
+
+    ~tocName = Get ( LayoutTableName );
+    ~prefix = 
+        Case ( 
+            not IsEmpty ( ~prefixOverride ) ; ~prefixOverride ;
+            MiddleWords ( ~tocName ; 2 ; 1 )
+            );
+
+~=""];
+
+~prefix & "-" & Get ( UUID )
+
+)

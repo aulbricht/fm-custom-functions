@@ -1,0 +1,42 @@
+/**
+ * 
+ * Convert milliseconds hour, minutes, and seconds (summed)
+ * 
+ * @param {number} UTCinMilliseconds - current UTC time in milliseconds
+ * 
+ * @return {text} valuelist of hours, minutes, and seconds, respectively
+ * 
+ * @module Time
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+    ///////////////////////////////////////
+    ~ms = UTCinMilliseconds ;
+    ///////////////////////////////////////
+
+
+    ~s = ~ms / 1000 ;
+    ~m = ~s / 60 ;
+    ~h = ~m / 60 ;
+
+    // put the segment parts together with the differenced values for each
+    ~part_h = Floor ( Mod ( ~h ; 60 ) );
+    ~part_m = Floor ( Mod ( ~m ; 60 ) );
+    ~part_s = Mod ( ~s ; 60 );
+    
+
+~=""];
+
+List ( 
+    ~part_h ;
+    ~part_m ;
+    ~part_s 
+    )
+
+)
