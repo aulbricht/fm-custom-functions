@@ -1,0 +1,60 @@
+/**
+ *
+ * REMOVE an element from the SESSION (global variable) JSON object; if the key is not valid or there is any error, revert to unaltered SESSION state
+ *
+ * @param {text} elementKey
+ *
+ * @returnSuccess {object} updated SESSION object
+ * 
+ * @note The SESSION variable will be automatically updated with this function. The returned, updated object is for utlility/convenience, such as for troubleshooting
+ * 
+ * @module SESSION
+ * @requires {constant} cVar.SESSION
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+Let ([
+
+	~sessionVarName = cVar.SESSION ;
+	~elementKey = elementKey ;
+
+	// strip any illegal symbols from the var name as well as scoping symbols (i.e. "$$")
+	~sessionVar = "$$" & Filter ( ~sessionVarName ; "01234556789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_." );
+
+	// get the current SESSION object
+	~JSON_session = Evaluate ( ~sessionVar );
+
+	// attempt to execute the assertion
+	~assertion = 
+		JSONFormatElements ( 
+			JSONDeleteElement ( ~JSON_session ; ~elementKey )
+			);
+
+	// verify the result is valid
+	~is_validAssertion = JSON.IsValid ( ~JSON_session );
+
+~=""];
+
+Case (
+
+	// if there is a problem with the assertion, revert to the previous SESSION state
+	not ~is_validAssertion ; ~JSON_session ;
+
+	// dynamically update the SESSION variable
+	Evaluate ( 
+		Substitute (
+			"Let ( _VAR_1 = _VALUE_1 ; _VALUE_1 )" ; 
+
+			[ "_VAR_1" ; ~sessionVarName ];
+			[ "_VALUE_1" ; Quote ( ~assertion ) ]
+
+			) 
+
+		) // END Evaluate
+
+	) // END Case
+
+) // END Let

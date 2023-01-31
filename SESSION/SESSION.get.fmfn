@@ -1,0 +1,49 @@
+/**
+ *
+ * GET an element from the SESSION (global variable) JSON object; if the key is not valid or there is any error, return NULL
+ *
+ * @param {text} elementKey
+ *
+ * @returnSuccess {any} value pulled from the SESSION object
+ * 
+ * @note The SESSION variable will be automatically updated with this function. The returned, updated object is for utlility/convenience, such as for troubleshooting
+ * 
+ * @module SESSION
+ * @requires {constant} cVar.SESSION
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+Let ([
+
+	~sessionVarName = cVar.SESSION ;
+	~elementKey = elementKey ;
+
+	// strip any illegal symbols from the var name as well as scoping symbols (i.e. "$$")
+	~sessionVar = "$$" & Filter ( ~sessionVarName ; "01234556789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_." );
+
+	// get the current SESSION object
+	~JSON_session = Evaluate ( ~sessionVar );
+
+	// verify the SESSION object is valid JSON
+	~is_validAssertion = JSON.IsValid ( ~JSON_session );
+
+	// attempt to execute the assertion
+	~result = JSONGetElement ( ~JSON_session ; ~elementKey );
+
+~=""];
+
+Case (
+
+	// if there is a problem with the assertion, revert to the previous SESSION state
+	not ~is_validAssertion ; "" ;
+
+	// dynamically update the SESSION variable
+	~result
+
+	) // END Case
+
+
+) // END Let

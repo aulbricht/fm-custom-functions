@@ -1,0 +1,40 @@
+/**
+ *
+ * INITIZALIZE the SESSION (global variable) JSON object
+ *
+ * @returnSuccess {any} value of the initialized SESSION object
+ * 
+ * @note The SESSION variable will be automatically updated with this function. The returned, updated object is for utlility/convenience, such as for troubleshooting
+ * 
+ * @module SESSION
+ * @requires {constant} cVar.SESSION
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+Let ([
+
+    ~sessionVarName = cVar.SESSION ;
+
+	// strip any illegal symbols from the var name as well as scoping symbols (i.e. "$$")
+	~sessionVar = "$$" & Filter ( ~sessionVarName ; "01234556789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_." );
+
+~=""];
+
+// Initialize the SESSION variable
+// note: we have to do this dynamically in order to use the constant containing the session variable name
+Evaluate ( 
+    Substitute (
+        "Let ( _VAR_1 = _VALUE_1 ; _VALUE_1 )" ; 
+
+        [ "_VAR_1" ; ~sessionVarName ];
+        [ "_VALUE_1" ; Quote ( "{}" ) ]
+
+        ) // END Substitute
+
+    ) // END Evaluate
+
+) // END Let
+
