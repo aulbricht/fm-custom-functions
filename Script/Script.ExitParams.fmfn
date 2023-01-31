@@ -1,0 +1,41 @@
+/**
+ *
+ * Default EXIT SCRIPT step parameter, adding any additionally specified object data
+ *
+ * @param {object} [varName_errorArray] = OPTIONAL: variable name containing an array of any errors, with or without the "$", e.g. "$ARRAY_errors" or "ARRAY_errors"
+ * @param {object} [JSON_successObject] = OPTIONAL: additional data to add to the default exit object
+ * 
+ * @returns {object} exit parameter(s)
+ *
+ * @module Script
+ * @requires {module} Error
+ * @requires {module} JSON
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	// abstract the function parameters
+	~successObject = JSON_successObject ;
+	~errorObjectVarName = varName_errorArray ;
+
+	// validity checks/manipulations
+	~successObject = If ( JSON.IsValid ( ~successObject ) ;  ~successObject ; "{}" );
+	~errorObjectVarName = If ( left ( ~errorObjectVarName ; 1 ) ≠ "$" ; "$" ) & ~errorObjectVarName ;
+
+	~ARRAY_errors = If ( not IsEmpty ( ~errorObjectVarName ) ; Evaluate ( ~errorObjectVarName ) );
+	~is_error = Error.IsError ( ~ARRAY_errors ; "any" );
+
+~=""];
+
+// construct the exit parameter object
+If ( ~is_error ; ~ARRAY_errors ;
+	JSONSetElement ( ~successObject ;
+		[ "completed" ; True ; JSONBoolean ]
+		)
+	)
+
+)
