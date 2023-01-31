@@ -4,7 +4,8 @@
  *
  * @param {string} key = the JSON key path to the value to test; if NULL, validation is aborted
  * @param {string} LIST_dataTypes = list of valid data types for the value; if NULL, any data type is accepted
- *				Valid types: text, number, boolean, date, time, timestamp, object, array, null
+ *				Valid types: text, number, boolean, date, time, timestamp, object, array, null, !null
+ *				Note: "!null" = not null, meaning that the value cannot be null
  *
  * @note for this validation, "null" is always assumed to be a valid key value type
  *
@@ -15,7 +16,7 @@
  * @requires {function} Validate._dataType()
  * @requires {function} Validate._errorCreate()
  * 
- * @version 2.2.1
+ * @version 2.3.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -39,7 +40,7 @@ Let ([
 			);
 
 	// All valid data types (which this function is able to validate)
-	~LIST_validDataTypes = List ( "null" ; "text"; "number"; "boolean"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
+	~LIST_validDataTypes = List ( "!null" ; "null" ; "text"; "number"; "boolean"; "date"; "time"; "timestamp"; "object"; "array" ) ; 
 
 	// Get the first type in the list to test
 	~type = GetValue ( ~LIST_dataTypes ; 1 );
@@ -54,7 +55,9 @@ Let ([
 Case (
 
 	// if the value is NULL, abort without error since that's allowed for this validation type
-	IsEmpty ( ~value ) or IsEmpty ( ~dataToValidate ); "" ;
+	( PatternCount ( ~LIST_dataTypes ; "!null" ) = 0 and IsEmpty ( ~value ) )
+		or IsEmpty ( ~dataToValidate ); 
+		"" ;
 
 
 	// evaluate basic cases for abort

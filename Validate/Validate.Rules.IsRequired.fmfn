@@ -14,7 +14,7 @@
  * @requires {function} Validate._errorCreate()
  * @requires {function} Validate.Rule.IsOfType ()
  * 
- * @version 2.1.2
+ * @version 2.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  * @credit forked from code by original author Todd Geist
  * 
@@ -38,7 +38,7 @@ Case (
 		Validate._errorCreate ( ~key ; "Required parameter is missing"  ) ; 
 
 	// if a data type parameter was included, validate that it matches the given value's data type
-	not IsEmpty ( ~list ) ; Validate.Rule.IsOfType ( ~key ; ~list ); 
+	not IsEmpty ( ~list ) ; Validate.Rule.IsOfType ( ~key ; List ( ~list ; "!null" ) ); 
 
 	// default return NULL
 	""
