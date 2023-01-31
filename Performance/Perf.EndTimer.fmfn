@@ -4,11 +4,11 @@
  *
  * @param {text} tag - unique tag that the end timer function will reference
  * @param {text} objectVarName - the performance JSON object or array
- * @param {text} [alternateElementKey] - OPTIONAL: JSON element key under which to store the result ; DEFAULT = tag
+ * @param {text} [alternateElementKey] - OPTIONAL: JSON element key under which to store the result ; DEFAULT = [given tag value]
  *
  * @module Performance (Perf)
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
