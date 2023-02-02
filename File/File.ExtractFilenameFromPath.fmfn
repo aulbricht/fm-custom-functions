@@ -9,13 +9,10 @@
  * 
  * @module File
  * 
- * @version 1.2.0
+ * @version 1.2.1
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
- 
- 
  
 Let ([
 
