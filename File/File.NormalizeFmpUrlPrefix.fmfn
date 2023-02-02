@@ -1,0 +1,47 @@
+/**
+ *
+ * Extract the filename from a given filepath
+ *
+ * @param {text} filepathFull - full filepath, including the filename
+ *
+ * @returnSuccess {text} return full filepath with normalized prefix
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+Let ([ 
+
+	~filepath = filepathFull ;
+
+	~isMac = Get ( SystemPlatform ) = 1 ;
+	~subMarker = "{{prefix}}" ;
+	~prefix = "file:/" & If ( ~isMac ; "/" );
+
+	~filepath = 
+		Substitute ( ~filepath ;
+			[ "fmnet://" ; "fmp://" ];
+			[ "fmnet:/" ; "fmp://" ];
+			[ "fmnet:" ; "fmp://" ];
+			[ "filewin:/" ; ~subMarker ];
+			[ "filewin:" ; ~subMarker ];
+			[ "filemac://" ; ~subMarker ];
+			[ "filemac:/" ; ~subMarker ];
+			[ "filemac:" ; ~subMarker ];
+			[ "file://" ; ~subMarker ];
+			[ "file:/" ; ~subMarker ];
+			[ "file:" ; ~subMarker ];
+			[ ~subMarker ; ~prefix ]
+
+			);
+
+~=""];
+
+~filePath
+
+)
+
+
