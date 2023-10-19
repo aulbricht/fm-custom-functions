@@ -1,0 +1,39 @@
+// isNumeric ( inputValue )
+// version 2023-10-19
+
+/* 
+	Test whether inputValue (assuming text) represents a valid number. 
+	Properly handles negative numbers, international decimal point, FileMaker's scientific notation format.
+	Also properly deals with the fact that FileMaker internally stores numbers 
+		without a 0 before decimals less than 1 if the text entered began with "0."
+	This returns TRUE for an empty string - in FileMaker, that IS a "valid" number. 
+
+HISTORY: 
+	2023-10-19 ( danshockley ): Handle international decimal point character. Updated documentation. No longer Trim the input within this function. 
+	20xx-xx-xx ( danshockley ): Created. Date unknown. 
+	
+*/
+
+Let ( [
+		/* do NOT assume U.S. decimal character, obtain it when used: */
+		  charDecimalPoint = Middle ( 3/2 ; 2 ; 1 )
+		; inputAsNum = GetAsNumber ( inputValue )
+		; backToText = GetAsText ( inputAsNum )
+]; 
+
+	Case ( 
+		Left ( inputValue ; 2 ) = "0" & charDecimalPoint
+			and inputAsNum < 1 
+			and inputAsNum > 0 
+		;  Exact ( inputValue ; "0" & backToText )
+		; 
+		Left ( inputValue ; 3 ) = "-0" & charDecimalPoint
+			and inputAsNum > -1 
+			and inputAsNum < 0 
+		; Exact ( inputValue ; Left ( backToText ; 1 ) & "0" & Middle ( backToText ; 2 ; Length ( backToText ) ) )
+		; 
+		/* if not one of the special cases above, just compare transformed data to that entered. */
+		Exact ( inputValue ; backToText )
+		)
+
+)
