@@ -6,8 +6,11 @@
  * 
  * @returns {string} primary valid data type
  *
- * @version 1.1.0
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ * @modified 2023-10-19 ( fmdev@danshockley.com ): Empty string should be considered "text" instead of "timestamp". 
+ * @modified 2023-10-19 ( fmdev@danshockley.com ): Bug-fix to handle numbers properly - previous version had a bug that didn't consider any number a number. Now use external custom function isNumeric to handle the multiple "types" of valid numbers in FileMaker. 
  *
  */
 
@@ -18,6 +21,9 @@ Let ([
 	~value = value ;
 
 	~baseDataType = Case ( 
+
+				// EMPTY, so assume text
+				IsEmpty ( ~value ) ; "text" ;
 
 				// JSON object types
 				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
@@ -31,7 +37,9 @@ Let ([
 
 				// time
 				GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
-				GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
+
+				// number
+				isNumeric ( ~value ) ; "number" ; /* too many things to check to do here, so call another function */
 
 				// text
 				GetAsText ( ~value ) = ~value ; "text" ;
