@@ -1,6 +1,6 @@
 /**
  * 
- * Determine yesterday's date, excluding weekend days. e.g. If the date provideed is a Monday, the result will be the previous Friday.
+ * Determine yesterday's date, excluding weekend days. e.g. If the date provided is a Monday, the result will be the previous Friday.
  *
  * @param {date} originDate - FileMaker formatted date
  *
