@@ -1,0 +1,24 @@
+/**
+ *
+ * Globally turns triggers on or off
+ *
+ * @param {string} state = "on" or "off"
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// abstract the parameter
+	~state = state ;
+
+	$$TRIGGERS.state = ~state
+
+~=""];
+
+""
+
+)
