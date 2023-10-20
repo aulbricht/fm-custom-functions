@@ -1,0 +1,16 @@
+/**
+ * 
+ * Value of the errors array, based on the constant-defined variable name
+ * 
+ * @requires {constant} cVar.errorsArray
+ * 
+ */
+
+Let ([
+    ~var = cVar.errorsArray ;
+    ~evaluateStatement = If ( Left ( ~var ; 1 ) ≠ "$" ; "$" ) & ~var ;
+~=""];
+
+Evaluate ( ~evaluateStatement )
+
+)
