@@ -1,0 +1,22 @@
+/**
+ *
+ * Extract the field name from the fully qualified reference (e.g. "fieldA" from "table1::fieldA")
+ *
+ * @param {text} fieldRef - fully qualified field reference
+ *
+ * @returnSuccess {text} field name
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+GetValue ( 
+	Substitute ( 
+		GetFieldName ( fieldRef ) ; 
+		"::" ; 
+		"¶"
+		);
+	2 
+)
