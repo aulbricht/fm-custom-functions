@@ -9,16 +9,15 @@
  *
  * @returnSuccess {text} table name
  *
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
 
 Let([
 	~existingString = Text ;
-	~searchString = HighlightString ;
+	~highlightString = HighlightString ;
 	~color = Case ( IsEmpty ( Color ) ; RGB ( 0; 100; 255 ) ; Color );
 	~style= Style ;
 	~style = Case ( 
@@ -29,8 +28,8 @@ Let([
 
 	~numChars = Length ( ~existingString );
 
-	~posStart = Position ( ~existingString ; ~searchString ; 1 ; 1 );
-	~numSearchChars = Length ( ~searchString );
+	~posStart = Position ( ~existingString ; ~highlightString ; 1 ; 1 );
+	~numSearchChars = Length ( ~highlightString );
 	~posEnd = ~posStart + ~numSearchChars ;
 
 	~replacementString = Middle ( ~existingString ; ~posStart ; ~numSearchChars );
@@ -44,6 +43,6 @@ Let([
 
 ];
 
-If ( PatternCount ( ~existingString; ~searchString ) > 0; ~newString ; ~existingString ) 
+If ( PatternCount ( ~existingString; ~highlightString ) > 0; ~newString ; ~existingString ) 
 
 )
