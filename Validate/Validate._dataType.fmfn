@@ -9,7 +9,7 @@
  * @private
  * @module Validate
  *
- * @version 2.2.0
+ * @version 2.3.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -20,31 +20,32 @@ Let ([
 	// Abstract parameter
 	~value = value ;
 
-	~baseDataType = Case ( 
+	~baseDataType = 
+		Case ( 
 
-				// empty value
-				IsEmpty ( ~value ) ; "null" ;
+			// empty value
+			IsEmpty ( ~value ) ; "null" ;
 
-				// JSON object types
-				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
-				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
+			// JSON object types
+			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
+			Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
 
-				// timestamp
-				GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
+			// timestamp
+			GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
 
-				// date
-				GetAsText ( GetAsDate ( ~value ) ) = ~value ; "date" ;
+			// date
+			GetAsText ( GetAsDate ( ~value ) ) = ~value ; "date" ;
 
-				// time
-				GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
+			// time
+			GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
 
-				// number
-				GetAsNumber ( ~value ) = ~value ; "number" ; 
+			// number
+			GetAsNumber ( ~value ) = ~value ; "number" ; 
 
-				// text
-				GetAsText ( ~value ) = ~value ; "text" ;
+			// text
+			GetAsText ( ~value ) = ~value ; "text" ;
 
-				);
+			);
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -56,38 +57,52 @@ Let ([
 
 	// boolean / number
 	~LIST_higherOrderDataTypes = If ( 
-				~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); 
-				List ( ~LIST_higherOrderDataTypes ; "boolean" );
-				~LIST_higherOrderDataTypes
-				);
+		~baseDataType = "number" and ( ~value = 0 or ~value = 1 ); 
+		List ( ~LIST_higherOrderDataTypes ; "boolean" );
+		~LIST_higherOrderDataTypes
+		);
 
-				// number / text
+	// number / text
 	~LIST_higherOrderDataTypes = If ( 
-				~baseDataType = "number" ;
-				List ( ~LIST_higherOrderDataTypes ; "text" );
-				~LIST_higherOrderDataTypes
-				);
+		~baseDataType = "number" ;
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
 
-				// date / text
+	// object / text
 	~LIST_higherOrderDataTypes = If ( 
-				~baseDataType = "date" ;
-				List ( ~LIST_higherOrderDataTypes ; "text" );
-				~LIST_higherOrderDataTypes
-				);
+		~baseDataType = "object" ;
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
 
-				// time / text
+	// array / text
 	~LIST_higherOrderDataTypes = If ( 
-				~baseDataType = "time" ; 
-				List ( ~LIST_higherOrderDataTypes ; "text" );
-				~LIST_higherOrderDataTypes
-				);
+		~baseDataType = "array" ;
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
 
-				// timestamp / text
+	// date / text
 	~LIST_higherOrderDataTypes = If ( 
-				~baseDataType = "timestamp" ; 
-				List ( ~LIST_higherOrderDataTypes ; "text" );
-				~LIST_higherOrderDataTypes
-				);
+		~baseDataType = "date" ;
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
+
+	// time / text
+	~LIST_higherOrderDataTypes = If ( 
+		~baseDataType = "time" ; 
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
+
+	// timestamp / text
+	~LIST_higherOrderDataTypes = If ( 
+		~baseDataType = "timestamp" ; 
+		List ( ~LIST_higherOrderDataTypes ; "text" );
+		~LIST_higherOrderDataTypes
+		);
 
 ~=""];
 
