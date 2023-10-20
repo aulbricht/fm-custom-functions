@@ -1,10 +1,10 @@
 /**
  *
- * Remove the extension from a given filepath or filename
+ * Return the extension from a given filepath or filename
  *
  * @param {text} filenameOrPath - filepath including the filename, or just the filename
  *
- * @returnSuccess {text} return filename or path without the file extension
+ * @returnSuccess {text} returns the filename extension
  * 
  * @module File
  * 
