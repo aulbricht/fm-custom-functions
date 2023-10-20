@@ -1,6 +1,6 @@
 /**
  *
- * For a given text string, parse and remove all comments
+ * For a given text string, find and return all variable names
  *
  * @param {text} function - calculation function from whcih to extract variables
  *  
