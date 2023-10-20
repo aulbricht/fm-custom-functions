@@ -1,0 +1,41 @@
+/**
+ * 
+ * Convert a value list to an XML delimited list
+ *
+ * @param {text} valueList - value list (¶ delimited)
+ * @param {text} xmlTag - tag to surround to each value list item
+ *
+ * @returnSuccess {text} updated value list, containing the new value
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~list = valueList ;
+	~tag = xmlTag ;
+
+	~tag_open = 
+		if ( left ( ~tag ; 1 ) ≠ "<" ; "<" ) 
+		& ~tag
+		& if ( right ( ~tag ; 1 ) ≠ ">" ; ">" ) ;
+	~tag_close = Substitute ( ~tag_open ; "<" ; "</" );
+
+~=""];
+
+	If ( IsEmpty ( ~list ) ; "" ;
+
+		~tag_open
+		& Substitute ( ~list ;
+			[ "¶" ; ~tag_close & "¶" & ~tag_open ]
+			)
+		& ~tag_close
+
+		)
+
+)
