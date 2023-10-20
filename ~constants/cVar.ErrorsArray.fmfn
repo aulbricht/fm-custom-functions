@@ -1,7 +1,0 @@
-/**
- * 
- * Global constant value, so it can be changed system-wide in this one place
- * 
- */
-
-"$ARRAY_errors"
