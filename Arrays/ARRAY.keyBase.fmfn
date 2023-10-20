@@ -1,0 +1,25 @@
+/**
+ *
+ * Create an array key base, given a positive integer index
+ *
+ * @param {text} index - which cell to make the key for (e.g. index 1 = cell "0")
+ *
+ * @returnSuccess {text} returns a usable array key for the specified index
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~index = index ;
+
+~=""];
+
+"[" & ~index - 1 & "]."
+
+)

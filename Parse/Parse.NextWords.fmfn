@@ -1,0 +1,41 @@
+/**
+ *
+ * Return the next words after a specified search string
+ *
+ * @param {text} text - full text string to search within
+ * @param {text} searchString - text to find, as a starting place for the word to return
+ * @param {number} numWordsToReturn - number of words following the searchString to return
+ *
+ * @returnSuccess {text} word(s) following the search string
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~content = text ;
+	~searchString = searchString ;
+	~numWordsToReturn = numWordsToReturn;
+
+	~pos_endSearchString = 
+		Position ( ~content ; 
+			~searchString ; 
+			PatternCount ( ~content ; ~searchString ) ; 
+			1 
+			) + Length ( ~searchString ) - 1 ;
+
+~=""];
+
+LeftWords ( 
+	Right ( ~content ; 
+		Length ( ~content ) - ~pos_endSearchString
+		);
+	~numWordsToReturn
+	)
+
+)
