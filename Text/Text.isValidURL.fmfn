@@ -1,0 +1,31 @@
+/**
+ *
+ * Validate the a given URL has all the necessary components
+ *
+ * @param {text} urlString
+ *
+ * @returnSuccess {text} updated value list
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~urlString = urlString ;
+
+	~hasProtocol = Left ( ~urlString ; 4 ) = "http" or Left ( ~urlString ; 5 ) = "https";
+	~hasDot = PatternCount ( ~urlString ; "." ) ≥ 1;
+	~hasDomain = Length ( Middle ( ~urlString ; Position ( ~urlString ; "://" ; 1 ; 1 ) + 3 ; 1000 ) ) > 0 ;
+
+~=""];
+
+~hasProtocol and ~hasDot and ~hasDomain
+
+)
+
+)

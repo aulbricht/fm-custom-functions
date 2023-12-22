@@ -1,0 +1,52 @@
+/**
+ * 
+ * Determine if the given eamil address is in a valid format
+ * 
+ * @param {text} email
+ * 
+ * @return {boolean} true if valid
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author ChatGPT & Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+// Check if there is exactly one '@' symbol
+Let ([
+
+	~email = email ;
+
+    ~atSymbolCount = PatternCount ( ~email; "@" );
+    ~positionOfAt = Position ( ~email ; "@" ; 1 ; 1 );
+    ~domain = Right ( ~email ; Length ( ~email ) - ~positionOfAt );
+
+	~=""];
+
+	If ( ~atSymbolCount ≠ 1 ; False ;
+	    
+	    // Check if the domain part contains a dot and is not just a dot
+	    Let ([
+	        ~dotInDomain = PatternCount ( ~domain ; "." );
+	        ~domainWithoutDot = Substitute ( ~domain ; "." ; "" );
+	    	~=""];
+
+		    If ( ~dotInDomain < 1 or IsEmpty ( ~domainWithoutDot );
+		        False;
+		        
+		        // Check for invalid characters (you can expand this list)
+		        Let ([
+		            ~invalidChars = 
+		            	PatternCount ( ~email; " " ) 
+		            	+ PatternCount ( ~email ; "!" ) 
+		            	+ PatternCount ( email ; "#" ) 
+		            	+ PatternCount ( email ; "$" );
+		        	~=""];
+			        If ( ~invalidChars > 0 ; False ; True ) // If all checks pass, the email is valid
+			    	) // end Let
+			    ) // end If
+			) // end Let
+		) //end If
+	) //end Let
