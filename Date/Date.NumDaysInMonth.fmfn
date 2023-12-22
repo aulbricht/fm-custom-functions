@@ -20,11 +20,10 @@ Let ([
 	~month = Month ( ~date );
 	~year = Year ( ~date );
 
-	~first = Date ( ~month ; 1 ; ~year ); 
 	~last = Date ( ~month + 1 ; 0 ; ~year );
 
 ~=""];
 
-~last - ~first
+	Day ( ~last )
 
 )
