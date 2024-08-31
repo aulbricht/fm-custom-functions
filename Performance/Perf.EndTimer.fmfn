@@ -2,13 +2,14 @@
  *
  * End performance time measurement and record results to a JSON object
  *
- * @param {text} tag - unique tag that the end timer function will reference
- * @param {text} objectVarName - the performance JSON object or array
- * @param {text} [alternateElementKey] - OPTIONAL: JSON element key under which to store the result ; DEFAULT = [given tag value]
+ * @param {text} arrayVarName - the performance JSON array
+ * @param {text} description - short description of what is being measured
+ *
+ * @returnSuccess {number} - elapsed milliseconds since timer start
  *
  * @module Performance (Perf)
  * 
- * @version 1.1.1
+ * @version 2.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -17,47 +18,51 @@
 Let ([
 
 	//////////////////////////////////////////
-	~tag = tag ;
-	~objName = objectVarName ;
-	~key = alternateElementKey ;
+	~tag  = tag ; // unique tag name to pair start and stop function calls, e.g. "MyTest1"
+	~arrayVarName = arrayVarName ; // variable name and scope in which to store the results (default local scope "$"), e.g. "$$ARRAY_performance"
+	~description = description ; // short description of what is being measured
 	//////////////////////////////////////////
 
 
 	~tag_converted = Filter ( Base64Encode ( ~tag ) ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
 	~varName_temp = "performance." & ~tag_converted ;
-	~key = If ( IsEmpty ( ~key ) ; ~tag ; ~key );
 
 	~end_ms = Get ( CurrentTimeUTCMilliseconds );
 	~start_ms = Let ( ~v = Evaluate ( "$$" & ~varName_temp ); If ( IsEmpty ( ~v ); ~end_ms ; ~v ) );
 	~elapsed_ms = ~end_ms - ~start_ms ;
 
-	~objScope = Filter ( ~objName ; "$" );
-	~objectVar = If ( IsEmpty ( ~objScope ) ; "$" ) & ~objName ;
-	~objectVarValue = Evaluate ( ~objectVar );
+	~objScope = Filter ( ~arrayVarName ; "$" );
+	~objectVar = If ( IsEmpty ( ~objScope ) ; "$" ) & ~arrayVarName ;
+	~objectVarValue = Let ( ~value = Evaluate ( ~objectVar ) ; If ( IsEmpty ( ~value ) or Left ( ~value ; 1 ) = "?" ; "[]" ; ~value ) );
+
+	~arrayCell = "[" & ValueCount ( JSONListKeys ( ~objectVarValue ; "." ) ) & "]" ;
 
 	~subStr = 
 		"Let ([¶
-			{{objectVar}} = If ( Left ( {{objectVar}} ; 1 ) = \"?\" ; \"{}\" ; {{objVarValue}} );¶
 			{{objectVar}} = ¶
 				JSONSetElement ( {{objectVar}} ;¶
-					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ];¶
-					[ \"{{key}}.end_ms\" ; {{end_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.description\" ; \"{{description}}\" ; JSONString ];¶
 					[ \"{{key}}.elapsed_ms\" ; {{elapsed_ms}} ; JSONNumber ];¶
-					[ \"{{key}}.elapsed_s\" ; {{elapsed_s}} ; JSONNumber ]¶
+					[ \"{{key}}.elapsed_s\" ; {{elapsed_s}} ; JSONNumber ];¶
+					[ \"{{key}}.end_ms\" ; {{end_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.script\" ; \"{{script}}\" ; JSONString ];¶
+					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ]¶
 					);¶
 			~=\"\"]; \"\" )";
 	~evalStr = 
 		Substitute ( ~subStr ;
+			[ "{{description}}" ; ~description ];
+			[ "{{elapsed_ms}}" ; ~elapsed_ms ];
+			[ "{{elapsed_s}}" ; Round ( ~elapsed_ms / 1000 ; 3 ) ];
+			[ "{{end_ms}}" ; ~end_ms ];
+			[ "{{key}}" ; ~arrayCell ];
 			[ "{{objectVar}}" ; ~objectVar ];
 			[ "{{objVarValue}}" ; Quote ( ~objectVarValue ) ];
-			[ "{{key}}" ; ~key ];
-			[ "{{start_ms}}" ; ~start_ms ];
-			[ "{{end_ms}}" ; ~end_ms ];
-			[ "{{elapsed_ms}}" ; ~elapsed_ms ];
-			[ "{{elapsed_s}}" ; Round ( ~elapsed_ms / 1000 ; 3 ) ]
+			[ "{{script}}" ; Get ( ScriptName ) ];
+			[ "{{start_ms}}" ; ~start_ms ]
 			);
 
-	~_void = Evaluate ( "Let ( $$" & ~varName_temp & "=\"\" ; \"\" )" );
+	~_void = Evaluate ( "Let ( $$" & ~varName_temp & "=\"\" ; \"\" )" ); // clear the temporary tag variable
 
 	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
 
