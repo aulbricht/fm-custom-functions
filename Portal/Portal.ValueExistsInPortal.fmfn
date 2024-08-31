@@ -1,0 +1,46 @@
+/**
+ * 
+ * Return whether a given value exists in a given portal field, for visible rows in that portal.
+ *
+ * @param {text} fqfn - fully qualified field name of the portal (child) field to search in, e.g. myTable::id
+ * @param {text} searchValue - value to search for
+ *
+ * @note the fqfn parameter input value does not need to be wrapped in quotes or GetFieldName. Just the direct relationship and field reference.
+ * @note This is useful because FileMaker does not give a function to accomplish this, and using a List() of the values across the relationship does not account for filtered/hidden portal rows.
+ * @note If there are multiple portals on the layout with the same relationship, this will only search the first one.
+ *
+ * @returnSuccess {boolean} count of the number of portal rows in the given portal
+ * 
+ * @module Portal
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While (
+	// INIT
+	[
+		~fqfn = fqfn ;
+		~targetValue = searchValue ;
+		~valueMatch = False ;
+		~numRecords = Portal.RowCount ( v01_con~STEP#portal::id );
+		~i = 0 ;
+	~=""];
+
+	// CONDITION
+		~i = 0 or ( not ~valueMatch and ~i ≤ ~numRecords );
+
+	// LOGIC
+	[
+		~i = ~i + 1;
+		~value = GetNthRecord ( ~fqfn ; ~i );
+		~valueMatch = ~value = ~targetValue ;
+	~=""];
+
+	// RESULT
+
+	~valueMatch
+
+	)

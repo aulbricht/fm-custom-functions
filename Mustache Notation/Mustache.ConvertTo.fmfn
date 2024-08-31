@@ -1,0 +1,44 @@
+/**
+ *
+ * Given a list of tags, wrap them in mustache notation and convert as necessary
+ *
+ * @param {text} listTags 
+ *
+ * @returnSuccess {text} sanitized text
+ * 
+ * @module Mustache
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+	//// initial variables ////
+	[ 
+
+		~listTags = listTags ;
+		~pattern = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-~.[]{}" ;
+		~numTags = ValueCount ( ~listTags );
+		~i = 0 ;
+		~result_list = "" ;
+
+	~=""]; 
+
+	//// "while this is true" loop condition /////
+	~i < ~numTags ; 
+
+	//// logic ////////////////
+	[ 
+		
+		~i = ~i + 1 ;
+		~tag = "{{" & GetValue ( ~listTags ; ~i ) & "}}" ;
+		~filteredTag = Upper ( Filter ( ~tag ; ~pattern ) ); 
+		~result_list = List ( ~result_list ; ~filteredTag );
+
+	~=""]; 
+
+	//// result ///////////////
+	~result_list
+)

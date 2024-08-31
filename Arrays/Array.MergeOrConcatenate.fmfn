@@ -1,0 +1,97 @@
+/**
+ * 
+ * Merge or Concatenate two JSON arrays of JSON Objects: 
+ *	1. Attempt to merge each cell of Array_2 into Array_2 by comparing the given 
+ *	2. If the value of the given match key is the same in a cell in Array_1 and Array_2, overwrite that cell in Array_1 with the contents of that cell in Array_2
+ *	3. If there is no match found, then concatenate the cell from Array_2 onto the end of Array_1
+ *
+ * @param {array} array_1 - JSON array (containing JSON objects)
+ * @param {array} array_2 - JSON array (containing JSON objects)
+ * @param {string} match_key - JSON key in each array/object by which we attempt to match & merge cells
+ *
+ * @returnSuccess {object} merged/concatenated JSON object
+ * 
+ * @module Array
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+ While (
+	// INIT
+	[
+		~array_1 = array_1 ;
+		~array_2 = array_2 ;
+		~match_key = match_key ;
+
+		~array_merged = ~array_1 ;
+
+		~numCells_1 = ValueCount ( JSONListKeys ( ~array_1 ; "." ) );
+		~numCells_2 = ValueCount ( JSONListKeys ( ~array_2 ; "." ) );
+
+		~i_2 = 0 ;
+	~=""];
+
+	// CONDITION
+		~i_2 < ~numCells_2 ;
+
+		
+	// LOGIC
+	[
+
+		~keybase_2 = "[" & ~i_2 & "]." ;
+		~cell_2 = JSONGetElement ( ~array_2 ; ~keybase_2 );
+		~param_2 = JSONGetElement ( ~cell_2 ; ~match_key ); 
+
+		// compare cell from array_2 to each cell in array_1, and merge or concatenate
+		~cell_containing_match = 
+			While (
+				// INIT
+				[
+					~match_cell = "" ;
+					~i_1 = 0 ;
+				~=""];
+
+				// CONDITION
+					IsEmpty ( ~match_cell ) and ~i_1 < ~numCells_1 ;
+
+					
+				// LOGIC
+				[
+
+					~keybase_1 = "[" & ~i_1 & "]." ;
+					~param_1 = JSONGetElement ( ~array_1 ; ~keybase_1 & ~match_key );
+					~match_cell = If ( ~param_1 = ~param_2 ; ~i_1 );
+					~i_1 = ~i_1 + 1;
+
+				~=""];
+
+				// RESULT
+
+				~match_cell
+
+				);
+
+		~numCells_merged = ValueCount ( JSONListKeys ( ~array_merged ; "." ) );
+		~keybase_merge = "[" & ~cell_containing_match & "]." ;
+		~keybase_concat = "[" & ~numCells_merged & "]." ;
+		~array_merged = 
+			If ( not IsEmpty ( ~cell_containing_match );
+
+				// if match was found, overwrite that cell with array 2
+				JSONSetElement ( ~array_merged ; ~keybase_merge ; ~cell_2 ; JSONObject );
+
+				// if no match was found, concatenate that cell at the end of array 1
+				JSONSetElement ( ~array_merged ; ~keybase_concat ; ~cell_2 ; JSONObject )
+				);
+
+		~i_2 = ~i_2 + 1;
+
+	~=""];
+
+	// RESULT
+
+	~array_merged
+
+	)

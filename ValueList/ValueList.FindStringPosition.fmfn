@@ -12,21 +12,20 @@
  * 
  * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
 
 Let ([
-	~list = valueList;
-	~search = searchString;
-	~occurrence = occurrence;
-	~numOccurrences = PatternCount ( ~list; ~search );
-	~occurrence = If ( ~occurrence > ~numOccurrences; ~numOccurrences; ~occurrence );
-	~position = Position ( ~list; ~search; 1; ~occurrence );
-	~listPosition = PatternCount ( Left ( ~list; ~position ); "¶") + 1
-];
+	~list = valueList ;
+	~search = searchString ;
+	~occurrence = occurrence ;
+	~numOccurrences = PatternCount ( ~list ; ~search );
+	~occurrence = If ( ~occurrence > ~numOccurrences ; ~numOccurrences ; ~occurrence );
+	~position = Position ( ~list; ~search ; 1 ; ~occurrence );
+	~listPosition = PatternCount ( Left ( ~list ; ~position ) ; "¶") + 1 ;
+~=""];
 
-If( ~numOccurrences = 0; 0; ~listPosition )
+If ( ~numOccurrences = 0 ; 0 ; ~listPosition )
 
 )

@@ -9,9 +9,8 @@
  * 
  * @module ValueList
  * 
- * @version 1.1.2
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
- * @website http://northcoastsoftware.com
  *
  */
 
@@ -20,44 +19,8 @@ Let ([
 	~list = valueList ;
 	~search = searchString ;
 
-	// remove any trailing carriage returns
-	~search = If( Right ( ~search ; 1 ) = "¶"; 
-			Left( ~search ; Length ( ~search ) - 1  ) ;
-			~search
-			);
-
-	// determine if the search is a single value or a value list
-	~isMultipleSearch = ValueCount ( ~search ) > 1 ;
-
-	// get the first (or only) value of the search list
-	~currentSearch = GetValue ( ~search ; 1 );
-
-	// get the remaining values (if any) in the search list
-	~remainingSearchString = RightValues ( ~search ; ValueCount ( ~search ) - 1 );
-
-	// validate the current search value
-	~isValid = Case (
-
-		// if the list is empty, return NULL
-		IsEmpty ( ~list ) and IsEmpty ( ~currentSearch ) ; False ;
-
-		// validate current: check to see if the curent search pattern exists in the list
-		PatternCount ( "¶" & ~list & "¶"; "¶" & ~search & "¶" ) > 0 ; True ;
-
-		// if there are multiple values in the search (list), recurse with the remaining values
-		ValueCount ( ~remainingSearchString ) > 0 ; 
-
-					// RECURSE ///////////////////////////
-					ValueList.ValueExistsInList ( ~list ; ~remainingSearchString ) ;
-					////////////////////////////////////////
-
-		// default
-		False
-
-	);
-
 ~=""];
 
-~isValid
+ValueCount ( FilterValues ( ~list ; ~search ) ) > 0
 
 )

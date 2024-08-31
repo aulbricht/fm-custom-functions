@@ -1,0 +1,32 @@
+/**
+ *
+ * Return the number of cells in the array root
+ *
+ * @param {array} array
+ *
+ * @returnSuccess {number} number of cells in the array root
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~array = array ;
+	~is_array = 
+		Left ( ~array ; 1 ) = "[" 
+		and Right ( ~array ; 1 ) = "]"
+		and Left ( JSONFormatElements ( ~array ) ; 1 ) ≠ "?" ;
+
+~=""];
+
+Case ( 
+	~is_array ; ValueCount ( JSONListKeys ( ~array ; "." ) );
+	0
+	)
+
+)

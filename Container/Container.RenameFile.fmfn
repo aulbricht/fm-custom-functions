@@ -1,0 +1,27 @@
+/**
+ *
+ * Rename the file inside a container field
+ *
+ * @param {text} fqfn - fully qualified field name, e.g. TABLE::FIELD
+ * @param {text} newFilename - new filename to rename to
+ *
+ * @returnSuccess {binary} binary file with new filename
+ * 
+ * @module Container
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+ 
+Let ([
+
+	// abstract parameters
+	~fqfn = fqfn ;
+	~newFilename = newFilename;
+
+~=""];
+
+Base64Decode ( Base64Encode ( ~fqfn ) ; ~newFilename )
+
+)

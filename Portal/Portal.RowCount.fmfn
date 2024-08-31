@@ -1,0 +1,41 @@
+/**
+ * 
+ * Return the number of portal rows in a portal object. 
+ *
+ * @param {text} fqfn_id - fully qualified field name of the portal (child) table's primary key id (or a field that will be non-null for every record), e.g. myTable::id
+ *
+ * @note the fqfn_id parameter input value does not need to be wrapped in quotes or GetFieldName. Just the direct relationship and field reference.
+ * @note This is useful because FileMaker does not give a function to accomplish this, and using a ValueCount() of the relationship does not account for filtered/hidden portal rows.
+ *
+ * @returnSuccess {number} count of the number of portal rows in the given portal
+ * 
+ * @module Portal
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While (
+	// INIT
+	[
+		~fqfn_id = fqfn_id ;
+		~maxIterations = 10000 ;
+		~value = "" ;
+		~i = 0 ;
+	~=""];
+
+	// CONDITION
+		~i = 0  or ( ~value ≠ "?" and ~i ≤ ~maxIterations );
+
+	// LOGIC
+	[
+		~i = ~i + 1;
+		~value = GetNthRecord ( ~fqfn_id ; ~i );
+	~=""];
+
+	// RESULT
+	~i - 1
+
+	)

@@ -1,0 +1,45 @@
+/**
+ *
+ * Return the primary valid data type, (e.g. 0 or 1 would be valid for both "number" and "boolean", but this function will return only "number")
+ *
+ * @param {string} data = data to evaluate for type
+ * 
+ * @returns {string} primary valid data type
+ *
+ * @version 1.1.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// Abstract the parameter
+	~value = value ;
+
+	~baseDataType = Case ( 
+
+				// JSON object types
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "{" ; "object" ;
+				Left ( JSONFormatElements ( ~value ) ; 1 ) ≠ "?" and Left ( ~value ; 1 ) = "[" ; "array" ;
+
+				// timestamp
+				GetAsText ( GetAsTimestamp ( ~value ) ) = ~value ; "timestamp" ;
+
+				// date
+				GetAsText ( GetAsDate ( ~value ) ) = ~value ; "date" ;
+
+				// time
+				GetAsText ( GetAsTime ( ~value ) ) = ~value ; "time" ;
+				GetAsTime ( ~value ) = ~value ; "number" ; // note: using GetAsTime on a number will equal the number, but not if the same value is set as text
+
+				// text
+				GetAsText ( ~value ) = ~value ; "text" ;
+
+				);
+
+~=""];
+
+~basedataType
+
+)

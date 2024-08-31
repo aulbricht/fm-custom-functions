@@ -1,6 +1,6 @@
 /**
  * 
- * Assign a value to a dynamic variable name
+ * Format a given number as a phone number
  * 
  * @param {string} phoneNumber
  * 
@@ -10,7 +10,7 @@
  * 
  * @module Text
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  * 
  **/
@@ -21,7 +21,7 @@ Let ([
 	~phone = phoneNumber ;
 
 	// filter invalid characters 
-	~phoneFiltered = Filter ( ~phone ;"0123456789+x"); 
+	~phoneFiltered = Filter ( ~phone ; "0123456789+x" ); 
 
 	~phoneAsNumber = Abs ( GetAsNumber ( ~phone ) );
 	~digitCount = Length ( ~phoneAsNumber );
@@ -33,8 +33,8 @@ Let ([
 	~lengthAreaCode = Min ( 3 ; ~digitCount - ~lengthLineNumber - ~lengthPrefix );
 
 	// determine what features the phone number contains
-	~hasExt = Max ( PatternCount ( ~phone ; "ext" ); PatternCount ( ~phone ; "x" ) ) > 0 ;
-	~hasCountryCode = Let ( ~left = Left ( ~phoneFiltered ; 1 ); ~left = "+" or ~left = "0" or ~left = "1" );
+	~hasExt = Max ( PatternCount ( ~phone ; "ext" ) ; PatternCount ( ~phone ; "x" ) ) > 0 ;
+	~hasCountryCode = Let ( ~left = Left ( ~phoneFiltered ; 1 ) ; ~left = "+" or ~left = "0" or ~left = "1" );
 
 	~format = Case (
 

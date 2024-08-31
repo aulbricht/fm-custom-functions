@@ -1,0 +1,26 @@
+/**
+ *
+ * Determines whether the JSON object is an array
+ *
+ * @param {text} json - JSON object or array
+ *
+ * @returnSuccess {boolean} returns True if the JSON is valid
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~json = json;
+	~validate = JSONFormatElements ( ~json );
+
+~=""];
+
+Left ( ~validate; 1 ) = "["
+
+)

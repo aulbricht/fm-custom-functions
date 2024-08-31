@@ -1,0 +1,32 @@
+/**
+ *
+ * Return a text version of the given number, formatted with leading and trailing "0" digits, e.g. 0.123 instead of .123
+ *
+ * @param {number} floatingPointNumber - initial number (e.g. 11.2358)
+ * @param {number} forceMinNumDigits - minimum digits in the number, adding 0's to the beginning and end to account for additional digits
+ *
+ * @returnSuccess {text}
+ * 
+ * @module Number (Num)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~number = GetAsNumber ( floatingPointNumber );
+	~forceMinNumDigits = forceMinNumDigits ;
+	~forceMinNumDigits = ~forceMinNumDigits + 1 ; // account for the decimal point (not a digit)
+
+	~length = Max ( Length ( ~number ) + If ( ~number < 1 ; 1 ); ~forceMinNumDigits );
+	~number = Right ( If ( ~number < 1 ; "0" ) & ~number ; ~length );
+	~number = Left ( ~number & "0000000000" ; Max ( Length ( ~number ) ; ~forceMinNumDigits ) );
+
+~=""];
+
+~number
+
+)

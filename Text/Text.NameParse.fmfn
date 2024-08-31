@@ -1,0 +1,73 @@
+/**
+ * 
+ * Parse a full name string into its component parts, e.g. first, middle, last
+ * 
+ * @param {string} fullName
+ * 
+ * @return {object} JSON object with each name component: prefix, first, middle, last, suffix
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+Let ([
+
+	~name = Trim ( fullName );
+
+	// convert the full name into a value list
+	~nameParts = Substitute ( ~name ; "." ; "" ) ;
+	~names_list = Substitute ( ~nameParts ; " " ; ¶ ) ;
+	~wordCount = ValueCount ( ~names_list ) ;
+
+	// identify prefix
+	~prefixList = "mr¶ms¶mrs¶dr¶prof¶rev¶hon" ;
+	~prefixCandidate = LeftValues ( ~names_list ; 1 );
+	~does_prefixExist = ValueCount ( FilterValues ( ~prefixList ; Lower ( ~prefixCandidate ) ) ) > 0 ;
+	~prefix = If ( ~does_prefixExist ; ~prefixCandidate );
+
+	// identify suffix
+	~suffixList = "jr¶sr¶ii¶iii¶iv¶v¶phd¶md¶dds¶esq" ;
+	~suffixCandidate = RightValues ( ~names_list ; 1 );
+	~does_suffixExist = ValueCount ( FilterValues ( ~suffixList ; Lower ( ~suffixCandidate ) ) ) > 0 ;
+	~suffix = If ( ~does_suffixExist ; ~suffixCandidate );
+
+	// update value list by removing prefix and suffix
+	~names_list = If ( ~does_prefixExist ; MiddleValues ( ~names_list ; 2 ; ~wordCount - 1 ) ; ~names_list ) ;
+	~names_list = If ( ~does_suffixExist ; LeftValues ( ~names_list ; ValueCount ( ~names_list ) - 1 ) ; ~names_list ) ;
+	~wordCount = ValueCount ( ~names_list ) ;
+
+	// identify first, middle, and last names
+	// note: the logic here is:
+	//	1 value = first name only
+	//	2 values = first & last names
+	//	3 values = first, middle, & last names
+	//	4+ values = the additional values are concatenated to the first name
+	~last = If ( ~wordCount > 1 ; GetValue ( ~names_list ; ~wordCount ) ; "" );
+	~middle = If ( ~wordCount ≥ 3 ; MiddleValues ( ~names_list ; ~wordCount - 1 ; 1 ) ; "" );
+	~first = 
+		Case ( 
+			~wordCount = 1 ; ~wordCount ;
+			~wordCount = 2 or ~wordCount = 3 ; GetValue ( ~names_list ; 1 );
+			LeftValues ( ~names_list ; ~wordCount - 2 ) 
+			);
+
+~=""];
+
+JSONSetElement ( "{}" ; 
+	[ "prefix" ; Substitute ( ~prefix ; "¶" ; "" ) ; JSONString ];
+	[ "first" ; 
+		TrimAll ( 
+			Substitute ( ~first ; "¶" ; " " ); 
+			True ; 
+			2 ); 
+		JSONString 
+		];
+	[ "middle" ; Substitute ( ~middle ; "¶" ; "" ) ; JSONString ];
+	[ "last" ; Substitute ( ~last ; "¶" ; "" ) ; JSONString ];
+	[ "suffix" ; Substitute ( ~suffix ; "¶" ; "" ) ; JSONString ]
+	)
+
+)

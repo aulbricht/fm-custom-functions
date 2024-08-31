@@ -1,0 +1,37 @@
+/**
+ *
+ * Find the position of a specified (whole) value in a value list
+ *
+ * @param {text} valueList - value list (¶ delimited) to search
+ * @param {text} searchString - search sub-string
+ *
+ * @returnSuccess {number} integer representing the given value's position in the value list, e.g. 3 == third position
+ * 
+ * @module ValueList
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~list = valueList ;
+	~search = searchString ; 
+	~LIST_valuesPriorToSearchValue = 
+		LeftValues ( 
+			~list ; 
+			ValueCount ( 
+				Left ( 
+					~list ; 
+					Position ( ~list ; ~search ; 1 ; 1 ) 
+					) 
+				) 
+			);
+
+~=""];
+
+ValueCount ( ~LIST_valuesPriorToSearchValue )
+
+)

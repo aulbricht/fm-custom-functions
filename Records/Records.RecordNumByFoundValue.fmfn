@@ -1,0 +1,43 @@
+/**
+ * 
+ * Return the record number (position) in the current found set for a given field and value
+ *
+ * @param {text} fqfn - fully qualified field name of the field to search values in, e.g. "tableName::id"
+ * @param {text} findValue - value to search for in the given fqfn field
+ *
+ * @returnSuccess {number} record number of the first record with the matching value, or 0 if not found
+ * 
+ * @module Record
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While (
+	// INIT
+	[
+		~fqfn = fqfn ;
+		~targetValue = findValue ;
+		~value = "" ;
+		~numRecords = Get ( FoundCount );
+		~i = 0
+	];
+
+	// CONDITION
+		~value ≠ ~targetValue and ~i ≤ ~numRecords ;
+
+	// LOGIC
+	[
+		~i = ~i + 1;
+		~value = GetNthRecord ( ~fqfn ; ~i )
+	];
+
+	// RESULT
+	Case (
+		~i = ~numRecords + 1 ; 0 ;
+		~i
+		)
+
+	)

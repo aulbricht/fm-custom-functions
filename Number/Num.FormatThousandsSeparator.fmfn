@@ -1,0 +1,49 @@
+/**
+ *
+ * Return a text version of the given number, formatted with commas for thousands separators
+ *
+ * @param {number} anyNumber - initial number (e.g. -11235.80)
+ *
+ * @returnSuccess {text} (e.g. -11,235.80, and yes it will retain the formatted 0 at the end of the decimal as given)
+ * 
+ * @module Number (Num)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ([
+
+		~number = anyNumber ;
+		~is_negative = GetAsNumber ( ~number ) < 0 ;
+		~integerPart = Abs ( Int ( GetAsNumber ( ~number ) ) );
+		~decimalPart = 
+			Let ( ~pos_decimal = Position ( ~number ; "." ; 1 ; 1 );
+				If ( ~number ≠ ~integerPart and ~pos_decimal > 0 ; 
+					Middle ( ~number ; ~pos_decimal ; Length ( ~number ) - ~pos_decimal + 1 )
+				)
+			);
+		~length = Length ( ~integerPart );
+		~result = "";
+		~i = 0 ;
+
+	~=""];
+	
+	~i < ~length ;
+	
+	[
+
+		~digit = Middle ( ~integerPart ; ~length - ~i ; 1 );
+		~is_commaSpot = Mod ( ~i + 1 ; 3 ) = 0 and ~i ≠ ~length - 1 ;
+		~segment = If ( ~is_commaSpot ; "," ) & ~digit ;
+		~result = ~segment & ~result ;
+
+		~i = ~i + 1 ;
+
+	~=""];
+
+	If ( ~is_negative ; "-" ) & ~result & ~decimalPart
+
+	)

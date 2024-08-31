@@ -1,0 +1,14 @@
+/**
+ *
+ * Determine if the client is Windows 
+ *
+ * @returnSuccess {boolean} True if the platform is Windows, False if not.
+ * 
+ * @module System (Sys)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Get ( SystemPlatform ) = -2

@@ -1,0 +1,58 @@
+/**
+ *
+ * Return a sorted value list of numbers as a text string of number ranges, e.g. "1¶2¶4¶6¶7¶8¶10" == "1-2, 4, 6-8, 10"
+ *
+ * @param {text} LIST_numbers - ordered value list of numbers
+ *
+ * @returnSuccess {text} number range string
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+	[ 
+		~LIST_numbers = LIST_numbers ;
+		~numItems = ValueCount ( ~LIST_numbers );
+		~current = GetAsNumber ( GetValue ( ~LIST_numbers ; 1 ) );
+		~previous = GetValue ( ~LIST_numbers ; 1 ); // initialize ~previous to the first value to handle the sequence from the beginning
+		~rangeStart = GetValue ( ~LIST_numbers ; 1 ); // start ~rangeStart from the first value as well
+		~result = "";
+		~i = 2; // start from the second item because we've already initialized the first
+	~=""]; 
+
+	~i ≤ ~numItems; 
+
+	[ 		
+
+		~current = GetAsNumber ( GetValue ( ~LIST_numbers ; ~i ) );	
+		~next = 
+			If ( ~i < ~numItems ; 
+				GetAsNumber ( GetValue ( ~LIST_numbers ; ~i + 1 ) );
+				"" 
+				);
+		~result = 
+			If ( ~rangeStart and ~current ≠ ~previous + 1 ;
+				~result & If ( ~rangeStart ≠ ~previous ; ~rangeStart & "-" & ~previous ; ~previous ) & ", ";
+				~result
+				);
+		~rangeStart = 
+			If ( ~current ≠ ~previous + 1 ; 
+				~current ; 
+				~rangeStart 
+				);
+		~previous = ~current;
+		~i = ~i + 1;
+
+	~=""]; 
+
+	If ( ~rangeStart ; 
+		~result & If ( ~rangeStart ≠ ~previous ; ~rangeStart & "-" & ~previous ; ~previous ) ; 
+		~result 
+		)
+
+)

@@ -1,8 +1,8 @@
 /**
  * 
- * Convert milliseconds to hour, minutes, and seconds (summed)
+ * Convert milliseconds hour, minutes, and seconds (summed)
  * 
- * @param {number} numMilliseconds - total number of milliseconds
+ * @param {number} UTCinMilliseconds - current UTC time in milliseconds
  * 
  * @return {text} valuelist of hours, minutes, and seconds, respectively
  * 
@@ -17,7 +17,7 @@
 Let ([
 
     ///////////////////////////////////////
-    ~ms = numMilliseconds ;
+    ~ms = UTCinMilliseconds ;
     ///////////////////////////////////////
 
 

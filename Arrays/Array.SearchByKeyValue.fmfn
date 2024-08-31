@@ -1,0 +1,53 @@
+/**
+ *
+ * Return the value of a specified key for the cell where the first instance of a given key and value pair are found to match.
+ *
+ * @param {array} array
+ * @param {text} searchKey
+ * @param {text} searchValue
+ * @param {text} returnKey
+ *
+ * @returnSuccess {text} value paired to the specified returnKey for the found array cell
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~array = array ;
+		~searchKey = searchKey ;
+		~searchValue = searchValue ;
+		~returnKey = returnKey ;
+
+		~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
+		~i = 1 ;
+		~thisValue = "" ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~thisValue ≠ ~searchValue and ~i ≤ ~numCells ; 
+
+	//// logic ////////////////
+	[ 
+
+		~keybase = "[" & ~i - 1 & "]." ;
+		~thisValue = JSONGetElement ( ~array ; ~keybase & ~searchKey );
+		~returnValue = If ( ~thisValue = ~searchValue ; JSONGetElement ( ~array ; ~keybase & ~returnKey ) );
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~returnValue
+
+	)

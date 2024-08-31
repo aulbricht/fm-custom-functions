@@ -1,0 +1,40 @@
+/**
+ *
+ * Map the script name to id for a given script name or id
+ *
+ * @param {text} scriptNameOrID - the FileMaker system ID of a script OR name of a script
+ * 
+ * @returns {text} the mapped opposite (e.g. for a given name, return the matching system ID)
+ *
+ * @module Script
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	~scriptNameOrID = scriptNameOrID ;
+
+	~scriptIds_list = ScriptIDs ( $ );
+	~scriptNames_list = ScriptNames ( $ );
+
+	~is_searchById = ValueList.ValueExistsInList ( ~scriptIds_list ; ~scriptNameOrID );
+	~is_searchByName = ValueList.ValueExistsInList ( ~scriptNames_list ; ~scriptNameOrID );
+
+	~valuePosition = Case (
+		~is_searchById ; ValueList.ValuePosition ( ~scriptIds_list ; ~scriptNameOrID );
+		~is_searchByName ; ValueList.ValuePosition ( ~scriptNames_list ; ~scriptNameOrID )
+		);
+
+	~result = Case (
+		~is_searchById ; GetValue ( ~scriptNames_list ; ~valuePosition );
+		~is_searchByName ; GetValue ( ~scriptIds_list ; ~valuePosition )
+		);
+
+~=""];
+
+~result
+
+)

@@ -1,0 +1,38 @@
+/**
+ *
+ * "Sanitize" a variable, like trimming flanking spaces and carriage returns
+ *
+ * @param {text} value 
+ * @param {text} convertToCase - "upper" or "lower", DEFAULT: null (ignore)
+ * @param {text} ignoreChars - supplemental allowed characters, such as "{}"
+ *
+ * @returnSuccess {text} sanitized text
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+	~value = value ;
+	~convertToCase = convertToCase ;
+	~ignoreChars = ignoreChars ;
+
+	~value = Filter ( ~value ; "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ _-~.[]$" & ~ignoreChars );
+	~value = TrimAll ( ~value ; True ; 2 );
+	~value = 
+		Substitute ( ~value ; 
+			[ "¶" ; "" ]
+			);
+~=""];
+
+Case ( 
+	~convertToCase = "lower" ; Lower ( ~value );
+	~convertToCase = "upper" ; Upper ( ~value );
+	~value
+	)
+
+)

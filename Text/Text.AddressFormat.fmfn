@@ -1,0 +1,48 @@
+/**
+ * 
+ * Format given fields as an address
+ * 
+ * @param {text} street_1
+ * @param {text} street_2
+ * @param {text} city
+ * @param {text} state
+ * @param {text} zip
+ * 
+ * @return {text} formatted address
+ * 
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+	~street_1 = street_1 ;
+	~street_2 = street_2 ;
+	~city = city ;
+	~state = state ;
+	~zip = zip ;
+
+	~csz = Substitute ( 
+		List (
+			~city ;
+			Case ( ~city ≠ "" and ( ~state ≠ "" or ~zip ≠ "" ) ; ", " );
+			~state ;
+			Case ( ~state ≠ "" and ~zip ≠ "" ; " " );
+			~zip
+			); 
+		[ "¶" ; "" ]
+		);
+
+~=""];
+
+List (
+	~street_1 ;
+	~street_2 ;
+	~csz
+	)
+
+)

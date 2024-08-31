@@ -1,0 +1,46 @@
+/**
+ *
+ * Given a list of tags, unwrap/strip them of their mustache notation and return just the raw tag text
+ *
+ * @param {text} listTags 
+ *
+ * @returnSuccess {text} sanitized text
+ * 
+ * @module Mustache
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+	//// initial variables ////
+	[ 
+
+		~listTags = listTags ;
+		~numTags = ValueCount ( ~listTags );
+		~i = 0 ;
+		~result_list = "" ;
+
+	~=""]; 
+
+	//// "while this is true" loop condition /////
+	~i < ~numTags ; 
+
+	//// logic ////////////////
+	[ 
+		
+		~i = ~i + 1 ;
+		~tag = GetValue ( ~listTags ; ~i );
+		~tag_stripped = Substitute ( ~tag ;
+			[ "{{" ; "" ];
+			[ "}}" ; "" ]
+			);
+		~result_list = List ( ~result_list ; ~tag_stripped );
+
+	~=""]; 
+
+	//// result ///////////////
+	~result_list
+)
