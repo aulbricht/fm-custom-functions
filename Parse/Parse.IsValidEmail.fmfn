@@ -1,6 +1,6 @@
 /**
  * 
- * Determine if the given email address is in a valid format
+ * Determine if the given eamil address is in a valid format
  * 
  * @param {text} email
  * 
@@ -45,13 +45,8 @@ Let ([
 		            	+ PatternCount ( email ; "$" );
 		        	~=""];
 			        If ( ~invalidChars > 0 ; False ; True ) // If all checks pass, the email is valid
-
 			    	) // end Let
-
 			    ) // end If
-
 			) // end Let
-
 		) //end If
-	
 	) //end Let
