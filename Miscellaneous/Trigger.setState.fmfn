@@ -2,9 +2,9 @@
  *
  * Globally turns triggers on or off
  *
- * @param {string} state = "on" or "off"
+ * @param {string} state = "on" or "off", also accept True or False where True is on and False is Off
  * 
- * @version 1.0.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -15,7 +15,15 @@ Let ([
 	// abstract the parameter
 	~state = state ;
 
-	$$TRIGGERS.state = ~state
+	~state = 
+		Case (
+			IsEmpty ( ~state ) ; "on" ;
+			~state = "on" or ~state = True ; "on" ;
+			~state = "off" or ~state = False ; "off" ;
+			"on"
+			);			
+
+	$$TRIGGERS.state = ~state ;
 
 ~=""];
 
