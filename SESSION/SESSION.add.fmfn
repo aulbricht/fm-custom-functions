@@ -13,7 +13,7 @@
  * @module SESSION
  * @requires {constant} cVar.SESSION
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -29,7 +29,10 @@ Let ([
 	~sessionVar = "$$" & Filter ( ~sessionVarName ; "01234556789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_." );
 
 	// get the current SESSION object
-	~JSON_session = Evaluate ( ~sessionVar );
+	~JSON_session = 
+		Let ( ~session = Evaluate ( ~sessionVar );
+			If (  JSON.IsValid ( ~session ) ; ~session ; "{}" )
+			);
 
 		// attempt to execute the assertion
 	~assertion = 
@@ -66,4 +69,3 @@ Case (
 	) // END Case
 
 ) // END Let
-
