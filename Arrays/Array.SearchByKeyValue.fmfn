@@ -5,13 +5,13 @@
  * @param {array} array
  * @param {text} searchKey
  * @param {text} searchValue
- * @param {text} returnKey
+ * @param {text} returnKey - note: if value is null, return the array cell ordinal instead (0-n)
  *
  * @returnSuccess {text} value paired to the specified returnKey for the found array cell
  *
  * @module ARRAY
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -41,7 +41,11 @@ While (
 
 		~keybase = "[" & ~i - 1 & "]." ;
 		~thisValue = JSONGetElement ( ~array ; ~keybase & ~searchKey );
-		~returnValue = If ( ~thisValue = ~searchValue ; JSONGetElement ( ~array ; ~keybase & ~returnKey ) );
+		~returnValue = If ( ~thisValue = ~searchValue ; 
+			Case ( 
+				isempty ( ~returnKey ) ; ~i - 1 ;
+				JSONGetElement ( ~array ; ~keybase & ~returnKey ) )
+				);
 
 		~i = ~i + 1 ;
 
