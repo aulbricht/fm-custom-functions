@@ -1,0 +1,25 @@
+
+/**
+ *
+ * Return a simple checksum hash for a given text string
+ *
+ * @param {text} string - text string to provide a hash for
+ *
+ * @returnSuccess {text} base64 encoded binary hash
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// abstract parameters
+	~str = string ;
+
+~=""];
+
+Base64EncodeRFC ( 4648 ; CryptDigest ( ~str ; "" ) )
+
+)

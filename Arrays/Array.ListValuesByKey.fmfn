@@ -1,0 +1,58 @@
+
+/**
+ *
+ * Return a list of values for a specified key from all non-empty cells in the array.
+ *
+ * @param {array} array
+ * @param {text} searchKey
+ *
+ * @returnSuccess {text} value list
+ *
+ * @module ARRAY
+ * 
+ * @version 1.1.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~array = array ;
+		~key = key ;
+
+		~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
+		~i = 1 ;
+		~thisValue = "" ;
+		~list = "" ;
+
+		// make sure this is a valid array
+		~array = If ( Left ( JSONFormatElements ( ~array ) ; 1 ) = "?" ; "[]" ; ~array );
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~numCells ; 
+
+	//// logic ////////////////
+	[ 
+
+		~keybase = "[" & ~i - 1 & "]." ;
+		~thisValue = JSONGetElement ( ~array ; ~keybase & ~key );
+		~list = If ( not IsEmpty ( ~thisValue ) ;
+			List ( ~list ; ~thisValue );
+			~list
+			);
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+
+	~list
+
+	)

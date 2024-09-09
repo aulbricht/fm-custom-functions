@@ -1,0 +1,31 @@
+/**
+ * 
+ * Determine if the given layout object is represented as a repeating field
+ *
+ * @param {text} objectName - name of the object to test; if null, use the active field object name (note: if the active field has a null object name, then this will not work)
+ *
+ * @returnSuccess {boolean} True if the field has multiple repetitions on this layout
+ * 
+ * @module Table
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// abstract parameters
+	~objectName = objectName ;
+
+	~objectName = If ( not IsEmpty ( ~objectName ) ; ~objectName ; Get ( ActiveLayoutObjectName ) );
+	~fqfn = GetLayoutObjectAttribute ( ~objectName ; "source" ) ;
+
+~=""];
+
+GetAsNumber ( 
+	FieldRepetitions ( Get ( FileName ) ; Get ( LayoutName ) ; ~fqfn )
+	) > 1
+
+)
