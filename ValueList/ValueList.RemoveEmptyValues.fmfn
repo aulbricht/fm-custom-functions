@@ -8,8 +8,9 @@
  * 
  * @module ValueList
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
+ * @website http://northcoastsoftware.com
  *
  */
 
@@ -19,13 +20,13 @@ Let([
 	~list = ValueList ;
 
 	// check first value, and remove if it's empty
-	~list = If ( Left ( ~list ; 1 ) = "¶"; 
+	~list = If ( not IsEmpty (~list ) and Left ( ~list ; 1 ) = "¶"; 
 				Right ( ~list ; Length ( ~list ) - 1 );
 				~list 
 				);
 
 	// check last value, and remove if it's empty
-	~list = If ( Right ( ~list ; 1 ) = "¶"; 
+	~list = If ( not IsEmpty (~list ) and Right ( ~list ; 1 ) = "¶"; 
 				Left ( ~list ; Length ( ~list ) - 1 );
 				~list 
 				);
@@ -36,15 +37,19 @@ Let([
 
 ];
 
-Case ( ~isEmptyValueInList ;
+Case ( 
 
-	// RECURSION
-	ValueList.RemoveEmptyValues ( 
+	IsEmpty (~list ) ; "" ;
 
-		// remove any empties in the middle of the list with substitute
-  		Substitute ( ~list ; "¶¶" ; "¶" )
+	~isEmptyValueInList ;
 
-  		);
+		// RECURSION
+		ValueList.RemoveEmptyValues ( 
+
+			// remove any empties in the middle of the list with substitute
+  			Substitute ( ~list ; "¶¶" ; "¶" )
+
+  			);
 
  	~list
 
