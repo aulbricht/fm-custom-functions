@@ -1,0 +1,36 @@
+/**
+ *
+ * Return the given string in quotation marks, escaping any existing quotation characters.
+ *
+ * @param {text} string
+ *
+ * @returnSuccess {text} string in quotation marks
+ *
+ * @note this is different from using the "Quote ()" FMP function because we don't want to escape special characters in the text string *except* existing quotation marks.
+ * @note: if given string is null, return null rather than empty quotes.
+ *
+ * @module Text
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~string = string ;
+
+	// escape any existing quotation marks
+	~string = Substitute ( ~string ; "\"" ; "\\\"" );
+
+~=""];
+
+// if the string is null, do not return empty quotes
+Case (
+	not IsEmpty ( ~string ) ;
+		"\"" & ~string & "\"" ;
+	""
+	)
+
+)

@@ -1,0 +1,28 @@
+/**
+ *
+ * Determines whether the JSON array is valid
+ *
+ * @param {text} json - JSON array
+ *
+ * @returnSuccess {boolean} returns True if the JSON is a valid array
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~array = array ;
+	
+	~validate = JSONFormatElements ( ~array );
+	~leftChar = Left ( ~validate; 1 );
+
+~=""];
+
+~leftChar ≠ "?" and ~leftChar = "["
+
+)

@@ -1,0 +1,61 @@
+/**
+ *
+ * For a given repeating field, return all values in the desired format
+ *
+ * @param {text} fqfn - fully qualified field name of the repeating field
+ * @param {number} max_repetitions - fully qualified field name of the repeating field
+ * @param {text} return_format - format the result as: "array" (default), "list"
+ *  
+ * @returnSuccess {text} all non-null values in the field in the specified format
+ * 
+ * @note warning: if returned as a value list, if the values therein contain carriage returns, it will appear to be additional field repetition values
+ * 
+ * @module Field
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		// abstract parameters
+		~fqfn = fqfn ;
+		~max_repetitions = max_repetitions ;
+		~format = return_format ;
+
+		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+		~result = "" ;
+		~i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~i ≤ ~max_repetitions ; 
+
+	//// logic ////////////////
+	[ 
+
+		~repCell = "[" & ~i & "]" ;
+		~isValid_value = IsValid ( GetField ( ~fqfn & ~repCell ) );
+		~value = If ( ~isValid_value ; GetField ( ~fqfn & ~repCell ) );
+		~result = If ( not IsEmpty ( ~value );
+			Case ( 
+				~format = "list" ; List ( ~result ; ~value );
+				JSONSetElement ( ~result ; Array.Keybase ( ~i ) ; ~value ; JSONString )
+				);
+			~result
+			);
+
+		~i = ~i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~result
+
+	)

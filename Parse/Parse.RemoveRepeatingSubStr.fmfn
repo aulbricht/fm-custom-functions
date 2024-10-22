@@ -1,0 +1,48 @@
+/**
+ *
+ * Removes sub-string repetitions from the given string, leaving only single instances of that sub-string
+ *
+ * @param {text} string - full text string
+ * @param {text} repeatingSubStr - substring for which there should be no repetitions
+ *
+ * @returnSuccess {text} return updated string
+ * 
+ * @module File
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While (
+
+	// INIT
+	[
+
+		// abstract params
+		~string = string ;	
+		~repeatingSubStr = repeatingSubStr;
+		 ~repeatedSubStr = ~repeatingSubStr & ~repeatingSubStr ;
+
+		// init vars
+		~i = 0 ;
+
+	~=""];
+
+	// CONDITION
+		PatternCount ( ~string ; ~repeatedSubStr ) > 0 ;
+
+		
+	// LOGIC
+	[
+
+		~string = Substitute ( ~string ; ~repeatedSubStr ; ~repeatingSubStr );
+		~i = ~i + 1;
+
+	~=""];
+
+	// RESULT
+
+	~string
+
+	)
