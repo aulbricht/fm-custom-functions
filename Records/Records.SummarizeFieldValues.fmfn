@@ -1,0 +1,45 @@
+/**
+ * 
+ * Return a value list of values for a given field for the current found set
+ *
+ * @param {text} fqfn - fully qualified field name of the field to search values in, e.g. "tableName::id"
+ *
+ * @returnSuccess {text} value list of non-null field values
+ * 
+ * @module Record
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While (
+	// INIT
+	[
+		~fqfn = fqfn ;
+
+		~list = "" ;
+		~numRecords = Get ( FoundCount );
+		~i = 0
+	];
+
+	// CONDITION
+		~i < ~numRecords ;
+
+	// LOGIC
+	[
+
+		~i = ~i + 1;
+		~value = GetNthRecord ( ~fqfn ; ~i );
+		~list = Case (
+			not IsEmpty ( ~value ) ; List ( ~list ; ~value );
+			~list
+			);
+
+	~=""];
+
+	// RESULT
+	~list
+
+	)
