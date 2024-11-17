@@ -8,7 +8,7 @@
  * 
  * @module Record
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -17,7 +17,12 @@
 While (
 	// INIT
 	[
-		~fqfn = fqfn ;
+
+		// abstract parameter
+		~fqfn = GetFieldName ( fqfn );
+
+		// validate format of parameter data
+		~fqfn = If ( GetFieldName ( ~fqfn ) = "?" ; ~fqfn ; GetFieldName ( ~fqfn ) );
 
 		~list = "" ;
 		~numRecords = Get ( FoundCount );

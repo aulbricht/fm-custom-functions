@@ -9,7 +9,7 @@
  * 
  * @module Record
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -18,12 +18,18 @@
 While (
 	// INIT
 	[
+
+		// abstract parameters
 		~fqfn = fqfn ;
 		~targetValue = findValue ;
 		~value = "" ;
 		~numRecords = Get ( FoundCount );
-		~i = 0
-	];
+		~i = 0 ;
+
+		// validate format of parameter data
+		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
+	~=""];
 
 	// CONDITION
 		~value ≠ ~targetValue and ~i ≤ ~numRecords ;

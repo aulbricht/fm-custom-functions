@@ -9,7 +9,7 @@
  * 
  * @module Container
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -19,6 +19,9 @@ Let ([
 	// abstract parameters
 	~fqfn = fqfn ;
 	~newFilename = newFilename;
+
+	// validate format of parameter data
+	~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 ~=""];
 

@@ -12,7 +12,7 @@
  * 
  * @module Field
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -28,7 +28,9 @@ While (
 		~max_repetitions = max_repetitions ;
 		~format = return_format ;
 
+		// validate format of parameter data
 		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
 		~result = "" ;
 		~i = 1 ;
 		

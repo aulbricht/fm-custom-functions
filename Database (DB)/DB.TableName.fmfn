@@ -2,21 +2,30 @@
  *
  * Extract the table name from the fully qualified reference (e.g. "fieldA" from "table1::fieldA")
  *
- * @param {text} fieldRef - fully qualified field reference
+ * @param {text} fqfn - fully qualified field reference
  *
  * @returnSuccess {text} field name
  *
- * @version 1.0.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
+Let ([
+
+	// abstract parameter
+	~fqfn = fqfn ;
+
+	// validate format of parameter data
+	~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
+~=""];
 
 GetValue ( 
-	Substitute ( 
-		GetFieldName ( fieldRef ) ; 
-		"::" ; 
-		"¶"
+	Substitute ( ~fqfn ; 
+		[ "::" ; "¶" ]
 		);
 	1 
+	)
+
 )

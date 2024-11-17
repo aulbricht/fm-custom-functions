@@ -11,7 +11,7 @@
  * 
  * @module Portal
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -20,10 +20,16 @@
 While (
 	// INIT
 	[
+
+		// abstract parameters
 		~fqfn_id = fqfn_id ;
 		~maxIterations = 10000 ;
 		~value = "" ;
 		~i = 0 ;
+
+		// validate format of parameter data
+		~fqfn_id = If ( IsValid ( GetFieldName ( ~fqfn_id ) ) ; GetFieldName ( ~fqfn_id ) ; ~fqfn_id );
+
 	~=""];
 
 	// CONDITION
