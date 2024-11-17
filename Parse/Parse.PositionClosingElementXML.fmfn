@@ -1,0 +1,107 @@
+/**
+ *
+ * For a specified opening element, find the position of its closing partner, e.g. "<script>" and "</script>"
+ *
+ * @param {text} xml - full xml (or text, like html) string to search within
+ * @param {text} tag - e.g. for the tag <script>, this would be "script"
+ * @param {object} [optionsObject] - object containing options, defined below
+ * @param {number} [optionsObject.pos_start] - position to begin search from; DEFAULT = 1
+ * @param {number} [optionsObject.occurrence] - occurence of opening element pair to locate; DEFAULT = 1
+ * @param {boolean} [optionsObject.ignoreNesting] - if True, do not look at nested sets; DEFAULT = False
+ *
+ * @returnSuccess {number} position - position of the first character after the closing element
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		// abstract function parameters
+		~xml = xml ;
+		~tag = tag ;
+		~options = optionsObject ;
+
+		// get options and set to variables
+		~options = 
+			If ( 
+				IsEmpty ( ~options ) or Left ( JSONFormatElements ( ~options ) ; 1 ) = "?" ; 
+				"{}" ; 
+				~options 
+				);
+
+		~occurrence = Max ( JSONGetElement ( ~options ; "occurrence" ) ; 1 );
+		~ignoreNesting = GetAsBoolean ( JSONGetElement ( ~options ; "ignoreNesting" ) );
+
+		// constants
+		~openChars = "<" & ~tag ;
+		~closeChars = "</" & ~tag ;
+
+		// misc var values
+		~numTags = PatternCount ( ~xml ; ~openChars );
+		~pos_start_OC = Max ( 1 ; JSONGetElement ( ~options ; "pos_start" ) ; Position ( ~xml ; ~openChars ; 1 ; ~occurrence ) ); // position of the OPENING character for the opening tag
+		~pos_start_CC = Position ( ~xml ; ">" ; ~pos_start_OC + Length ( ~openChars ) ; 1 ); // position of the CLOSING character for the opening tag
+
+		// init vars
+		~num_openSets = 0 ;
+		~result_pos = 0 ;
+		~tag_previous = "" ;
+		~state_ignore = False ;
+		~state_inSet = False ;
+		~i = 0 ;
+
+
+		~=""]; 
+
+	//// loop condition ///////
+	~result_pos = 0 
+	and ~numTags > 0
+	and ~i < ~numTags ;
+
+	//// logic ////////////////
+	[ 
+
+		~i = ~i + 1 ;
+
+		// position of the close tag for the current tag instance
+		~pos_closeTag_OC = Position ( ~xml ; ~closeChars ; ~pos_start_CC ; ~i );
+		~pos_closeTag_CC = Position ( ~xml ; ">" ; ~pos_closeTag_OC + Length ( ~closeChars ) ; 1 );
+		~is_closeTagExists = ~pos_closeTag_CC > 0 ;
+
+		// find the position of the closing tag instance equal to the current value of ~i
+		~pos_nthClosingTag_OC = Position ( ~xml ; ~closeChars ; ~pos_start_CC ; ~i );
+		~pos_nthClosingTag_CC = Position ( ~xml ; ">" ; ~pos_nthClosingTag_OC + Length ( ~closeChars ) ; 1 );
+
+		// position of the next open tag for this tag type
+		~pos_nextOpenTag = Position ( ~xml ; ~openChars ; ~pos_start_CC ; ~i );
+		~is_nextOpenTagExists = ~pos_nextOpenTag > 0 ;
+
+		~is_nestedTagExists = ~is_nextOpenTagExists and ~is_closeTagExists and ( ~pos_nextOpenTag < ~pos_closeTag_CC );
+
+		~result_pos = 
+			Case ( 
+
+				// if ignoring nesting, then simply return the first close tag end position
+				~ignoreNesting ; ~pos_closeTag_CC ;
+
+				// if there is no more nesting, the closing tag will be the position of the "~i-th" closing tag from the current ~i open tag
+				not ~is_nestedTagExists ; ~pos_nthClosingTag_CC ;
+
+				// DEFAULT: keep the same value
+				~result_pos
+
+				);
+
+		~=""]; 
+
+	//// result ///////////////
+	Max ( 0 ; ~result_pos )
+
+	)

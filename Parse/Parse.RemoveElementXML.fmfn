@@ -1,0 +1,99 @@
+/**
+ *
+ * For a specified opening element, find the position of its closing partner, e.g. "<script>" and "</script>"
+ *
+ * @param {text} xml - full xml (or text, like html) string to process
+ * @param {text} tags_list - value list of tags to remove, e.g. for the tag <script>, this would be "script"
+ *
+ * @returnSuccess {text} updated xml/text
+ * 
+ * @module Parse
+ * 
+ * @requires {function} Parse.PositionClosingElementXML ()
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While (
+	//// initial variables ////
+	[
+
+		// abstract parameters
+		~xml = xml ;
+		~tags_list = tags_list ;
+
+		// initialize variables
+		~result = ~xml ;
+
+	~=""];
+
+	//// "while this is true" loop condition /////
+	ValueCount ( ~tags_list ) > 0 ;
+
+	//// logic ////////////////
+	[
+
+		~tag = GetValue ( ~tags_list ; 1 ) ;
+		~tagOpen = "<" & ~tag ;
+		~tagClose = "</" & ~tag ;
+		~is_tagExists = PatternCount ( ~result ; ~tagOpen ) > 0 ;
+		~numTagInstances = PatternCount ( ~xml ; ~tagOpen );
+
+		~result = Case (
+			not ~is_tagExists ; ~result ;
+			While (
+				//// initial variables ////
+				[
+					~i = 1 ;
+					~result_tagRemoved = ~result ;
+				~=""];
+
+				//// "while this is true" loop condition /////
+				~i ≤ ~numTagInstances ;
+
+				//// logic ////////////////
+				[
+					~pos_tagOpen_OC = Position ( ~result_tagRemoved ; ~tagOpen ; 1 ; 1 ) ;
+					~pos_tagOpen_CC = Position ( ~result_tagRemoved ; ">" ; ~pos_tagOpen_OC ; 1 ) ;
+					~pos_tagClose_CC = Let (
+						~pos = Parse.PositionClosingElementXML (
+							~result_tagRemoved ;
+							~tag ;
+							JSONSetElement ( "{}" ;
+								[ "pos_start" ; ~pos_tagOpen_OC ; JSONNumber ]
+							)
+						);
+						Case ( 
+							// handle tags that inherently don't have a closing tag, like <br>
+							~pos = 0 or ~pos < ~pos_tagOpen_OC ; ~pos_tagOpen_CC ;
+							~pos
+							)
+						);
+
+					~result_tagRemoved = If (
+						~pos_tagOpen_OC > 0 and ~pos_tagOpen_CC > 0 and ~pos_tagClose_CC > 0 ;
+							Left ( ~result_tagRemoved ; ~pos_tagOpen_OC - 1 ) 
+							& Right ( ~result_tagRemoved ; Length ( ~result_tagRemoved ) - ~pos_tagClose_CC );
+						~result_tagRemoved
+					);
+
+					~i = ~i + 1 ;
+				~=""];
+
+				//// result ///////////////
+				~result_tagRemoved
+			)
+		);
+
+		~tags_list = RightValues ( ~tags_list ; ValueCount ( ~tags_list ) - 1 );
+
+	~=""];
+
+	//// result ///////////////
+	~result
+
+)
+
