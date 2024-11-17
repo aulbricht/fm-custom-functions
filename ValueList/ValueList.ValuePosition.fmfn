@@ -9,7 +9,7 @@
  * 
  * @module ValueList
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -19,6 +19,7 @@ Let ([
 
 	~list = valueList ;
 	~search = searchString ; 
+
 	~LIST_valuesPriorToSearchValue = 
 		LeftValues ( 
 			~list ; 
@@ -32,6 +33,9 @@ Let ([
 
 ~=""];
 
-ValueCount ( ~LIST_valuesPriorToSearchValue )
+Case ( 
+	IsEmpty ( ~list ) or IsEmpty ( ~search ) ; "" ;
+	ValueCount ( ~LIST_valuesPriorToSearchValue )
+	)
 
 )
