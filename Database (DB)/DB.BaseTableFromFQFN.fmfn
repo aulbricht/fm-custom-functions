@@ -1,0 +1,38 @@
+/**
+ *
+ * Determine the base table name for the table occurence in a given fully qualified reference
+ *
+ * @param {text} fqfn - fully qualified field reference
+ *
+ * @returnSuccess {text} base table name
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	// abstract parameter
+	~fqfn = fqfn ;
+
+	// validate format of parameter data
+	~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
+	// Extract the Table Occurrence (TO) name from the FQFN
+	~toName = GetValue ( Substitute ( ~fqfn ; "::" ; "¶" ) ; 1 );
+
+	// Execute SQL to find the Base Table Name for the given TO
+	~baseTableName = ExecuteSQL (
+		"SELECT BaseTableName FROM FileMaker_Tables WHERE TableName = ?"; 
+		""; 
+		""; 
+		~toName
+	);
+
+~=""];
+
+~baseTableName
+
+)
