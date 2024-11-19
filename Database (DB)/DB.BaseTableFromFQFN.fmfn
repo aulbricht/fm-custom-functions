@@ -18,7 +18,8 @@ Let ([
 	~fqfn = fqfn ;
 
 	// validate format of parameter data
-	~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+	~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+	~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 	// Extract the Table Occurrence (TO) name from the FQFN
 	~toName = GetValue ( Substitute ( ~fqfn ; "::" ; "¶" ) ; 1 );

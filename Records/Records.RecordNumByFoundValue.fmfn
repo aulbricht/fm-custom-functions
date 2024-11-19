@@ -9,7 +9,7 @@
  * 
  * @module Record
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -27,7 +27,9 @@ While (
 		~i = 0 ;
 
 		// validate format of parameter data
-		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+		~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+		~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
 
 	~=""];
 
@@ -37,13 +39,14 @@ While (
 	// LOGIC
 	[
 		~i = ~i + 1;
-		~value = GetNthRecord ( ~fqfn ; ~i )
+		~value = GetNthRecord ( GetField ( ~fqfn ) ; ~i )
 	];
 
 	// RESULT
+
 	Case (
 		~i = ~numRecords + 1 ; 0 ;
 		~i
 		)
 
-	)
+)

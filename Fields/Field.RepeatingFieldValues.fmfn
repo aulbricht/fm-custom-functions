@@ -29,7 +29,8 @@ While (
 		~format = return_format ;
 
 		// validate format of parameter data
-		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+		~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+		~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 		~result = "" ;
 		~i = 1 ;

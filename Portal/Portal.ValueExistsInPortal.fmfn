@@ -31,7 +31,8 @@ While (
 		~i = 0 ;
 
 		// validate format of parameter data
-		~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+		~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+		~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 
 	~=""];
@@ -42,7 +43,7 @@ While (
 	// LOGIC
 	[
 		~i = ~i + 1;
-		~value = GetNthRecord ( ~fqfn ; ~i );
+		~value = GetNthRecord ( GetField ( ~fqfn ) ; ~i );
 		~valueMatch = ~value = ~targetValue ;
 	~=""];
 

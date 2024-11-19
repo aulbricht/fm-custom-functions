@@ -22,7 +22,8 @@ While (
 		~fqfn = GetFieldName ( fqfn );
 
 		// validate format of parameter data
-		~fqfn = If ( GetFieldName ( ~fqfn ) = "?" ; ~fqfn ; GetFieldName ( ~fqfn ) );
+		~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+		~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 		~list = "" ;
 		~numRecords = Get ( FoundCount );
@@ -36,7 +37,7 @@ While (
 	[
 
 		~i = ~i + 1;
-		~value = GetNthRecord ( ~fqfn ; ~i );
+		~value = GetNthRecord ( GetField ( ~fqfn ) ; ~i );
 		~list = Case (
 			not IsEmpty ( ~value ) ; List ( ~list ; ~value );
 			~list

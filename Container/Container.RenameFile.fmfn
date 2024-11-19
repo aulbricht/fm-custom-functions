@@ -21,10 +21,11 @@ Let ([
 	~newFilename = newFilename;
 
 	// validate format of parameter data
-	~fqfn = If ( IsValid ( GetFieldName ( ~fqfn ) ) ; GetFieldName ( ~fqfn ) ; ~fqfn );
+	~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+	~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 ~=""];
 
-Base64Decode ( Base64Encode ( ~fqfn ) ; ~newFilename )
+Base64Decode ( Base64Encode ( GetField ( ~fqfn ) ) ; ~newFilename )
 
 )

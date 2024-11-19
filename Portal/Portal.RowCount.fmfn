@@ -22,13 +22,14 @@ While (
 	[
 
 		// abstract parameters
-		~fqfn_id = fqfn_id ;
+		~fqfn = fqfn_id ;
 		~maxIterations = 10000 ;
 		~value = "" ;
 		~i = 0 ;
 
 		// validate format of parameter data
-		~fqfn_id = If ( IsValid ( GetFieldName ( ~fqfn_id ) ) ; GetFieldName ( ~fqfn_id ) ; ~fqfn_id );
+		~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+		~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
 
 	~=""];
 
@@ -38,7 +39,7 @@ While (
 	// LOGIC
 	[
 		~i = ~i + 1;
-		~value = GetNthRecord ( ~fqfn_id ; ~i );
+		~value = GetNthRecord ( GetField ( ~fqfn ) ; ~i );
 	~=""];
 
 	// RESULT
