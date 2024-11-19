@@ -16,11 +16,11 @@
 
 Let ([
 
-	~list = valueList;
-	~list = If ( Right ( ~list ; 1 ) = "¶"; Left ( ~list ; Length ( ~list ) - 1 ) ; ~list )
+	~list = valueList ;
+	~list = If ( Right ( ~list ; 1 ) = "¶"; Left ( ~list ; Length ( ~list ) - 1 ) ; ~list );
 
-];
+~=""];
 
-Substitute( ~list ; "¶" ; ", ") 
+Substitute ( ~list ; "¶" ; ", " ) 
 
 )
