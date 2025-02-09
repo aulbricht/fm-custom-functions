@@ -6,15 +6,12 @@
  *
  * @returnSuccess {object} returns unformatted JSON object
  * 
- * @returnError {array} error[n].code - error code
- * @returnError {array} error[n].descriptor - description of error
- * 
  * @module JSON
  * 
- * @version 1.0.2
+ * @version 1.0.3
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
 
-JSONDeleteElement ( json; Get( UUID) )
+JSONDeleteElement ( json ; Get( UUID) )

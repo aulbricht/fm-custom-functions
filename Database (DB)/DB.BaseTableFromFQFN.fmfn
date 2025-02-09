@@ -2,7 +2,7 @@
  *
  * Determine the base table name for the table occurence in a given fully qualified reference
  *
- * @param {text} fqfn - fully qualified field reference
+ * @param {text} fqfn - fully qualified field name reference
  *
  * @returnSuccess {text} base table name
  *
