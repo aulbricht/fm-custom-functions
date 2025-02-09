@@ -1,0 +1,33 @@
+/**
+ *
+ * Determines whether the JSON array is valid and has 1 or more cells of data
+ *
+ * @param {text} json - JSON array
+ *
+ * @returnSuccess {boolean} returns True if the JSON is a valid, populated array
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~array = array ;
+	
+	~validate = JSONFormatElements ( ~array );
+	~leftChar = Left ( ~validate; 1 );
+	~numCells = JSONListKeys ( ~array ; "." );
+
+~=""];
+
+// is valid
+~leftChar ≠ "?" and ~leftChar = "["
+
+// is populated
+and ~numCells > 0
+
+)

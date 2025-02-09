@@ -1,0 +1,32 @@
+/**
+ *
+ * Determines whether the JSON object is an object or an array
+ *
+ * @param {text} json - JSON object or array
+ *
+ * @returnSuccess {text} returns "object" , "array", or null (if invalid)
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~json = json;
+	
+	~json = JSONFormatElements ( ~json );
+	~firstChar = Left ( ~json ; 1 ) ;
+
+~=""];
+
+Case ( 
+	~firstChar = "[" ; "array" ;
+	~firstChar = "{" ; "object" ;
+	""
+	)
+
+)

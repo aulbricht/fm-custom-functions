@@ -1,0 +1,32 @@
+/**
+ *
+ * Return the most recent cell value in the array root
+ *
+ * @param {array} array
+ *
+ * @returnSuccess {text} last cell of the array
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	~array = array ;
+
+	~is_valid_array = Left ( JSONFormatElements ( ~array ) ; 1 ) = "[" ;
+	~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
+
+~=""];
+
+// RESULT
+Case ( 
+	~is_valid_array ; 
+		JSONGetElement ( ~array ; "[" & ~numCells - 1 & "]" );
+	""
+	)
+
+)

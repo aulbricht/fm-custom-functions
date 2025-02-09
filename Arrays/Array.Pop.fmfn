@@ -1,0 +1,32 @@
+/**
+ *
+ * Remove the last cell from the end of an array
+ *
+ * @param {array} array
+ *
+ * @returnSuccess {number} updated array, with the most recent cell removed from the array
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	~array = array ;
+
+	~is_valid_array = Left ( JSONFormatElements ( ~array ) ; 1 ) = "[" ;
+	~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
+
+~=""];
+
+// RESULT
+Case ( 
+	~is_valid_array ; 
+		JSONDeleteElement ( ~array ; "[" & ~numCells - 1 & "]" );
+	~array
+	)
+
+)

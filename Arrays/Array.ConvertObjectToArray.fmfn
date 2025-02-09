@@ -1,0 +1,65 @@
+/**
+ *
+ * Convert a JSON object to an array, where each element key and value become separate values in the corresponding array cell.
+ *
+ * @param {object} original_obj
+ * @param {text} key_forEach_objKey - the key to use for defining the object key in the new array
+ * @param {text} key_forEach_objValue - the key to use for defining the object value in the new array
+ *
+ * @returnSuccess {array} the object converted into an array
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~original_obj = original_obj ;
+		~key_key = key_forEach_objKey ;
+		~key_value = key_forEach_objValue ;
+
+		~keys_list = JSONListKeys ( ~original_obj ; "." );
+		~numCells = ValueCount ( ~keys_list );
+
+		~array = "[]" ;
+		~_i = 1 ;
+		~thisValue = "" ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~_i ≤ ~numCells ; 
+
+	//// logic ////////////////
+	[ 
+
+		~keybase = "[" & ~_i - 1 & "]." ;
+
+		// get the original_obj key
+		~this_key = GetValue ( ~keys_list ; ~_i );
+
+
+		// get the original_obj value
+		~this_value = JSONGetElement ( ~original_obj ; ~this_key );
+
+		~array = 
+			JSONSetElement ( ~array ;
+				[ ~keybase & ~key_key ; ~this_key ; JSONString ];
+				[ ~keybase & ~key_value ; ~this_value ; JSONString ]
+				);
+
+		~_i = ~_i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~array
+
+	)

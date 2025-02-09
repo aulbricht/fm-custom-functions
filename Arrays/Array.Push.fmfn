@@ -1,0 +1,38 @@
+/**
+ *
+ * Push a new cell to the end of an array
+ *
+ * @param {array} array
+ * @param {any} new_data
+ *
+ * @returnSuccess {number} updated array, with new data added to the end of the array
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+		~array = array ;
+		~new_data = new_data ;
+
+		~is_valid_array = Left ( JSONFormatElements ( ~array ) ; 1 ) = "[" ;
+		~array = If ( not ~is_valid_array ; "[]" ; ~array ); 
+
+		~newData_type = Case (
+			IsEmpty ( ~new_data ) ; JSONNull ;
+			Left ( JSONFormatElements ( ~new_data ) ; 1 ) = "[" ; JSONArray ;
+			Left ( JSONFormatElements ( ~new_data ) ; 1 ) = "{" ; JSONObject ;
+			GetAsBoolean ( ~new_data ) = ~new_data ; JSONBoolean ;
+			GetAsNumber ( ~new_data ) = ~new_data ; JSONNumber ;
+			JSONString
+			);
+
+	~=""];
+
+	// RESULT
+	JSONSetElement ( ~array ; "[+]" ; ~new_data ; ~newData_type )
+
+)

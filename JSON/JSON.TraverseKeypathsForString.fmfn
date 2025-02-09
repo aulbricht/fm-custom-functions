@@ -1,0 +1,151 @@
+/**
+ *
+ * Traverse a JSON object or array for a given search string, and return a list of all keypaths whose value contains the string.
+ *
+ * @param {text} json - initial JSON object
+ * @param {text} findString - string to search for in object values
+ *
+ * @returnSuccess {text} returns a list of JSON keypaths containing the find string
+ * 
+ * 
+ * @module JSON
+ * @requires JSON.ValueType
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While (
+
+	//// initial variables ////
+	[
+		// OPTIONS:
+		~maxKeys = 1000 ; // maximum root keys/cells to process in the given JSON object/array
+
+		// abstract params
+		~json = json ;
+		~findStr = findString ;
+		
+		~valType = JSON.ValueType ( ~json );
+		~stack = 
+			Case (
+				~valType = "array" ;
+					While (
+						[
+							~tempStack = "" ;
+							~rootKeys = JSONListKeys ( ~json ; "." );
+							~numRootKeys = Min ( ValueCount ( ~rootKeys ) ; ~maxKeys );
+							~i = Max ( ~numRootKeys - 1 ; 0 );
+						~=""];
+						~i ≥ 0 ;
+						[
+							~tempStack = List ( ~tempStack ; "[" & ~i & "]" & "§" & JSONGetElement ( ~json ; ~i ) );
+							~i = ~i - 1 ;
+						~=""];
+						~tempStack
+					);
+
+				~valType = "object" ;
+					"§" & ~json ;
+
+				""
+
+				);
+
+		// init variables
+		~debugLog = "" ;
+		~totalInstances = 0 ;
+		~keypaths_list = "" ;
+
+	~=""];
+
+	//// "while this is true" loop condition /////
+	ValueCount ( ~stack ) > 0 ;
+
+	//// logic ////////////////
+	[
+		~current = GetValue ( ~stack ; 1 );
+		~stack = RightValues ( ~stack ; ValueCount ( ~stack ) - 1 );
+		~dPos = Position ( ~current ; "§" ; 1 ; 1 );
+		~currentPath = If ( ~dPos > 0 ; Left ( ~current ; ~dPos - 1 ) ; "" );
+		~currentNode = Middle ( ~current ; ~dPos + 1 ; Length ( ~current ) );
+		~valType = JSON.ValueType ( ~currentNode );
+		~instanceCount = 
+			If ( ~valType <> "object" and ~valType <> "array" ;
+				PatternCount ( 
+					JSONGetElement ( ~json ; ~currentPath ); 
+					~findStr 
+					)
+				); 
+		~totalInstances = ~totalInstances + ~instanceCount ;
+
+		// Debug: log the current key path on every iteration
+		/*
+		~debugLog = List ( ~debugLog ; "" & ~instanceCount & " >> Current Path: " & ~currentPath ) ;
+		~debugLog = 
+			If ( ~instanceCount > 0 ;
+				List ( ~debugLog ; "Match Found - Path: " & ~currentPath & " | Count: " & ~instanceCount & " | Value: " & ~currentNode ) ;
+				~debugLog
+			) ;
+		*/
+
+		~keypaths_list = 
+			If ( ~instanceCount > 0 ;
+				List ( ~currentPath ; ~keypaths_list ) ;
+				~keypaths_list
+			);
+
+		~stack =
+			Case (
+				~valType = "array" ;
+					While (
+						[
+							~keys = JSONListKeys ( ~currentNode ; "." );
+							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
+							~k = Max ( ~numKeys - 1 ; 0 );
+							~childStack = ~stack ;
+						~=""];
+						~k ≥ 0 ;
+						[
+							~elem = JSONGetElement ( ~currentNode ; ~k );
+							~newPath = If ( ~currentPath = "" ; "[" & ~k & "]" ; ~currentPath & ".[" & ~k & "]" );
+							~childStack = List ( ~newPath & "§" & ~elem ;  ~childStack );
+							~k = ~k - 1 ;
+						~=""];
+						~childStack
+					);
+				
+				~valType = "object" ;
+					While (
+						[
+							~keys = JSONListKeys ( ~currentNode ; "." );
+							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
+							~j = Max ( ~numKeys ; 0 );
+							~childStack = ~stack ;
+						~=""];
+						~j > 0 ;
+						[
+							~key = GetValue ( ~keys ; ~j );
+							~newPath = If ( ~currentPath = "" ; ~key ; ~currentPath & "." & ~key );
+							~child = JSONGetElement ( ~currentNode ; ~key );
+							~childStack = List ( ~newPath & "§" & ~child ;  ~childStack );
+							~j = ~j - 1 ;
+						~=""];
+						~childStack
+					);
+				
+				~stack
+
+			);
+
+	~=""];
+
+	//// result ///////////////
+	~keypaths_list
+
+	// Debug:
+	//"Total Instances: " & ~totalInstances & ¶ & "Debug Log:" & ¶ & ~debugLog & ¶ & "¶¶Results:" & ¶ & 
+
+
+)
