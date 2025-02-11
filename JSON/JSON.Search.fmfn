@@ -1,8 +1,8 @@
 /**
  *
- * Traverse a JSON object or array for a given search string, and return a list of all keypaths whose value contains the string.
+ * Traverse a JSON object or array for a given search string, and return a list of all keypaths whose corresponding value contains the string.
  *
- * @param {text} json - initial JSON object
+ * @param {text} json - initial JSON object or array
  * @param {text} findString - string to search for in object values
  *
  * @returnSuccess {text} returns a list of JSON keypaths containing the find string
@@ -11,7 +11,7 @@
  * @module JSON
  * @requires JSON.ValueType
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -50,7 +50,6 @@ While (
 					"§" & ~json ;
 
 				""
-
 				);
 
 		// init variables
