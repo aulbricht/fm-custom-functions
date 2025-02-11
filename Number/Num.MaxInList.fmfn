@@ -1,0 +1,36 @@
+/**
+ *
+ * Given a list of numbers, return the maximum value
+ *
+ * @param {text} numbers_list - list of numbers, carriage return-separated
+ *
+ * @returnSuccess {number} returns the max number in the list
+ * 
+ * 
+ * @module Number (Num)
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~list = numbers_list ;
+	~num_values = ValueCount ( ~list );
+	~list_converted = Substitute ( ~list ; "¶" ; ";" );
+
+	~to_evaluate = "Max (" & ~list_converted & ")" ;
+	~error_code = EvaluationError ( Evaluate ( ~to_evaluate ) );
+	~result = If ( ~error_code = 0 ; Evaluate ( ~to_evaluate ) );
+
+~=""];
+
+Case ( 
+	~num_values = 1 ; ~list ;
+	GetAsNumber ( ~result ) = ~result ; ~result ;
+	""
+	)
+
+)
