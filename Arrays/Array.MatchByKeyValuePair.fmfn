@@ -1,17 +1,17 @@
 /**
  *
- * Return the value of a specified key for the cell where the first instance of a given key and value pair are found to match.
+ * Return the value of a specified key for the cell where the first instance of a different, given key and value pair are found to match.
  *
  * @param {array} array
- * @param {text} searchKey
- * @param {text} searchValue
+ * @param {text} matchKey
+ * @param {text} matchValue
  * @param {text} returnKey - note: if value is null, return the array cell ordinal instead (0-n)
  *
  * @returnSuccess {text} value paired to the specified returnKey for the found array cell
  *
  * @module ARRAY
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -23,8 +23,8 @@ While (
 	[ 
 
 		~array = array ;
-		~searchKey = searchKey ;
-		~searchValue = searchValue ;
+		~searchKey = matchKey ;
+		~searchValue = matchValue ;
 		~returnKey = returnKey ;
 
 		~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
