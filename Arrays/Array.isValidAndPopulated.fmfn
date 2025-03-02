@@ -8,7 +8,7 @@
  *
  * @module JSON
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -20,7 +20,7 @@ Let ([
 	
 	~validate = JSONFormatElements ( ~array );
 	~leftChar = Left ( ~validate; 1 );
-	~numCells = JSONListKeys ( ~array ; "." );
+	~numCells = ValueCount ( JSONListKeys ( ~array ; "." ) );
 
 ~=""];
 
