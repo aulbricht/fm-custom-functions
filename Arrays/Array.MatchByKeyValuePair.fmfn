@@ -5,7 +5,7 @@
  * @param {array} array
  * @param {text} matchKey
  * @param {text} matchValue
- * @param {text} returnKey - note: if value is null, return the array cell ordinal instead (0-n)
+ * @param {text} returnKey - associated value to return; note: if value is null, return the array cell ordinal instead (0-n)
  *
  * @returnSuccess {text} value paired to the specified returnKey for the found array cell
  *
