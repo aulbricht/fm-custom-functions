@@ -11,7 +11,7 @@
  * @module JSON
  * @requires JSON.ValueType
  * 
- * @version 1.0.1
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -21,12 +21,16 @@ While (
 	//// initial variables ////
 	[
 		// OPTIONS:
-		~maxKeys = 1000 ; // maximum root keys/cells to process in the given JSON object/array
-
-		// abstract params
+		~maxKeys = 500 ; // maximum root keys/cells to process in the given JSON object/array
+		~maxIterations = 500 ; // maximum iterations of the main loop; to prevent infinite looping
+ 
+ 		// abstract params
 		~json = json ;
 		~findStr = findString ;
 		
+		// json cannot be formatted for this to work correctly, so unformat/uglify it
+		~json = JSONDeleteElement ( ~json, Get ( UUID ) );
+
 		~valType = JSON.ValueType ( ~json );
 		~stack = 
 			Case (
@@ -56,14 +60,16 @@ While (
 		~debugLog = "" ;
 		~totalInstances = 0 ;
 		~keypaths_list = "" ;
+		~i = 0 ;
 
 	~=""];
 
 	//// "while this is true" loop condition /////
-	ValueCount ( ~stack ) > 0 ;
+	ValueCount ( ~stack ) > 0 and ~i ≤ ~maxIterations ;
 
 	//// logic ////////////////
 	[
+		~i = ~i + 1 ;
 		~current = GetValue ( ~stack ; 1 );
 		~stack = RightValues ( ~stack ; ValueCount ( ~stack ) - 1 );
 		~dPos = Position ( ~current ; "§" ; 1 ; 1 );
@@ -71,11 +77,15 @@ While (
 		~currentNode = Middle ( ~current ; ~dPos + 1 ; Length ( ~current ) );
 		~valType = JSON.ValueType ( ~currentNode );
 		~instanceCount = 
-			If ( ~valType <> "object" and ~valType <> "array" ;
+			// if value is NOT another JSON object or array
+			If ( ~valType <> "object" and ~valType <> "array" ; 
 				PatternCount ( 
 					JSONGetElement ( ~json ; ~currentPath ); 
 					~findStr 
-					)
+					);
+
+				// ELSE
+				0
 				); 
 		~totalInstances = ~totalInstances + ~instanceCount ;
 
@@ -104,9 +114,11 @@ While (
 							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
 							~k = Max ( ~numKeys - 1 ; 0 );
 							~childStack = ~stack ;
+							~i_subLoop1 = 0 ;
 						~=""];
-						~k ≥ 0 ;
+						~k ≥ 0 and ~i_subLoop1 ≤ ~maxIterations ;
 						[
+							~i_subLoop1 = ~i_subLoop1 + 1 ;
 							~elem = JSONGetElement ( ~currentNode ; ~k );
 							~newPath = If ( ~currentPath = "" ; "[" & ~k & "]" ; ~currentPath & ".[" & ~k & "]" );
 							~childStack = List ( ~newPath & "§" & ~elem ;  ~childStack );
@@ -122,9 +134,11 @@ While (
 							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
 							~j = Max ( ~numKeys ; 0 );
 							~childStack = ~stack ;
+							~i_subLoop2 = 0 ;
 						~=""];
-						~j > 0 ;
+						~j > 0 and ~i_subLoop2 ≤ ~maxIterations ;
 						[
+							~i_subLoop2 = ~i_subLoop2 + 1 ;
 							~key = GetValue ( ~keys ; ~j );
 							~newPath = If ( ~currentPath = "" ; ~key ; ~currentPath & "." & ~key );
 							~child = JSONGetElement ( ~currentNode ; ~key );
@@ -141,10 +155,10 @@ While (
 	~=""];
 
 	//// result ///////////////
-	~keypaths_list
 
 	// Debug:
 	//"Total Instances: " & ~totalInstances & ¶ & "Debug Log:" & ¶ & ~debugLog & ¶ & "¶¶Results:" & ¶ & 
 
+	~keypaths_list
 
 )
