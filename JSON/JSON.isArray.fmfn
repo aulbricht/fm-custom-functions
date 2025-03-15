@@ -2,13 +2,13 @@
  *
  * Determines whether the JSON object is an array
  *
- * @param {text} json - JSON object or array
+ * @param {text} json - JSON array
  *
- * @returnSuccess {boolean} returns True if the JSON is valid
+ * @returnSuccess {boolean} returns True if the JSON is a valid array
  *
  * @module JSON
  * 
- * @version 1.0.0
+ * @version 1.0.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
