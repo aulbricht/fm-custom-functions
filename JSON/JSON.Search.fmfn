@@ -11,7 +11,7 @@
  * @module JSON
  * @requires JSON.ValueType
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -23,6 +23,7 @@ While (
 		// OPTIONS:
 		~maxKeys = 500 ; // maximum root keys/cells to process in the given JSON object/array
 		~maxIterations = 500 ; // maximum iterations of the main loop; to prevent infinite looping
+		~pointerChar = "‖" ;
  
  		// abstract params
 		~json = json ;
@@ -44,14 +45,14 @@ While (
 						~=""];
 						~i ≥ 0 ;
 						[
-							~tempStack = List ( ~tempStack ; "[" & ~i & "]" & "§" & JSONGetElement ( ~json ; ~i ) );
+							~tempStack = List ( ~tempStack ; "[" & ~i & "]" & ~pointerChar & JSONGetElement ( ~json ; ~i ) );
 							~i = ~i - 1 ;
 						~=""];
 						~tempStack
 					);
 
 				~valType = "object" ;
-					"§" & ~json ;
+					~pointerChar & ~json ;
 
 				""
 				);
@@ -72,7 +73,7 @@ While (
 		~i = ~i + 1 ;
 		~current = GetValue ( ~stack ; 1 );
 		~stack = RightValues ( ~stack ; ValueCount ( ~stack ) - 1 );
-		~dPos = Position ( ~current ; "§" ; 1 ; 1 );
+		~dPos = Position ( ~current ; ~pointerChar ; 1 ; 1 );
 		~currentPath = If ( ~dPos > 0 ; Left ( ~current ; ~dPos - 1 ) ; "" );
 		~currentNode = Middle ( ~current ; ~dPos + 1 ; Length ( ~current ) );
 		~valType = JSON.ValueType ( ~currentNode );
@@ -121,7 +122,7 @@ While (
 							~i_subLoop1 = ~i_subLoop1 + 1 ;
 							~elem = JSONGetElement ( ~currentNode ; ~k );
 							~newPath = If ( ~currentPath = "" ; "[" & ~k & "]" ; ~currentPath & ".[" & ~k & "]" );
-							~childStack = List ( ~newPath & "§" & ~elem ;  ~childStack );
+							~childStack = List ( ~newPath & ~pointerChar & ~elem ;  ~childStack );
 							~k = ~k - 1 ;
 						~=""];
 						~childStack
@@ -142,7 +143,7 @@ While (
 							~key = GetValue ( ~keys ; ~j );
 							~newPath = If ( ~currentPath = "" ; ~key ; ~currentPath & "." & ~key );
 							~child = JSONGetElement ( ~currentNode ; ~key );
-							~childStack = List ( ~newPath & "§" & ~child ;  ~childStack );
+							~childStack = List ( ~newPath & ~pointerChar & ~child ;  ~childStack );
 							~j = ~j - 1 ;
 						~=""];
 						~childStack
