@@ -1,0 +1,75 @@
+/**
+ *
+ * Query value with SQL
+ *
+ * @param {text} fqfn_from - fqfn for the table::field to get data from (fqfn == fully qualified field reference)
+ * @param {text} [fqfn_or_field_where] - OPTIONAL: fqfn of field name for the where/search by
+ * @param {text} [value_where] - OPTIONAL: value to query/search the where field for
+ *
+ * @returnSuccess {text} field name
+ *
+ * @version 1.1.1
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	// abstract parameter
+	~fqfn_from = fqfn_from ;
+	~field_where = fieldName_or_fqfn_where ;
+	~value_where = value_where ;
+
+	// validate format of parameter data
+	~is_valid_fqfn_from = IsValid ( GetFieldName ( ~fqfn_from ) );
+	~fqfn_from = If ( ~is_valid_fqfn_from ; GetFieldName ( ~fqfn_from ) ; ~fqfn_from );
+	~table_from = "\"" & GetValue ( Substitute ( ~fqfn_from ; "::" ; "¶" ) ; 1 ) & "\"" ;
+	~field_from = "\"" & GetValue ( Substitute ( ~fqfn_from ; "::" ; "¶" ) ; 2 ) & "\"" ;
+
+	// validate format of parameter data
+	~is_valid_field_where = IsValid ( GetFieldName ( ~field_where ) );
+	~search_fieldName_or_fqfn = If ( ~is_valid_field_where ; GetFieldName ( ~field_where ) ; ~field_where );
+	~field_where = If ( not IsEmpty ( ~search_fieldName_or_fqfn ) ; 
+			"\"" 
+			& Case ( 
+
+				// if this is a fqfn...
+				PatternCount ( ~search_fieldName_or_fqfn ; "::" ) = 1 ; 
+					GetValue ( Substitute ( ~search_fieldName_or_fqfn ; "::" ; "¶" ) ; 2 );
+
+				// if this is a field name...
+				~search_fieldName_or_fqfn
+
+				)
+			& "\"" 
+		);
+
+
+	// SQL query setup
+	~sql = "SELECT {{_F1_}} FROM {{_T1_}} "
+		& If ( not IsEmpty ( ~field_where ) ; "WHERE {{_W1_}} = ?" );
+
+	~sqlQuery = 
+		Substitute ( ~sql ;
+			// FIELDS
+			[ "{{_F1_}}" ; ~field_from ];
+
+			// TABLES
+			[ "{{_T1_}}" ; ~table_from ];
+
+			// WHERE
+			[ "{{_W1_}}" ; ~field_where ]
+
+			);
+
+	// query result
+	~result = 
+		ExecuteSQL ( ~sqlQuery ; "|" ; "¶" ;
+			~value_where
+			);
+
+~=""];
+
+~result
+
+)

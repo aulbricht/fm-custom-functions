@@ -1,0 +1,52 @@
+/**
+ *
+ * Truncate a JSON  array at the given cell index.
+ *
+ * @param {array} array
+ * @param {number} index_to_truncate - e.g. a value of "3" would truncate the array at the 3rd cell, returning the array with first three cells, indices 0-2
+ *
+ * @returnSuccess {array} the truncated array
+ *
+ * @module ARRAY
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+While ( 
+
+	//// initial variables ////
+	[ 
+
+		~array = array ;
+		~index = index_to_truncate ;
+		
+		~is_array_valid = Left ( JSONFormatElements ( ~array ) ; 1 ) = "[" ;
+		~numCells = If ( ~is_array_valid ; ValueCount ( JSONListKeys ( ~array ; "." ) ) ; 0 );
+		~array_new = "" ;
+		~_i = 1 ;
+		
+		~=""] ; 
+
+	//// "while this is true" loop condition ///////
+	~_i ≤ ~index and ~_i ≤ ~numCells ; 
+
+	//// logic ////////////////
+	[ 
+
+		~key = "[" & ~_i - 1 & "]." ;
+		~cell = JSONGetElement ( ~array ; ~key );
+		~data_type = JSONGetElementType ( ~array ; ~key );
+
+		~array_new = JSONSetElement ( ~array_new ; ~key ; ~cell ; ~data_type );
+
+		~_i = ~_i + 1 ;
+
+		~=""] ; 
+
+	//// result ///////////////
+	~array_new
+
+	)

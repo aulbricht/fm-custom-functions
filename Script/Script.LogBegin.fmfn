@@ -1,0 +1,115 @@
+/**
+ *
+ * SCRIPT LOG: beginning of script
+ *
+ * @param {object} [optional_parameter_obj] - OPTIONAL:
+ * 					.description
+ * 					.do_includeFullScriptPerformanceData - if True, log run time for the full script
+ * 					.is_debugging - if True, capture additional data for debugging
+ * 					.supplemental_data
+ *
+ * @module Script
+ * @requires {function} DB.FieldName
+ * @requires {module} Perf (Performance)
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	////////////////////////////////////////////////////////////
+	// OPTIONAL: performance data
+	~_void = Perf.StartTimer ( 
+		"full_script" // tracking id tag
+		); 
+	////////////////////////////////////////////////////////////
+
+
+	// abstract function parameters
+	~param_obj = optional_parameter_obj ;
+
+	// get optional params:
+	~is_param_validJSON = Let ( ~json = Left ( JSONFormatElements ( ~param_obj ) ; 1 ) ; ~json = "{" or ~json = "[" );
+	~description = If ( ~is_param_validJSON ; JSONGetElement ( ~param_obj ; "description" ) );
+	~do_includeFullScriptPerformanceData = If ( ~is_param_validJSON ; JSONGetElement ( ~param_obj ; "do_includeFullScriptPerformanceData" ) );
+	~is_debugging = If ( ~is_param_validJSON ; JSONGetElement ( ~param_obj ; "is_debugging" ) );
+	~supplemental_data = If ( ~is_param_validJSON ; JSONGetElement ( ~param_obj ; "supplemental_data" ) );
+
+	// set constants
+	~description = If ( not IsEmpty ( ~description ) ; ~description ; "\"" & Get ( ScriptName ) & "\" script run" ); // default
+	~id_process = Get ( UUID );
+
+
+	////////////////////////////////////////////////////////////
+	// extract pertinent data from logParam object FIELD DATA
+
+	// prep var names & keys
+	~varName_logData_parent = "parent_logParam" ;
+	~varName_logData_new = "this_logParam" ;
+	~key_id_process = "id_process" ;
+	~key_id_process_list = DB.FieldName ( C_LOG__SystemLog::id__process_list );
+
+	// get log data
+	~logData_obj = Evaluate ( "$" & ~varName_logData_parent );
+	~is_logData_validJSON = Let ( ~fp = Left ( JSONFormatElements ( ~logData_obj ) ; 1 ) ; ~fp = "{" or ~fp = "[" );
+	
+	// create updated process list
+	~id_process_list = If ( ~is_logData_validJSON ; JSONGetElement ( ~logData_obj ; ~key_id_process_list ) );
+	~id_process_latest = GetValue ( ~id_process_list ; ValueCount ( ~id_process_list ) );
+	~id_process_list = Case (
+		IsEmpty ( ~id_process_list ) ; ~id_process ;
+		IsEmpty ( ~id_process ) ; ~id_process_list ;
+		~id_process_list = ~id_process ; ~id_process ;
+		~id_process_latest = ~id_process ; ~id_process_list ;
+		List ( ~id_process_list ; ~id_process )
+		);
+
+	////////////////////////////////////////////////////////////
+
+
+
+	// construct LOG fieldData object
+	~fieldData_obj = JSONSetElement ( "{}" ;
+		[ DB.FieldName ( C_LOG__SystemLog::scriptName ) ; Get ( ScriptName ) ; JSONString ];
+		[ DB.FieldName ( C_LOG__SystemLog::ts_begin_ms ) ; Get ( CurrentTimeUTCMilliseconds ) ; JSONNumber ];
+
+		// list of parent/child process ids
+		[ ~key_id_process_list ; ~id_process_list ; JSONString ]
+		);
+
+	~this_logParam = JSON.Format ( JSONSetElement ( ~param_obj ;
+		[ "id_process" ; ~id_process ; JSONString ];
+		[ "fieldData" ; ~fieldData_obj ; JSONObject ];
+
+		// OPTIONAL PARAMETERS DATA
+		[ "description" ; ~description ; JSONString ];
+		[ "do_includeFullScriptPerformanceData" ; ~do_includeFullScriptPerformanceData ; JSONBoolean ];
+		[ "is_debugging" ; ~is_debugging ; JSONBoolean ];
+		[ "supplemental_data" ; ~supplemental_data ; JSONString ]
+
+		) );
+
+
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+	// SET LOCAL VARIABLE:
+
+	~value = Quote ( ~this_logParam );
+	~subStr = "Let ( ${{variable}} = {{value}} ; False )";
+	~evalStr = Substitute ( ~subStr ; 
+		[ "{{variable}}" ; ~varName_logData_new ];
+		[ "{{value}}" ; ~value ]
+		);
+	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
+
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+
+
+~=""];
+
+~description
+
+)

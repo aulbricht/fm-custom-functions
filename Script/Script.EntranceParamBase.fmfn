@@ -1,0 +1,54 @@
+/**
+ *
+ * SCRIPT entrance parameter base
+ *
+ * @returns {object} entrance parameter(s)
+ *
+ * @module Script
+ * @requires {module} Performance (Perf)
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	////////////////////////////////////////////////////////////
+	// extract pertinent data from logParam object FIELD DATA
+
+	// prep var names & keys
+	~varName_logData = "this_logParam" ;
+	~keybase_logData_parent = "parent_logParam." ;
+	~key_id_process = "id_process" ;
+	~key_id_process_list = DB.FieldName ( C_LOG__SystemLog::id__process_list );
+
+	// get log data
+	~logData_obj = Evaluate ( "$" & ~varName_logData );
+	~is_logData_validJSON = Let ( ~fp = Left ( JSONFormatElements ( ~logData_obj ) ; 1 ) ; ~fp = "{" or ~fp = "[" );
+	
+	// extract specific data, if log data is valid
+	~id_process = If ( ~is_logData_validJSON ; JSONGetElement ( ~logData_obj ; ~key_id_process ) );
+	~id_process_list = If ( ~is_logData_validJSON ; JSONGetElement ( ~logData_obj ;  "fieldData." & ~key_id_process_list ) );
+	~id_process_latest = GetValue ( ~id_process_list ; ValueCount ( ~id_process_list ) );
+	~id_process_list = Case (
+		IsEmpty ( ~id_process_list ) ; ~id_process ;
+		IsEmpty ( ~id_process ) ; ~id_process_list ;
+		~id_process_list = ~id_process ; ~id_process ;
+		~id_process_latest = ~id_process ; ~id_process_list ;
+		List ( ~id_process_list ; ~id_process )
+		);
+	////////////////////////////////////////////////////////////
+
+~=""];
+
+// construct the parameter object
+JSONSetElement ( "{}" ;
+	[ ~keybase_logData_parent & ~key_id_process_list ; ~id_process_list ; JSONString ];
+	[ ~keybase_logData_parent & "id_process" ; ~id_process ; JSONString ];
+	[ ~keybase_logData_parent & "script.name" ; Get ( ScriptName ) ; JSONString ];
+	[ ~keybase_logData_parent & "script.call_ms" ; Get ( CurrentTimeUTCMilliseconds ) ; JSONNumber ]
+
+	)
+
+)

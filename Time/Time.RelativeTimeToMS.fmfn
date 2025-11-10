@@ -1,0 +1,33 @@
+/**
+ * 
+ * Get a relative amount of time (e.g. 10 minutes) in milliseconds
+ * 
+ * @param {number} num_hours
+ * @param {number} num_minutes
+ * @param {number} num_seconds
+ * 
+ * @return {number} total relative amount of time in milliseconds
+ * 
+ * @module Time
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ * 
+ **/
+
+
+Let ([
+
+	~num_hrs = num_hours ;
+	~num_mins = num_minutes ;
+	~num_secs = num_seconds ;
+
+	~hrs_to_ms = ~num_hrs * 3600000 ;
+	~mins_to_ms = ~num_mins * 60000 ;
+	~secs_to_ms = ~num_secs * 1000 ;
+
+~=""];
+
+~hrs_to_ms + ~mins_to_ms + ~secs_to_ms
+
+)

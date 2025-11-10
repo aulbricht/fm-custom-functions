@@ -1,0 +1,20 @@
+/**
+ *
+ * Default script validation execution line. Note: this exists primarily for better script step readability.
+ *
+ * @returns {object} error
+ *
+ * @module Script
+ * @requires {function} Script.dCalcParamValidation
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ( $this.scriptParameter = Get ( ScriptParameter ) ; 
+
+	Script.dCalcParamValidation ( "this.scriptParameter" ; "validation_rules" ) 
+
+	)

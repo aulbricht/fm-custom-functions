@@ -1,0 +1,35 @@
+/**
+ *
+ * Returns the value to be written to the given field: this solves the problem of accidentally overwriting an existing value when one exists. So if the existing field value is null, return the proposed value; otherwise the current value of the given field.
+ *
+ * @param {text} fqfn - fully qualified field reference
+ * @param {text} value
+ *
+ * @returnSuccess {text} value to write
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	// abstract parameter
+	~fqfn = fqfn ;
+	~value = value ;
+
+	// validate format of parameter data
+	~is_valid_convertFqfn = IsValid ( GetFieldName ( ~fqfn ) );
+	~fqfn = If ( ~is_valid_convertFqfn ; GetFieldName ( ~fqfn ) ; ~fqfn );
+
+	~current_value = GetField ( ~fqfn );
+	~do_write = IsEmpty ( ~current_value );
+
+~=""];
+
+Case (
+	~do_write ; ~value ;
+	~current_value
+	)
+
+)

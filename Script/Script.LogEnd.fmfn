@@ -1,0 +1,126 @@
+/**
+ *
+ * SCRIPT LOG: end of script
+ *
+ * @param {object} [optional_parameter_obj] - OPTIONAL:
+ * 					.description
+ * 					.do_includeFullScriptPerformanceData - if True, log run time for the full script
+ * 					.is_debugging - if True, capture additional data for debugging
+ * 					.supplemental_data
+ *
+ * @module Script
+ * @requires {function} cValue.ErrorsArray
+ * @requires {function} DB.FieldName
+ * @requires {module} Perf (Performance)
+ *
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+Let ([
+
+	// abstract function parameters
+	~param_obj = optional_parameter_obj ;
+
+	// set constants
+	~varName_logData = "this_logParam" ;
+	~errors_array = cValue.ErrorsArray ;
+	~keybase_fieldData = "fieldData." ;
+	~key_removeFromScriptParameter = "parent_logParam" ;
+	
+	// get params/data from LOG BEGIN
+	~logData_obj = Evaluate ( "$" & ~varName_logData );
+	~is_logData_validJSON = Let ( ~json = Left ( JSONFormatElements ( ~logData_obj ) ; 1 ) ; ~json = "{" or ~json = "[" );
+	~logData_obj =  Case ( 
+		~is_logData_validJSON ; ~logData_obj ; 
+		Script.LogBegin ( "" ) // DEFAULT: if the log was not begun properly yet in this script, run it now
+		);
+
+	// get optional parameter values, overriding with values passed into this function:
+	~is_param_validJSON = Let ( ~json = Left ( JSONFormatElements ( ~param_obj ) ; 1 ) ; ~json = "{" or ~json = "[" );
+	~description = Let ([ ~key = "description" ; ~value_override = JSONGetElement ( ~param_obj ; ~key ) ; ~value_original = JSONGetElement ( ~logData_obj ; ~key ) ]; Case ( 
+			~is_param_validJSON and not IsEmpty ( ~value_override ) ; ~value_override ;
+			~is_logData_validJSON ; ~value_original  
+			)
+		);
+	~do_includeFullScriptPerformanceData = Let ([ ~key = "do_includeFullScriptPerformanceData" ; ~value_override = JSONGetElement ( ~param_obj ; ~key ) ; ~value_original = JSONGetElement ( ~logData_obj ; ~key ) ]; Case ( 
+			~is_param_validJSON and not IsEmpty ( ~value_override ) ; ~value_override ;
+			~is_logData_validJSON ; ~value_original  
+			)
+		);
+	~is_debugging = Let ([ ~key = "is_debugging" ; ~value_override = JSONGetElement ( ~param_obj ; ~key ) ; ~value_original = JSONGetElement ( ~logData_obj ; ~key ) ]; Case ( 
+			~is_param_validJSON and not IsEmpty ( ~value_override ) ; ~value_override ;
+			~is_logData_validJSON ; ~value_original  
+			)
+		);
+	~supplemental_data = Let ([ ~key = "supplemental_data" ; ~value_override = JSONGetElement ( ~param_obj ; ~key ) ; ~value_original = JSONGetElement ( ~logData_obj ; ~key ) ]; Case ( 
+			~is_param_validJSON and not IsEmpty ( ~value_override ) ; ~value_override ;
+			~is_logData_validJSON ; ~value_original  
+			)
+		);
+
+
+	////////////////////////////////////////////////////////////
+	// OPTIONAL: performance data
+	~_void = If ( ~do_includeFullScriptPerformanceData ; Perf.EndTimer ( 
+			"full_script" ; // tracking id tag
+			"performance_array" ; // performance array variable namne
+			"full script: " & Get ( ScriptName ) // description
+			)
+		);
+	~performance_array = $performance_array ;
+	////////////////////////////////////////////////////////////
+
+
+    // set variables
+	~fieldData_obj = JSONGetElement ( ~logData_obj ; ~keybase_fieldData );
+	~scriptParameter = Let ([
+			~param = Get ( ScriptParameter ); 
+			~isValidJSON = Let ( ~json = Left ( JSONFormatElements ( ~param ) ; 1 ) ; ~json = "{" or ~json = "[" );
+		~=""];
+			Case (
+			not IsEmpty ( ~key_removeFromScriptParameter ) and ~isValidJSON ; JSONDeleteElement ( ~param ; ~key_removeFromScriptParameter );
+			~param
+			) 
+		);
+
+	// construct LOG fieldData object
+	~fieldData_obj = JSONSetElement ( ~fieldData_obj ;
+		[ DB.FieldName ( C_LOG__SystemLog::description ) ; ~description ; JSONString ];
+		[ DB.FieldName ( C_LOG__SystemLog::error_array ) ; ~errors_array ; JSONArray ];
+		[ DB.FieldName ( C_LOG__SystemLog::performance_array ) ; ~performance_array ; JSONArray ];
+		[ DB.FieldName ( C_LOG__SystemLog::supplemental_data ) ; ~supplemental_data ; JSONString ];
+		[ DB.FieldName ( C_LOG__SystemLog::ts_end_ms ) ; Get ( CurrentTimeUTCMilliseconds ) ; JSONNumber ];
+		[ DB.FieldName ( C_LOG__SystemLog::warnings ) ; cValue.WarningList ; JSONString ]
+		);
+
+	// add additional data if is_debugging mode
+	~fieldData_obj = If ( not ~is_debugging ; ~fieldData_obj ; JSONSetElement ( ~fieldData_obj ; 
+			// DEBUGGING INFO
+			[ DB.FieldName ( C_LOG__SystemLog::is_debuggingOn ) ; ~is_debugging ; JSONBoolean ];
+			[ DB.FieldName ( C_LOG__SystemLog::scriptParameter ) ; ~scriptParameter ; JSONString ];
+
+			// HOST INFO (included for debugging)
+			[ DB.FieldName ( C_LOG__SystemLog::accountName ) ; Get ( AccountName ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::accountPrivilegeSetName ) ; Get ( AccountPrivilegeSetName ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::description ) ; ~description ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::filename ) ; Get ( FileName ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::hostIPAddress ) ; Get ( HostIPAddress ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::hostName ) ; Get ( HostName ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::hostVersion ) ; Get ( HostApplicationVersion ) ; JSONString ];
+			[ DB.FieldName ( C_LOG__SystemLog::systemPlatform ) ; Get ( SystemPlatform ) ; JSONNumber ];
+			[ DB.FieldName ( C_LOG__SystemLog::systemVersion ) ; Get ( SystemVersion ) ; JSONString ]
+			)
+		);
+	
+	// package the full log parameter
+	~this_logParam = JSON.Format ( JSONSetElement ( "{}" ;
+		[ "fieldData" ; ~fieldData_obj ; JSONObject ]
+		) );
+
+~=""];
+
+~this_logParam
+
+)

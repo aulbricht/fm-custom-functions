@@ -1,0 +1,143 @@
+/**
+ *
+ * Traverse a JSON object or array for a given search string, and return a list of all keypaths whose corresponding value contains the string.
+ * FAST VERSION: Skips deep traversal of containers that don't contain the search string. Note: this would not be accurate if the search string contains escaped characters or carriage returns
+ *
+ * @param {text} json_object_or_array - initial JSON object or array
+ * @param {text} search_string - string to search for in object values (case-sensitive)
+ *
+ * @returnSuccess {text} returns a list of JSON keypaths containing the search string
+ * 
+ * @example json_search_fast ( "[{\"name\":\"John\"}]" ; "John" ) returns "[0].name"
+ * 
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While ( 
+	//// initial variables ////
+	[ 
+
+		~json = json_object_or_array ;
+		~search_str = search_string ;
+		~results = "" ;
+		~stack = "" ;
+		~stack_index = 0 ;
+		
+		// Debug variables (uncomment the following line for tracing)
+		// ~debug_trace = "" ;
+
+	~=""]; 
+
+	//// "while this is true" loop condition /////
+	~stack_index = 0 or ~stack_index ≤ ValueCount ( ~stack ) ; 
+
+	//// logic ////////////////
+	[ 
+
+		~current_path = If ( ~stack_index = 0 ; "" ; GetValue ( ~stack ; ~stack_index ) ) ;
+		
+		// Early exit: if search string is empty, skip processing
+		~should_continue = not IsEmpty ( ~search_str ) ;
+		
+		// Cache element retrieval and type detection (Optimization #1 & #3)
+		~current_element = If ( ~should_continue ; 
+			If ( IsEmpty ( ~current_path ) ; ~json ; JSONGetElement ( ~json ; ~current_path ) ) ; 
+			"" 
+		) ;
+		~element_type = If ( ~should_continue ; 
+			If ( IsEmpty ( ~current_path ) ; 
+				// For root element, detect type from first character
+				If ( Left ( Trim ( ~json ) ; 1 ) = "[" ; JSONArray ; JSONObject ) ; 
+				JSONGetElementType ( ~json ; ~current_path )
+			) ; 
+			JSONRaw 
+		) ;
+		
+		// Debug trace (uncomment the following line to see processing steps)
+		// ~debug_trace = ~debug_trace & "Processing: " & ~current_path & " | Type: " & ~element_type & " | Element: " & Left ( ~current_element ; 50 ) & ¶ ;
+		
+		// Efficient type detection using JSONGetElementType() with named constants
+		~is_array = ~element_type = JSONArray ;
+		~is_object = ~element_type = JSONObject ;
+		~is_leaf_value = not ( ~is_array or ~is_object ) ;
+		
+		// Check if current element value contains the search string (only for leaf values)
+		~contains_search = If ( ~should_continue and ~is_leaf_value ; 
+			PatternCount ( ~current_element ; ~search_str ) > 0 ; 
+			False 
+		) ;
+		~results = If ( ~contains_search ; List ( ~results ; ~current_path ) ; ~results ) ;
+		
+		// FAST OPTIMIZATION: Skip deep traversal for containers that don't contain search string
+		~container_has_search = If ( ~should_continue and ( ~is_array or ~is_object ) ; 
+			PatternCount ( ~current_element ; ~search_str ) > 0 ; 
+			True 
+		) ;
+		
+		// Add child paths to stack for arrays and objects (with container pre-filtering)
+		~new_paths = Case (
+			not ~should_continue ; "" ;
+			not ~container_has_search ; "" ;  // FAST: Skip if container doesn't contain search string
+			
+			~is_array ;
+				While ( 
+					[
+						~arr_index = 0 ;
+						~arr_count = JSONListValues ( ~current_element ; "" ) ;
+						~arr_count_num = ValueCount ( ~arr_count );
+						~paths_batch = "" ;
+					~=""];
+					~arr_index < ~arr_count_num ;
+					[
+						~path_to_add = If ( IsEmpty ( ~current_path ) ; 
+							"[" & ~arr_index & "]" ; 
+							~current_path & ".[" & ~arr_index & "]" 
+						);
+						~paths_batch = List ( ~paths_batch ; ~path_to_add );
+						~arr_index = ~arr_index + 1 ;
+					~=""];
+					~paths_batch
+				) ;
+			
+			~is_object ;
+				While ( 
+					[
+						~obj_keys = JSONListKeys ( ~current_element ; "" );
+						~key_index = 1 ;
+						~key_count = ValueCount ( ~obj_keys );
+						~paths_batch = "" ;
+					~=""];
+					~key_index ≤ ~key_count ;
+					[
+						~key_name = GetValue ( ~obj_keys ; ~key_index ) ;
+						~path_to_add = If ( IsEmpty ( ~current_path ) ; 
+							~key_name ; 
+							~current_path & "." & ~key_name 
+						);
+						~paths_batch = List ( ~paths_batch ; ~path_to_add );
+						~key_index = ~key_index + 1 ;
+					~=""];
+					~paths_batch
+				) ;
+			
+			// Default case - leaf values don't add paths
+			""
+		) ;
+		
+		// Optimized stack update
+		~stack = If ( not IsEmpty ( ~new_paths ) ; List ( ~stack ; ~new_paths ) ; ~stack );
+		~stack_index = ~stack_index + 1 ;
+
+	~=""]; 
+
+	//// result ///////////////
+	If ( IsEmpty ( ~results ) ; "" ; ~results )
+	
+	// Debug output (uncomment the following line to see debug trace)
+	// "RESULTS:" & ¶ & If ( IsEmpty ( ~results ) ; "(none)" ; ~results ) & ¶ & ¶ & "DEBUG TRACE:" & ¶ & ~debug_trace
+
+) 

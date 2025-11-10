@@ -1,0 +1,32 @@
+/**
+ *
+ * Return the number of elements in the JSON object root
+ *
+ * @param {object} object
+ *
+ * @returnSuccess {number} number of elements in the object root
+ *
+ * @module JSON
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+
+Let ([
+
+	~json_obj = object ;
+	~is_validJson = 
+		Left ( ~json_obj ; 1 ) = "{" 
+		and Right ( ~json_obj ; 1 ) = "}"
+		and Left ( JSONFormatElements ( ~json_obj ) ; 1 ) ≠ "?" ;
+
+~=""];
+
+Case ( 
+	~is_validJson ; ValueCount ( JSONListKeys ( ~json_obj ; "." ) );
+	0
+	)
+
+)
