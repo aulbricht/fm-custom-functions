@@ -3,12 +3,13 @@
  * Map the script name to id for a given script name or id
  *
  * @param {text} scriptNameOrID - the FileMaker system ID of a script OR name of a script
+ * @param {text} [filename_or_blank_for_this_file] - OPTIONAL: name of the destination file; DEFAULT: "$" for current file, if empty
  * 
  * @returns {text} the mapped opposite (e.g. for a given name, return the matching system ID)
  *
  * @module Script
  *
- * @version 1.0.0
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -16,9 +17,12 @@
 Let ([
 
 	~scriptNameOrID = scriptNameOrID ;
+	~filename = filename_or_blank_for_this_file ;
 
-	~scriptIds_list = ScriptIDs ( $ );
-	~scriptNames_list = ScriptNames ( $ );
+	~filename = If ( not IsEmpty ( ~filename ) ; ~filename ; Get ( FileName ) );
+
+	~scriptIds_list = ScriptIDs ( ~filename );
+	~scriptNames_list = ScriptNames ( ~filename );
 
 	~is_searchById = ValueList.ValueExistsInList ( ~scriptIds_list ; ~scriptNameOrID );
 	~is_searchByName = ValueList.ValueExistsInList ( ~scriptNames_list ; ~scriptNameOrID );

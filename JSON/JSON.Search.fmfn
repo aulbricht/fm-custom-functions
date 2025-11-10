@@ -2,164 +2,135 @@
  *
  * Traverse a JSON object or array for a given search string, and return a list of all keypaths whose corresponding value contains the string.
  *
- * @param {text} json - initial JSON object or array
- * @param {text} findString - string to search for in object values
+ * @param {text} json_object_or_array - initial JSON object or array
+ * @param {text} search_string - string to search for in object values (case-sensitive)
  *
- * @returnSuccess {text} returns a list of JSON keypaths containing the find string
+ * @returnSuccess {text} returns a list of JSON keypaths containing the search string
  * 
+ * @example json_search ( "[{\"name\":\"John\"}]" ; "John" ) returns "[0].name"
  * 
  * @module JSON
- * @requires JSON.ValueType
  * 
- * @version 1.2.0
+ * @version 2.0.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
-While (
-
+While ( 
 	//// initial variables ////
-	[
-		// OPTIONS:
-		~maxKeys = 500 ; // maximum root keys/cells to process in the given JSON object/array
-		~maxIterations = 500 ; // maximum iterations of the main loop; to prevent infinite looping
-		~pointerChar = "‖" ;
- 
- 		// abstract params
-		~json = json ;
-		~findStr = findString ;
+	[ 
+
+		~json = json_object_or_array ;
+		~search_str = search_string ;
+
+		~results = "" ;
+		~stack = "" ;
+		~stack_index = 0 ;
 		
-		// json cannot be formatted for this to work correctly, so unformat/uglify it
-		~json = JSONDeleteElement ( ~json, Get ( UUID ) );
+		// Debug variables (uncomment the following line for tracing)
+		// ~debug_trace = "" ;
 
-		~valType = JSON.ValueType ( ~json );
-		~stack = 
-			Case (
-				~valType = "array" ;
-					While (
-						[
-							~tempStack = "" ;
-							~rootKeys = JSONListKeys ( ~json ; "." );
-							~numRootKeys = Min ( ValueCount ( ~rootKeys ) ; ~maxKeys );
-							~i = Max ( ~numRootKeys - 1 ; 0 );
-						~=""];
-						~i ≥ 0 ;
-						[
-							~tempStack = List ( ~tempStack ; "[" & ~i & "]" & ~pointerChar & JSONGetElement ( ~json ; ~i ) );
-							~i = ~i - 1 ;
-						~=""];
-						~tempStack
-					);
-
-				~valType = "object" ;
-					~pointerChar & ~json ;
-
-				""
-				);
-
-		// init variables
-		~debugLog = "" ;
-		~totalInstances = 0 ;
-		~keypaths_list = "" ;
-		~i = 0 ;
-
-	~=""];
+	~=""]; 
 
 	//// "while this is true" loop condition /////
-	ValueCount ( ~stack ) > 0 and ~i ≤ ~maxIterations ;
+	~stack_index = 0 or ~stack_index ≤ ValueCount ( ~stack ) ; 
 
 	//// logic ////////////////
-	[
-		~i = ~i + 1 ;
-		~current = GetValue ( ~stack ; 1 );
-		~stack = RightValues ( ~stack ; ValueCount ( ~stack ) - 1 );
-		~dPos = Position ( ~current ; ~pointerChar ; 1 ; 1 );
-		~currentPath = If ( ~dPos > 0 ; Left ( ~current ; ~dPos - 1 ) ; "" );
-		~currentNode = Middle ( ~current ; ~dPos + 1 ; Length ( ~current ) );
-		~valType = JSON.ValueType ( ~currentNode );
-		~instanceCount = 
-			// if value is NOT another JSON object or array
-			If ( ~valType <> "object" and ~valType <> "array" ; 
-				PatternCount ( 
-					JSONGetElement ( ~json ; ~currentPath ); 
-					~findStr 
-					);
+	[ 
 
-				// ELSE
-				0
-				); 
-		~totalInstances = ~totalInstances + ~instanceCount ;
+		~current_path = If ( ~stack_index = 0 ; "" ; GetValue ( ~stack ; ~stack_index ) ) ;
+		
+		// Early exit: if search string is empty, skip processing
+		~should_continue = not IsEmpty ( ~search_str ) ;
+		
+		// Cache element retrieval and type detection (Optimization #1 & #3)
+		~current_element = If ( ~should_continue ; 
+			If ( IsEmpty ( ~current_path ) ; ~json ; JSONGetElement ( ~json ; ~current_path ) ) ; 
+			"" 
+		) ;
+		~element_type = If ( ~should_continue ; 
+			If ( IsEmpty ( ~current_path ) ; 
+				// For root element, detect type from first character
+				If ( Left ( Trim ( ~json ) ; 1 ) = "[" ; JSONArray ; JSONObject ) ; 
+				JSONGetElementType ( ~json ; ~current_path )
+			) ; 
+			JSONRaw 
+		) ;
+		
+		// Debug trace (uncomment the following line to see processing steps)
+		// ~debug_trace = ~debug_trace & "Processing: " & ~current_path & " | Type: " & ~element_type & " | Element: " & Left ( ~current_element ; 50 ) & ¶ ;
+		
+		// Efficient type detection using JSONGetElementType() with named constants
+		~is_array = ~element_type = JSONArray ;
+		~is_object = ~element_type = JSONObject ;
+		~is_leaf_value = not ( ~is_array or ~is_object ) ;
+		
+		// Check if current element value contains the search string (only for leaf values)
+		~contains_search = If ( ~should_continue and ~is_leaf_value ; 
+			PatternCount ( ~current_element ; ~search_str ) > 0 ; 
+			False 
+		) ;
+		~results = If ( ~contains_search ; List ( ~results ; ~current_path ) ; ~results ) ;
+		
+		// Add child paths to stack for arrays and objects (Optimization #4 - combined logic)
+		~new_paths = Case (
+			not ~should_continue ; "" ;
+			
+			~is_array ;
+				While ( 
+					[
+						~arr_index = 0 ;
+						~arr_count = JSONListValues ( ~current_element ; "" ) ;
+						~arr_count_num = ValueCount ( ~arr_count );
+						~paths_batch = "" ;
+					~=""];
+					~arr_index < ~arr_count_num ;
+					[
+						~path_to_add = If ( IsEmpty ( ~current_path ) ; 
+							"[" & ~arr_index & "]" ; 
+							~current_path & ".[" & ~arr_index & "]" 
+						);
+						~paths_batch = List ( ~paths_batch ; ~path_to_add );
+						~arr_index = ~arr_index + 1 ;
+					~=""];
+					~paths_batch
+				) ;
+			
+			~is_object ;
+				While ( 
+					[
+						~obj_keys = JSONListKeys ( ~current_element ; "" );
+						~key_index = 1 ;
+						~key_count = ValueCount ( ~obj_keys );
+						~paths_batch = "" ;
+					~=""];
+					~key_index ≤ ~key_count ;
+					[
+						~key_name = GetValue ( ~obj_keys ; ~key_index ) ;
+						~path_to_add = If ( IsEmpty ( ~current_path ) ; 
+							~key_name ; 
+							~current_path & "." & ~key_name 
+						);
+						~paths_batch = List ( ~paths_batch ; ~path_to_add );
+						~key_index = ~key_index + 1 ;
+					~=""];
+					~paths_batch
+				) ;
+			
+			// Default case - leaf values don't add paths
+			""
+		) ;
+		
+		// Optimized stack update (Optimization #4)
+		~stack = If ( not IsEmpty ( ~new_paths ) ; List ( ~stack ; ~new_paths ) ; ~stack );
+		~stack_index = ~stack_index + 1 ;
 
-		// Debug: log the current key path on every iteration
-		/*
-		~debugLog = List ( ~debugLog ; "" & ~instanceCount & " >> Current Path: " & ~currentPath ) ;
-		~debugLog = 
-			If ( ~instanceCount > 0 ;
-				List ( ~debugLog ; "Match Found - Path: " & ~currentPath & " | Count: " & ~instanceCount & " | Value: " & ~currentNode ) ;
-				~debugLog
-			) ;
-		*/
-
-		~keypaths_list = 
-			If ( ~instanceCount > 0 ;
-				List ( ~currentPath ; ~keypaths_list ) ;
-				~keypaths_list
-			);
-
-		~stack =
-			Case (
-				~valType = "array" ;
-					While (
-						[
-							~keys = JSONListKeys ( ~currentNode ; "." );
-							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
-							~k = Max ( ~numKeys - 1 ; 0 );
-							~childStack = ~stack ;
-							~i_subLoop1 = 0 ;
-						~=""];
-						~k ≥ 0 and ~i_subLoop1 ≤ ~maxIterations ;
-						[
-							~i_subLoop1 = ~i_subLoop1 + 1 ;
-							~elem = JSONGetElement ( ~currentNode ; ~k );
-							~newPath = If ( ~currentPath = "" ; "[" & ~k & "]" ; ~currentPath & ".[" & ~k & "]" );
-							~childStack = List ( ~newPath & ~pointerChar & ~elem ;  ~childStack );
-							~k = ~k - 1 ;
-						~=""];
-						~childStack
-					);
-				
-				~valType = "object" ;
-					While (
-						[
-							~keys = JSONListKeys ( ~currentNode ; "." );
-							~numKeys = Min ( ValueCount ( ~keys ) ; ~maxKeys );
-							~j = Max ( ~numKeys ; 0 );
-							~childStack = ~stack ;
-							~i_subLoop2 = 0 ;
-						~=""];
-						~j > 0 and ~i_subLoop2 ≤ ~maxIterations ;
-						[
-							~i_subLoop2 = ~i_subLoop2 + 1 ;
-							~key = GetValue ( ~keys ; ~j );
-							~newPath = If ( ~currentPath = "" ; ~key ; ~currentPath & "." & ~key );
-							~child = JSONGetElement ( ~currentNode ; ~key );
-							~childStack = List ( ~newPath & ~pointerChar & ~child ;  ~childStack );
-							~j = ~j - 1 ;
-						~=""];
-						~childStack
-					);
-				
-				~stack
-
-			);
-
-	~=""];
+	~=""]; 
 
 	//// result ///////////////
+	If ( IsEmpty ( ~results ) ; "" ; ~results )
+	
+	// Debug output (uncomment the following line to see debug trace)
+	// "RESULTS:" & ¶ & If ( IsEmpty ( ~results ) ; "(none)" ; ~results ) & ¶ & ¶ & "DEBUG TRACE:" & ¶ & ~debug_trace
 
-	// Debug:
-	//"Total Instances: " & ~totalInstances & ¶ & "Debug Log:" & ¶ & ~debugLog & ¶ & "¶¶Results:" & ¶ & 
-
-	~keypaths_list
-
-)
+) 

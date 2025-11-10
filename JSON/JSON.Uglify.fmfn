@@ -8,10 +8,22 @@
  * 
  * @module JSON
  * 
- * @version 1.0.3
+ * @version 1.1.0
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
 
 
-JSONDeleteElement ( json ; Get ( UUID ) )
+Let ([
+
+	~json = json;
+	~validate = JSONFormatElements ( ~json );
+
+~=""];
+
+If ( Left ( ~validate; 1 ) ≠ "?" ; 
+	JSONDeleteElement ( json ; Get ( UUID ) ) ; 
+	~json 
+	)
+
+)

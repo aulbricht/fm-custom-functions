@@ -9,7 +9,7 @@
  *
  * @module Performance (Perf)
  * 
- * @version 2.1.0
+ * @version 2.2.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -25,10 +25,12 @@ Let ([
 
 
 	~tag_converted = Filter ( Base64Encode ( ~tag ) ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
+	~scope_tempVar = "$" ;
 	~varName_temp = "performance." & ~tag_converted ;
 
 	~end_ms = Get ( CurrentTimeUTCMilliseconds );
-	~start_ms = Let ( ~v = Evaluate ( "$$" & ~varName_temp ); If ( IsEmpty ( ~v ); ~end_ms ; ~v ) );
+	~start_ms = Let ( ~v = Evaluate ( ~scope_tempVar & ~varName_temp ); If ( IsEmpty ( ~v ) ; ~end_ms ; ~v ) );
+	~_void = Evaluate ( "Let ( " & ~scope_tempVar & ~varName_temp & "=\"\" ; \"\" )" ); // clear the temporary tag variable
 	~elapsed_ms = ~end_ms - ~start_ms ;
 
 	~objScope = Filter ( ~arrayVarName ; "$" );
@@ -46,7 +48,8 @@ Let ([
 					[ \"{{key}}.elapsed_s\" ; {{elapsed_s}} ; JSONNumber ];¶
 					[ \"{{key}}.end_ms\" ; {{end_ms}} ; JSONNumber ];¶
 					[ \"{{key}}.script\" ; \"{{script}}\" ; JSONString ];¶
-					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ]¶
+					[ \"{{key}}.start_ms\" ; {{start_ms}} ; JSONNumber ];¶
+					[ \"{{key}}.tag\" ; \"{{tag}}\" ; JSONString ]¶
 					);¶
 			~=\"\"]; \"\" )";
 	~evalStr = 
@@ -59,10 +62,9 @@ Let ([
 			[ "{{objectVar}}" ; ~objectVar ];
 			[ "{{objVarValue}}" ; Quote ( ~objectVarValue ) ];
 			[ "{{script}}" ; Get ( ScriptName ) ];
-			[ "{{start_ms}}" ; ~start_ms ]
+			[ "{{start_ms}}" ; ~start_ms ];
+			[ "{{tag}}" ; ~tag ]
 			);
-
-	~_void = Evaluate ( "Let ( $$" & ~varName_temp & "=\"\" ; \"\" )" ); // clear the temporary tag variable
 
 	~evalResult = EvaluationError ( Evaluate ( ~evalStr ) );
 

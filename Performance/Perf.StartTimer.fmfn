@@ -6,7 +6,7 @@
  *
  * @module Performance (Perf)
  * 
- * @version 1.1.0
+ * @version 1.1.1
  * @author Allen Ulbricht, https://github.com/aulbricht
  *
  */
@@ -17,8 +17,9 @@ Let ([
 	~tag = tag ;
 
 	~tag_converted = Filter ( Base64Encode ( ~tag ) ; "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
+	~scope_tempVar = "$" ;
 	~varName_temp = "performance." & ~tag_converted ;
-	~subStr = "Let( $${{tagVar}} = {{value}} ; \"\")";
+	~subStr = "Let( " & ~scope_tempVar & "{{tagVar}} = {{value}} ; \"\")";
 	~evalStr = 
 		Substitute ( ~subStr ;
 			[ "{{tagVar}}" ; ~varName_temp ];
