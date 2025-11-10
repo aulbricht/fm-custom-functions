@@ -1,7 +1,7 @@
 /**
  * 
  * Merge or Concatenate two JSON arrays of JSON Objects: 
- *	1. Attempt to merge each cell of Array_2 into Array_2 by comparing the given 
+ *	1. Attempt to merge each cell of Array_2 into Array_1 by comparing the given match key
  *	2. If the value of the given match key is the same in a cell in Array_1 and Array_2, overwrite that cell in Array_1 with the contents of that cell in Array_2
  *	3. If there is no match found, then concatenate the cell from Array_2 onto the end of Array_1
  *
