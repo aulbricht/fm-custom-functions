@@ -1,0 +1,46 @@
+/**
+ *
+ * For a given HTML string, strip the HTML and count the content words
+ *
+ * @param {text} content
+ *  
+ * @returnSuccess {number} word count
+ * 
+ * @module Parse
+ * 
+ * @version 1.0.0
+ * @author Allen Ulbricht, https://github.com/aulbricht
+ *
+ */
+
+While (
+	[ 
+		// abstract params
+		~content = M_AVE__ArticleVersion::content ;
+
+		~cleanedText = Substitute ( ~content ; 
+			[ "&nbsp;" ; " " ] ;
+			[ "&amp;" ; "&" ] ;
+			[ "&lt;" ; "<" ] ;
+			[ "&gt;" ; ">" ] ;
+			[ "&quot;" ; "\"" ] ;
+			[ "&#39;" ; "'" ]
+			);
+
+        ~text = ~cleanedText ;
+        ~startPos = Position ( ~text ; "<" ; 1 ; 1 )
+	];
+      
+	~startPos > 0 ;
+      
+	[
+		~endPos = Position ( ~text ; ">" ; ~startPos ; 1 ) ;
+		~text = Left ( ~text ; ~startPos - 1 ) 
+				& " " // added in to make sure there is space surrounding punctuation, etc
+				& Middle ( ~text ; ~endPos + 1 ; Length ( ~text ) );
+		~startPos = Position ( ~text ; "<" ; 1 ; 1 )
+	];
+
+	Wordcount ( ~text )
+
+	)
